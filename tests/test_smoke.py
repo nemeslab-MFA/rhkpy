@@ -93,6 +93,14 @@ def test_navigation_plot_spec_false(loaded_fixtures):
 	assert len(plot) == _expected_navigation_layers(args, plot_spec = False)
 
 
+def test_navigation_nothing_to_plot(loaded_fixtures, capsys):
+	"""No image and no spectrum positions: a message instead of a crash."""
+	import rhkpy
+	spec = _first(loaded_fixtures, 'spec')
+	assert rhkpy.navigation(spec, plot_spec = False) is None
+	assert 'Nothing to plot' in capsys.readouterr().out
+
+
 def test_navigation_spec_positions_only(loaded_fixtures):
 	"""A single spectrum with no image data plots just its tip position."""
 	import rhkpy

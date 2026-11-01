@@ -120,7 +120,11 @@ def navigation(*args, **kwargs):
 		if value in ('map', 'line', 'spec'):
 			indices_spec += [index]
 	# indices_topo = [index for index, value in enumerate(datatypes) if value in ('map', 'image')]
-	
+
+	if indices_topo == [] and (plot_spec is not True or indices_spec == []):
+		print('Nothing to plot: the rhkdata instances have no images, and spectrum positions are not requested.')
+		return
+
 	# plot those images
 	# get a color map for the bounding boxes
 	from bokeh.palettes import all_palettes
