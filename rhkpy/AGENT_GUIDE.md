@@ -45,9 +45,26 @@ Don't use `qplot()` here: it returns an interactive widget that is only useful i
 - `line`: the sweep, `dist` (nm along the line), `repetitions`, the scan direction
 - `spec`: the sweep, `repetitions`, the scan direction
 
-`iv` spectra have data variables `lia` and `current`; `iz` spectra have only `current`, in pA. `x` and `y` hold the tip positions in nm. `lia` is the lock-in signal, which is proportional to dI/dV; its `pA` label is not a calibrated conductance.
+`iv` spectra have data variables `lia` and `current`; `iz` spectra have only `current`, in pA. `x` and `y` hold the measured tip positions in nm, with a flip on maps: see "Tip positions on maps" below. `lia` is the lock-in signal, which is proportional to dI/dV; its `pA` label is not a calibrated conductance. The first scan direction entry (`left` or `up`) is the first sweep of each pair.
 
-Measurement settings are in the `attrs` of each Dataset, for example `data.spectra.attrs['setpoint']`.
+Measurement settings are in the `attrs` of each Dataset, for example `data.spectra.attrs['setpoint']`. Everything else the instrument stored is in `data.spymdata[page].attrs`. Files don't record the temperature, magnetic field or sample as such; filenames sometimes do.
+
+### Tip positions on maps
+
+The spectra in a map are flipped along both position axes to line up with the topography, but `x` and `y` are not. The tip position of the spectrum at `[i, j]` is therefore at `[-1 - i, -1 - j]` in `x` and `y`:
+
+```python
+import rhkpy
+
+spectra = rhkpy.rhkdata('map.sm4').spectra
+lia = spectra.lia.transpose('bias', 'specpos_y', 'specpos_x', 'repetitions', 'biasscandir')
+x = spectra.x.transpose('specpos_y', 'specpos_x').values
+y = spectra.y.transpose('specpos_y', 'specpos_x').values
+i, j = 3, 5
+print('spectrum', lia.shape, 'measured at', x[-1 - i, -1 - j], y[-1 - i, -1 - j])
+```
+
+`specpos_x` and `specpos_y` are the coordinates to use for selecting and plotting. They are the image offset plus the pixel positions, with no scan rotation applied, so on a rotated scan they differ from the measured tip positions. Sections from `rhkpy.mapsection` interpolate `x` and `y` the same way as the data, so they carry the same flip.
 
 ## Working with the data
 
@@ -89,7 +106,7 @@ fit = rhkpy.peakfit(near_zero, stval = {'x0': 0.0, 'ampl': 5.0, 'width': 0.1})
 print(fit.curvefit_coefficients)
 ```
 
-Images are flattened on loading; pass `loadraw = True` to `rhkdata` for the raw topography. Image coordinates start at 0, while `specpos_x` and `specpos_y` are absolute tip positions, so use `coord_to_absolute()` to compare them. It takes scan rotation into account:
+Topography is flattened on loading, while `current` and `lia` are left as they are; pass `loadraw = True` to `rhkdata` for the raw topography. Image coordinates start at 0, while `specpos_x` and `specpos_y` include the image offset, so use `coord_to_absolute()` to compare them. It takes scan rotation into account:
 
 ```python
 import rhkpy
@@ -99,6 +116,8 @@ flat, background = rhkpy.plane(raw.image.topography.sel(scandir = 'forward').val
 absolute = rhkpy.rhkdata('map.sm4').coord_to_absolute()
 print(absolute.image.x.min().item(), absolute.image.x.max().item())
 ```
+
+`rhkpy.peakfit` fits a Gaussian by default, and `width` means the full width at half maximum.
 
 Other functions: `rhkpy.align`, `rhkpy.fixzero` and `rhkpy.destripe` level images, `rhkpy.polyflatten` flattens image Datasets, `rhkpy.bgsubtract` removes spectral backgrounds, and `rhkpy.navigation` plots where measurements were taken. Check `help(rhkpy.<name>)` for each.
 
@@ -117,6 +136,9 @@ Warnings go to stderr through the `rhkpy` logger, so stdout stays clean. `rhkpy.
 
 - **Scan direction labels can be assumptions.** A file with one spectrum per tip position loads with a single scan direction, labelled like the first sweep of an alternating measurement. That label isn't a measured direction.
 - **`alternate = False` mixes sweeps if the file alternates.** Every sweep then counts as a repetition. Leave it at its default unless you know the measurement used one direction.
+- **Modulation limits resolution.** A lock-in amplitude well above the sweep step broadens every feature in `lia`, so check `spectra.lock_in` in the summary before reading widths.
+- **An image's `lia` can be empty.** If the lock-in wasn't modulating during imaging, `image.lia` is only noise around zero, even when the spectra in the same file are fine. Look at its range before using it.
+- **`time_per_point` isn't a reliable dwell time for spectra.** It is `RHK_Period`, which was 0.1 ms in every spectroscopy test file whatever the settings.
 - **Older files.** Files written by RHK Rev versions before 6 give a warning and are less tested. Their spectrum type is taken from the sweep axis units if the declared line type disagrees.
 - **Unsupported spectroscopy.** Other line types, such as time spectroscopy, load without `spectra`, with a warning and a note in the summary.
 - **`load_spym` and `load_dataset` return `None` for an invalid file**, instead of raising. Prefer `rhkdata`.

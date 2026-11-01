@@ -6,6 +6,7 @@ so it works with no display and doesn't change any global plotting state.
 """
 
 import colorcet
+import numpy as np
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 from matplotlib.figure import Figure
 
@@ -15,7 +16,7 @@ _CMAP_SPEC = 'viridis'
 
 #: what to plot from the spectra, per spectype
 _SWEEPS = {
-	'iv': dict(sweep_dim = 'bias', scandir_dim = 'biasscandir', signal = 'lia', name = 'bias', unit = 'V', signal_label = 'dI/dV (pA)'),
+	'iv': dict(sweep_dim = 'bias', scandir_dim = 'biasscandir', signal = 'lia', name = 'bias', unit = 'V', signal_label = 'lia, dI/dV signal (pA)'),
 	'iz': dict(sweep_dim = 'z', scandir_dim = 'zscandir', signal = 'current', name = 'z', unit = 'nm', signal_label = 'current (pA)'),
 }
 
@@ -27,18 +28,20 @@ def _half_step(values):
 
 def _show_image(ax, dataarray, x, y, cmap, label, title):
 	"""Density plot of a 2D DataArray, with the dims selected by name and both axes
-	ascending. Bias sweeps are often stored high to low."""
+	ascending. Bias sweeps are often stored high to low. The color scale covers the
+	1st to 99th percentile, so that a few outlier pixels don't hide everything else."""
 	data = dataarray.transpose(y, x).sortby([y, x])
 	xvalues = data[x].values
 	yvalues = data[y].values
 	xstep = _half_step(xvalues)
 	ystep = _half_step(yvalues)
+	vmin, vmax = np.nanpercentile(data.values, [1, 99])
 	image = ax.imshow(
-		data.values, origin = 'lower', cmap = cmap, aspect = 'auto',
+		data.values, origin = 'lower', cmap = cmap, aspect = 'auto', vmin = vmin, vmax = vmax,
 		extent = (xvalues[0] - xstep, xvalues[-1] + xstep, yvalues[0] - ystep, yvalues[-1] + ystep),
 	)
 	ax.set_title(title)
-	ax.figure.colorbar(image, ax = ax, label = label)
+	ax.figure.colorbar(image, ax = ax, label = label, extend = 'both')
 	return image
 
 
@@ -47,8 +50,8 @@ def _show_scan(ax, rhkdata_obj, channel, cmap, title):
 	the tip moves in while the spectra are measured."""
 	dataarray = rhkdata_obj.image[channel].sel(scandir = 'backward')
 	_show_image(ax, dataarray, 'x', 'y', cmap, f'{channel} ({dataarray.attrs["units"]})', title)
-	ax.set_xlabel('x (nm)')
-	ax.set_ylabel('y (nm)')
+	ax.set_xlabel('x (nm, from the image corner)')
+	ax.set_ylabel('y (nm, from the image corner)')
 	ax.set_aspect('equal')
 
 
@@ -91,8 +94,8 @@ def _draw_map(rhkdata_obj, figure, at):
 	# rounding and adding zero, so that a value that is really 0 doesn't print as -2.37e-08 or -0
 	title = f'map at {sweep["name"]} = {round(value, 6) + 0.0:.4g} {sweep["unit"]}'
 	_show_image(axes[1], mean.isel({sweep_dim: index}), 'specpos_x', 'specpos_y', _CMAP_SPEC, sweep['signal_label'], title)
-	axes[1].set_xlabel('x (nm)')
-	axes[1].set_ylabel('y (nm)')
+	axes[1].set_xlabel('specpos_x (nm)')
+	axes[1].set_ylabel('specpos_y (nm)')
 	axes[1].set_aspect('equal')
 
 	average = mean.mean(dim = ['specpos_x', 'specpos_y'])
@@ -123,7 +126,7 @@ def _draw_line(rhkdata_obj, figure, at):
 def _draw_spec(rhkdata_obj, figure, at):
 	sweep = _SWEEPS[rhkdata_obj.spectype]
 	xlabel = f'{sweep["name"]} ({sweep["unit"]})'
-	channels = [('lia', 'dI/dV (pA)', 'dI/dV'), ('current', 'current (pA)', 'current')] if sweep['signal'] == 'lia' else [('current', 'current (pA)', 'current')]
+	channels = [('lia', 'lia, dI/dV signal (pA)', 'dI/dV'), ('current', 'current (pA)', 'current')] if sweep['signal'] == 'lia' else [('current', 'current (pA)', 'current')]
 	axes = figure.subplots(1, len(channels), squeeze = False)[0]
 	for ax, (channel, label, title) in zip(axes, channels):
 		_sweep_lines(ax, rhkdata_obj.spectra[channel], sweep['sweep_dim'], sweep['scandir_dim'], xlabel, label)
@@ -141,6 +144,8 @@ def _title(rhkdata_obj):
 	title = f'{dataset.attrs["filename"]} ({kind})'
 	if 'bias' in dataset.attrs and 'setpoint' in dataset.attrs:
 		title += f'\nbias {float(dataset.attrs["bias"]):.3g} V, setpoint {float(dataset.attrs["setpoint"]):.4g} pA'
+		if rhkdata_obj.spectype == 'iv' and 'LI amplitude' in dataset.attrs:
+			title += f', lock-in {float(dataset.attrs["LI amplitude"]):.3g} mV'
 	return title
 
 

@@ -61,7 +61,6 @@ def _spectra_summary(spectra):
 			'x': [_number(spectra['x'].min()), _number(spectra['x'].max())],
 			'y': [_number(spectra['y'].min()), _number(spectra['y'].max())],
 		},
-		'time_per_point_s': _number(spectra['current'].attrs.get('time_per_point'), 9),
 		'lock_in': None,
 	}
 	if 'LI frequency' in attrs:

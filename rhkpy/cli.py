@@ -34,6 +34,9 @@ def _summary_text(summary):
 		sweep = spectra['sweep']
 		lines.append('spectra: ' + ', '.join(f'{dim} {size}' for dim, size in spectra['sizes'].items()))
 		lines.append(f'sweep: {sweep["name"]} {sweep["start"]} to {sweep["stop"]} {sweep["units"]}, {sweep["points"]} points')
+		lock_in = spectra['lock_in']
+		if lock_in is not None:
+			lines.append(f'lock-in: {lock_in["amplitude_mV"]} mV, {lock_in["frequency_Hz"]} Hz')
 	lines += [f'note: {note}' for note in summary['notes']]
 	return '\n'.join(lines)
 

@@ -121,3 +121,8 @@ def test_preview_default_name_is_in_the_current_folder(tmp_path):
 def test_preview_bad_output_folder(tmp_path):
 	_need(MAP_FILE)
 	assert _run('preview', MAP_FILE, '-o', tmp_path / 'no' / 'out.png').returncode == 1
+
+
+def test_info_text_shows_lock_in():
+	_need(MAP_FILE)
+	assert 'lock-in: ' in _run('info', MAP_FILE).stdout

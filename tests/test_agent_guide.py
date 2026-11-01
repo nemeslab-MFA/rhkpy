@@ -5,6 +5,7 @@ run against real files, and every name it mentions exists.
 import re
 import shutil
 
+import numpy as np
 import pytest
 
 import rhkpy
@@ -48,3 +49,30 @@ def test_mentioned_methods_exist():
 
 def test_help_points_to_the_guide():
 	assert 'rhkpy.agent_guide()' in rhkpy.__doc__
+
+
+@pytest.mark.parametrize('fixture', [
+	'dI-dV_ABC_Graphite-Sample5_9K_2021_08_24_11_54_33_632.sm4',
+	'Iz_map_Stripes-9K-HOPG-SPI2-3_2021_09_08_11_21_03_743.sm4',
+])
+def test_map_tip_position_flip(fixture):
+	"""The relation the guide states: the spectrum at [i, j] was measured at
+	[-1 - i, -1 - j] of x and y. Checked against the raw columns and coordinates."""
+	if not (TESTDATA_DIR / fixture).is_file():
+		pytest.skip(f'{fixture} not present in test/ (local-only, proprietary data)')
+	data = rhkpy.rhkdata(str(TESTDATA_DIR / fixture))
+	spectra = data.spectra
+	scandir = 'biasscandir' if 'biasscandir' in spectra.dims else 'zscandir'
+	sweep = 'bias' if scandir == 'biasscandir' else 'z'
+	current = spectra.current.isel(repetitions = 0).isel({scandir: 0}).transpose(sweep, 'specpos_y', 'specpos_x').values
+	x = spectra.x.transpose('specpos_y', 'specpos_x').values
+	y = spectra.y.transpose('specpos_y', 'specpos_x').values
+	raw = data.spymdata.Current
+	raw_x = np.array(raw.attrs['RHK_SpecDrift_Xcoord']) * 10**9
+	raw_y = np.array(raw.attrs['RHK_SpecDrift_Ycoord']) * 10**9
+	# the same spectrum, found in the raw columns, tells where it was measured
+	i, j = 3, 5
+	matches = [k for k in range(raw.data.shape[1]) if np.allclose(raw.data[:, k] * 10**12, current[:, i, j])]
+	assert len(matches) == 1
+	np.testing.assert_allclose(x[-1 - i, -1 - j], raw_x[matches[0]], rtol = 1e-5)
+	np.testing.assert_allclose(y[-1 - i, -1 - j], raw_y[matches[0]], rtol = 1e-5)
