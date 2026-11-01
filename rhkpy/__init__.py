@@ -20,6 +20,8 @@ import logging
 from bokeh.util import logconfig
 # Suppress Bokeh's warnings
 logconfig.basicConfig(level=logging.ERROR)
+# this also sets the level of the root logger, so rhkpy's own warnings need their own level
+logging.getLogger('rhkpy').setLevel(logging.WARNING)
 
 import warnings
 # suppress holoviews warnings

@@ -12,12 +12,16 @@ function. To add support for a new measurement type:
 5. add a quick plot layout in :mod:`rhkpy.plotting.quickplot`.
 """
 
+import logging
+
 from ..analysis.ops import polyflatten
 
 from .detect import _checkrepetitions, _checkdatatype, _aspect_ratio, _get_filename, _is_single_sweep
 from .spectra import _xr_map_iv, _xr_line_iv, _xr_spec_iv, _xr_map_iz, _xr_line_iz, _xr_spec_iz
 from .image import _xr_image, _xr_image_line
 from .metadata import _add_map_metadata, _add_line_metadata, _add_spec_metadata, _add_image_metadata
+
+_logger = logging.getLogger('rhkpy')
 
 #: (datatype, spectype) -> (spectra builder, metadata function)
 _BUILDER_REGISTRY = {
@@ -33,8 +37,15 @@ _BUILDER_REGISTRY = {
 
 def _build_spectra(stmdata_object):
 	"""Build the `spectra` Dataset and attach its metadata, dispatching on
-	(datatype, spectype) through the registry."""
+	(datatype, spectype) through the registry. Spectroscopy types that aren't in
+	the registry (e.g. time spectroscopy) are loaded without a `spectra` Dataset."""
 	key = (stmdata_object.datatype, stmdata_object.spectype)
+	if key not in _BUILDER_REGISTRY:
+		_logger.warning(
+			'%s: spectra with line type %s are not supported, loading the file without `spectra`.',
+			_get_filename(stmdata_object.filename), stmdata_object.spymdata.Current.attrs['RHK_LineTypeName'],
+		)
+		return stmdata_object
 	builder, add_metadata = _BUILDER_REGISTRY[key]
 	stmdata_object = builder(stmdata_object)
 	stmdata_object = add_metadata(stmdata_object)

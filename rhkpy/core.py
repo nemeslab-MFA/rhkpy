@@ -121,7 +121,7 @@ class rhkdata:
 		self.datatype, self.spectype = _checkdatatype(self)
 
 		# one spectrum per tip position leaves no second sweep to separate
-		if self.datatype != 'image' and self.alternate and _is_single_sweep(self):
+		if self.datatype in ('map', 'line', 'spec') and self.alternate and _is_single_sweep(self):
 			_logger.warning('%s has one spectrum per tip position, loading it with alternate = False.', _get_filename(self.filename))
 			self.alternate = False
 
