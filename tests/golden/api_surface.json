@@ -164,7 +164,8 @@
    "msw": "(self)",
    "polyflatten": "(self, **kwargs)",
    "print_info": "(self)",
-   "qplot": "(self, width=None, **kwargs)"
+   "qplot": "(self, width=None, **kwargs)",
+   "summary": "(self)"
   }
  },
  "rhkpy_loader": {
@@ -178,6 +179,14 @@
  "rhksm4": {
   "kind": "module",
   "name": "rhkpy.io.sm4"
+ },
+ "scan": {
+  "kind": "function",
+  "signature": "(folder='./', recursive=False)"
+ },
+ "summary": {
+  "kind": "module",
+  "name": "rhkpy.summary"
  },
  "version": {
   "kind": "module",

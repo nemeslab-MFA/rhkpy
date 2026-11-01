@@ -18,6 +18,7 @@ import numpy as _np
 from .io import load_spym
 from .builders import _load_specmap, _load_line, _load_spec, _load_image
 from .builders.detect import _checkdatatype, _checkrepetitions, _is_single_sweep, _may_alternate, _get_filename
+from . import summary as _summary
 from .analysis import ops as _ops
 from .plotting import quickplot as _quickplot
 
@@ -161,6 +162,33 @@ class rhkdata:
 			self = _load_spec(self)
 		elif self.datatype == 'image':
 			self = _load_image(self)
+
+	def __repr__(self):
+		parts = [repr(self.filename), f'datatype={self.datatype!r}', f'spectype={self.spectype!r}']
+		if 'image' in self.__dict__:
+			parts.append(f'image={dict(self.image.sizes)}')
+		if 'spectra' in self.__dict__:
+			parts.append(f'spectra={dict(self.spectra.sizes)}')
+		return f'rhkdata({", ".join(parts)})'
+
+	def summary(self):
+		"""What this measurement contains, as a dict of plain Python values, ready for :py:func:`json.dumps`.
+		Includes the measurement type, date, bias, setpoint and the shape, ranges and units of the `image` and `spectra` Datasets.
+		The 'notes' entry lists anything that changes how the data should be read, for example if the sweep direction label is an assumption.
+
+		:return: description of the measurement. The 'image' and 'spectra' entries are `None` if the file doesn't have them.
+		:rtype: dict
+
+		:Example:
+
+			.. code-block:: python
+
+				import rhkpy
+
+				info = rhkpy.rhkdata('filename.sm4').summary()
+				print(info['datatype'], info['spectype'], info['setpoint_pA'])
+		"""
+		return _summary.summarize(self)
 
 	def mrep(self):
 		"""Returns a new instance of :class:`rhkdata`, with the data averaged (using :py:mod:`xarray.Variable.mean`) along the 'repetitions' coordinate.
