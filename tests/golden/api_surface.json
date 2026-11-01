@@ -1,4 +1,8 @@
 {
+ "agent_guide": {
+  "kind": "function",
+  "signature": "()"
+ },
  "align": {
   "kind": "function",
   "signature": "(image, baseline='mean', axis=1, poly_degree=2)"
@@ -62,6 +66,10 @@
  "glob": {
   "kind": "module",
   "name": "glob"
+ },
+ "guide": {
+  "kind": "module",
+  "name": "rhkpy.guide"
  },
  "hv": {
   "kind": "module",
@@ -163,8 +171,10 @@
    "mrep": "(self)",
    "msw": "(self)",
    "polyflatten": "(self, **kwargs)",
+   "preview": "(self, path=None, dpi=150, at=None)",
    "print_info": "(self)",
-   "qplot": "(self, width=None, **kwargs)"
+   "qplot": "(self, width=None, **kwargs)",
+   "summary": "(self)"
   }
  },
  "rhkpy_loader": {
@@ -178,6 +188,14 @@
  "rhksm4": {
   "kind": "module",
   "name": "rhkpy.io.sm4"
+ },
+ "scan": {
+  "kind": "function",
+  "signature": "(folder='./', recursive=False)"
+ },
+ "summary": {
+  "kind": "module",
+  "name": "rhkpy.summary"
  },
  "version": {
   "kind": "module",

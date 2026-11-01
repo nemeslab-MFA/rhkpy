@@ -54,7 +54,11 @@ are the responsibility of the local hooks.
 - `rhkpy/analysis/` — fitting (`fitting.py`), Dataset operations (`ops.py`),
   image leveling (`level.py`).
 - `rhkpy/plotting/` — `quickplot.py` (the `qplot` panels and its layout
-  registry), `navigation.py`, `thumbnails.py`.
+  registry), `preview.py` (static matplotlib pictures), `navigation.py`,
+  `thumbnails.py`.
+- `rhkpy/summary.py`, `rhkpy/cli.py`, `rhkpy/guide.py` with `AGENT_GUIDE.md` — use
+  without a notebook: JSON-ready summaries, the command line tool, and the guide
+  for scripts and AI agents. Keep the guide true; its examples run as tests.
 - `rhkpy/rhkpy_loader.py`, `rhkpy/rhkpy_process.py` — backward-compatibility
   shims re-exporting the historical names. Do not add new code here.
 - `spym/` — legacy vendored copy of the spym project, used ONLY by
@@ -97,8 +101,9 @@ Supporting a new `(datatype, spectype)` combination is registry work:
 
 ## Conventions
 
-- Load-time diagnostics go through `logging.getLogger('rhkpy')`; prints are
-  reserved for user-facing command output (e.g. `print_info`, `genthumbs`
+- Failures raise exceptions, so that code using rhkpy can't miss them. Warnings
+  and other load-time diagnostics go through `logging.getLogger('rhkpy')`; prints
+  are reserved for user-facing command output (e.g. `print_info`, `genthumbs`
   progress).
 - Indentation: tabs (matching the existing code).
 - Historical quirks that the golden tests pin (e.g. the position-dim order of

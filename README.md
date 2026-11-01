@@ -1,6 +1,6 @@
 # RHK STM data analysis tool
 
-Based on the [spym project](https://github.com/rescipy-project/spym) (version 0.9.1).
+The sm4 reader is ported from the [spym project](https://github.com/rescipy-project/spym) (version 0.9.1).
 
 Documentation can be found here: https://zrbyte.github.io/rhkpy/
 
@@ -21,6 +21,8 @@ Peter Nemes-I., & Mirco Panighel. (2023). zrbyte/rhkpy: v1.3.3 (v1.3.3). Zenodo.
 - Generating thumbnails of your measurements (see [`genthumbs`](https://zrbyte.github.io/rhkpy/rhkpy.html#rhkpy.rhkpy_process.genthumbs))
 - Peak fitting (see [`peakfit`](https://zrbyte.github.io/rhkpy/rhkpy.html#rhkpy.rhkpy_process.peakfit))
 
+- Inspecting and picturing measurements without a notebook or browser (see [Scripts and AI agents](#scripts-and-ai-agents))
+
 ## Installation
 `pip install rhkpy`
 
@@ -39,5 +41,27 @@ rhkpy.genthumbs()
 ```
 
 Also take a look at the `demo.ipynb` and `tutorial.ipynb` Jupyter notebooks in this repository.
+
+## Scripts and AI agents
+`qplot` is interactive, so it needs a notebook. For scripts, servers and AI agents, rhkpy also has plain-data and static-picture equivalents:
+
+```python
+import rhkpy
+
+data = rhkpy.rhkdata('filename.sm4')
+data.summary()             # a JSON-ready dict: type, date, bias, setpoint, shapes, ranges, units
+data.preview('out.png')    # a picture, with no browser or display needed
+rhkpy.scan('folder/')      # summaries of every file in a folder
+```
+
+The same from a shell:
+
+```bash
+rhkpy info filename.sm4 --json
+rhkpy preview filename.sm4 -o out.png
+rhkpy scan folder/ --json
+```
+
+AI agents should start with `rhkpy guide` (or `rhkpy.agent_guide()` in Python), which covers the data model, errors and pitfalls. Agents changing rhkpy itself should read [AGENTS.md](AGENTS.md).
 
 To make the most of rhkpy, also consult the xarray documentation and check out plotting examples, with HoloViews. The HoloViews website has examples on how to customize plots, as well as tutorial notebooks.

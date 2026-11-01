@@ -24,8 +24,6 @@ from .io import sm4 as rhksm4
 ## flatten and plane fitting
 from .analysis.level import align
 from .analysis.level import plane
-from .analysis.level import fixzero
-from .analysis.level import destripe
 
 # for fancy plotting
 import hvplot.xarray

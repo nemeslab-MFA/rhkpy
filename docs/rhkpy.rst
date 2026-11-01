@@ -9,6 +9,17 @@ The rhkdata class
    :undoc-members:
    :show-inheritance:
 
+Summaries (rhkpy.summary)
+-------------------------
+
+.. automodule:: rhkpy.summary
+   :members: scan
+   :show-inheritance:
+
+.. automodule:: rhkpy.guide
+   :members:
+   :show-inheritance:
+
 File loading (rhkpy.io)
 -----------------------
 
@@ -45,6 +56,10 @@ Plotting (rhkpy.plotting)
 .. automodule:: rhkpy.plotting.quickplot
    :members:
    :undoc-members:
+   :show-inheritance:
+
+.. automodule:: rhkpy.plotting.preview
+   :members: preview
    :show-inheritance:
 
 .. automodule:: rhkpy.plotting.navigation

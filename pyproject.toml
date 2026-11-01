@@ -23,13 +23,17 @@ dependencies = [
 	"holoviews>=1.17.0",
 	"hvplot>=0.8.4",
 	"bokeh>=3.2.2",
+	"colorcet",
 	"panel>=1.2.1",
 	"selenium>=4.6",
 ]
 
 [project.urls]
 Homepage = "https://github.com/zrbyte/rhkpy"
-Documentation = "https://rhkpy.readthedocs.io"
+Documentation = "https://zrbyte.github.io/rhkpy/"
+
+[project.scripts]
+rhkpy = "rhkpy.cli:main"
 
 [project.optional-dependencies]
 test = ["pytest"]
@@ -38,6 +42,9 @@ test = ["pytest"]
 # (cross-validation of rhkpy.io.sm4); it is deliberately NOT packaged.
 [tool.setuptools.packages.find]
 include = ["rhkpy*"]
+
+[tool.setuptools.package-data]
+rhkpy = ["AGENT_GUIDE.md"]
 
 [tool.setuptools.dynamic]
 version = { attr = "rhkpy.version.__version__" }

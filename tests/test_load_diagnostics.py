@@ -69,6 +69,18 @@ def test_numpy_arguments_are_valid():
 	assert data.spectra.identical(rhkpy.rhkdata(path, repetitions = 1, alternate = True).spectra)
 
 
+def test_missing_file_raises():
+	with pytest.raises(FileNotFoundError, match = 'nope.sm4'):
+		rhkpy.rhkdata('nope.sm4')
+
+
+def test_invalid_file_raises(tmp_path):
+	path = tmp_path / 'corrupt.sm4'
+	path.write_bytes(b'not an sm4 file' * 20)
+	with pytest.raises(ValueError, match = 'corrupt.sm4'):
+		rhkpy.rhkdata(str(path))
+
+
 @pytest.mark.parametrize('name, datatype, has_image', [
 	('hopg_300k_2020_08_11_16_04_06_999.sm4', 'map', True),
 	(LINE_FILE, 'line', True),

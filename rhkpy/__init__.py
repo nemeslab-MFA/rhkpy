@@ -5,12 +5,18 @@ Load a measurement with :class:`~rhkpy.rhkpy_loader.rhkdata`, take a quick
 look with its ``qplot()`` method, and use the analysis functions (
 :func:`~rhkpy.rhkpy_process.peakfit`, :func:`~rhkpy.rhkpy_process.bgsubtract`,
 :func:`~rhkpy.rhkpy_process.polyflatten`, ...) on the underlying Datasets.
-See the tutorial notebook and https://rhkpy.readthedocs.io for examples.
+See the tutorial notebook and https://zrbyte.github.io/rhkpy/ for examples.
+
+For use from scripts and AI agents, without a notebook, read the guide:
+``print(rhkpy.agent_guide())``, or run ``rhkpy guide`` in a shell.
 """
 
 from .version import __version__
 from .rhkpy_loader import *
 from .rhkpy_process import *
+from .analysis.level import fixzero, destripe
+from .summary import scan
+from .guide import agent_guide
 
 import hvplot.xarray
 import holoviews as hv

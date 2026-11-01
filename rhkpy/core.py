@@ -11,13 +11,16 @@ The heavy lifting is delegated to the submodules:
 import copy
 import logging as _logging
 import numbers as _numbers
+import os as _os
 
 import numpy as _np
 
 from .io import load_spym
 from .builders import _load_specmap, _load_line, _load_spec, _load_image
 from .builders.detect import _checkdatatype, _checkrepetitions, _is_single_sweep, _may_alternate, _get_filename
+from . import summary as _summary
 from .analysis import ops as _ops
+from .plotting import preview as _preview
 from .plotting import quickplot as _quickplot
 
 _logger = _logging.getLogger('rhkpy')
@@ -112,10 +115,13 @@ class rhkdata:
 		# Boolean value, True if alternate scan directions is turned on
 		self.alternate = alternate
 
-		# Load the data using spym
+		if not _os.path.isfile(self.filename):
+			raise FileNotFoundError(f'No such file: {self.filename}')
+
+		# Load the data using the built-in sm4 reader
 		self.spymdata = load_spym(self.filename)
 		if self.spymdata is None:
-			return
+			raise ValueError(f'Could not read {self.filename}: it does not appear to be a valid sm4 file')
 
 		# check software version. Not tested for MinorVer < 6
 		l = list(self.spymdata.keys())
@@ -158,6 +164,58 @@ class rhkdata:
 		elif self.datatype == 'image':
 			self = _load_image(self)
 
+	def __repr__(self):
+		parts = [repr(self.filename), f'datatype={self.datatype!r}', f'spectype={self.spectype!r}']
+		if 'image' in self.__dict__:
+			parts.append(f'image={dict(self.image.sizes)}')
+		if 'spectra' in self.__dict__:
+			parts.append(f'spectra={dict(self.spectra.sizes)}')
+		return f'rhkdata({", ".join(parts)})'
+
+	def summary(self):
+		"""What this measurement contains, as a dict of plain Python values, ready for :py:func:`json.dumps`.
+		Includes the measurement type, date, bias, setpoint and the shape, ranges and units of the `image` and `spectra` Datasets.
+		The 'notes' entry lists anything that changes how the data should be read, for example if the sweep direction label is an assumption.
+
+		:return: description of the measurement. The 'image' and 'spectra' entries are `None` if the file doesn't have them.
+		:rtype: dict
+
+		:Example:
+
+			.. code-block:: python
+
+				import rhkpy
+
+				info = rhkpy.rhkdata('filename.sm4').summary()
+				print(info['datatype'], info['spectype'], info['setpoint_pA'])
+		"""
+		return _summary.summarize(self)
+
+	def preview(self, path = None, dpi = 150, at = None):
+		"""Draw a static picture of the measurement with :py:mod:`matplotlib`, optionally saving it to a file.
+		Unlike :meth:`qplot`, this needs no notebook, browser or display.
+		Maps, lines and images are averaged over the repetitions and scan directions; images show the backward scan direction, as :meth:`qplot` does.
+
+		:param path: file to save the picture to, for example 'out.png'. If `None`, nothing is saved, defaults to None
+		:type path: str, optional
+		:param dpi: resolution of the saved picture, defaults to 150
+		:type dpi: int, optional
+		:param at: for maps, the sweep value to show the map at: bias in V, or z in nm. If `None`, the middle of the sweep is used, defaults to None
+		:type at: float, optional
+
+		:return: the figure
+		:rtype: :py:class:`matplotlib.figure.Figure`
+
+		:Example:
+
+			.. code-block:: python
+
+				import rhkpy
+
+				rhkpy.rhkdata('map.sm4').preview('map.png', at = 0.1)
+		"""
+		return _preview.preview(self, path = path, dpi = dpi, at = at)
+
 	def mrep(self):
 		"""Returns a new instance of :class:`rhkdata`, with the data averaged (using :py:mod:`xarray.Variable.mean`) along the 'repetitions' coordinate.
 		Meant to be shorthand for: ``rhkdata_instance.spectra.mean(dim = 'repetitions')``.
@@ -167,8 +225,7 @@ class rhkdata:
 		"""
 		# function to take the mean along the repetitions coordinate
 		if self.datatype == 'image':
-			print('An image instance doesn\'t have repetitions.')
-			return
+			raise TypeError('An image instance doesn\'t have repetitions.')
 		newdata = copy.deepcopy(self)
 		newdata.spectra = newdata.spectra.mean(dim = 'repetitions')
 		return newdata
@@ -182,8 +239,7 @@ class rhkdata:
 		"""
 		# function to take the mean along the biasscan coordinate
 		if self.datatype == 'image':
-			print('An image instance doesn\'t have biasscandir or zscandir.')
-			return
+			raise TypeError('An image instance doesn\'t have biasscandir or zscandir.')
 		newdata = copy.deepcopy(self)
 		if self.spectype == 'iv':
 			newdata.spectra = newdata.spectra.mean(dim = 'biasscandir')
@@ -243,8 +299,7 @@ class rhkdata:
 		"""
 		# check if 'image' is present
 		if 'image' not in self.__dict__:
-			print('This `rhkdata` instance does not contain an image')
-			return
+			raise TypeError('This `rhkdata` instance does not contain an image')
 
 		# copy the current instance
 		rhkdataobj_new = copy.deepcopy(self)
@@ -264,8 +319,7 @@ class rhkdata:
 
 		# check if 'image' is present
 		if 'image' not in self.__dict__:
-			print('This `rhkdata` instance does not contain an image')
-			return
+			raise TypeError('This `rhkdata` instance does not contain an image')
 		# make a copy of the instance
 		flattened_rhkdataobj = copy.deepcopy(self)
 		# apply flatten to the copy
