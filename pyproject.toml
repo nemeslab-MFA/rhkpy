@@ -30,7 +30,7 @@ dependencies = [
 
 [project.urls]
 Homepage = "https://github.com/zrbyte/rhkpy"
-Documentation = "https://rhkpy.readthedocs.io"
+Documentation = "https://zrbyte.github.io/rhkpy/"
 
 [project.optional-dependencies]
 test = ["pytest"]
@@ -39,6 +39,9 @@ test = ["pytest"]
 # (cross-validation of rhkpy.io.sm4); it is deliberately NOT packaged.
 [tool.setuptools.packages.find]
 include = ["rhkpy*"]
+
+[tool.setuptools.package-data]
+rhkpy = ["AGENT_GUIDE.md"]
 
 [tool.setuptools.dynamic]
 version = { attr = "rhkpy.version.__version__" }

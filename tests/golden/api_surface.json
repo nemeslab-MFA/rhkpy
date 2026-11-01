@@ -1,4 +1,8 @@
 {
+ "agent_guide": {
+  "kind": "function",
+  "signature": "()"
+ },
  "align": {
   "kind": "function",
   "signature": "(image, baseline='mean', axis=1, poly_degree=2)"
@@ -62,6 +66,10 @@
  "glob": {
   "kind": "module",
   "name": "glob"
+ },
+ "guide": {
+  "kind": "module",
+  "name": "rhkpy.guide"
  },
  "hv": {
   "kind": "module",

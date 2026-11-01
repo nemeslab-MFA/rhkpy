@@ -36,6 +36,7 @@ from .rhkpy_process import *
 
 from .core import rhkdata
 from .summary import scan
+from .guide import agent_guide
 from .io import load_rhksm4, load_spym
 
 # internal helpers, re-exported for backward compatibility of private imports
