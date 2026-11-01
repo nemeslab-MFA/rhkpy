@@ -24,8 +24,6 @@ from .io import sm4 as rhksm4
 ## flatten and plane fitting
 from .analysis.level import align
 from .analysis.level import plane
-from .analysis.level import fixzero
-from .analysis.level import destripe
 
 # for fancy plotting
 import hvplot.xarray
@@ -35,8 +33,6 @@ import panel as pn
 from .rhkpy_process import *
 
 from .core import rhkdata
-from .summary import scan
-from .guide import agent_guide
 from .io import load_rhksm4, load_spym
 
 # internal helpers, re-exported for backward compatibility of private imports

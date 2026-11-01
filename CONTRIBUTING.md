@@ -54,7 +54,11 @@ are the responsibility of the local hooks.
 - `rhkpy/analysis/` — fitting (`fitting.py`), Dataset operations (`ops.py`),
   image leveling (`level.py`).
 - `rhkpy/plotting/` — `quickplot.py` (the `qplot` panels and its layout
-  registry), `navigation.py`, `thumbnails.py`.
+  registry), `preview.py` (static matplotlib pictures), `navigation.py`,
+  `thumbnails.py`.
+- `rhkpy/summary.py`, `rhkpy/cli.py`, `rhkpy/guide.py` with `AGENT_GUIDE.md` — use
+  without a notebook: JSON-ready summaries, the command line tool, and the guide
+  for scripts and AI agents. Keep the guide true; its examples run as tests.
 - `rhkpy/rhkpy_loader.py`, `rhkpy/rhkpy_process.py` — backward-compatibility
   shims re-exporting the historical names. Do not add new code here.
 - `spym/` — legacy vendored copy of the spym project, used ONLY by

@@ -14,6 +14,9 @@ For use from scripts and AI agents, without a notebook, read the guide:
 from .version import __version__
 from .rhkpy_loader import *
 from .rhkpy_process import *
+from .analysis.level import fixzero, destripe
+from .summary import scan
+from .guide import agent_guide
 
 import hvplot.xarray
 import holoviews as hv
