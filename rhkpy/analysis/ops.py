@@ -54,11 +54,9 @@ def coord_to_absolute(xrobj):
 	"""	
 	# the xrobj passed to the function should always be and image
 	if 'topography' not in xrobj.data_vars:
-		print('Wrong xarray type. The data needs to be an `image`, not `spectra`')
-		return
+		raise TypeError('Wrong xarray type. The data needs to be an `image`, not `spectra`')
 	if xrobj.attrs['datatype'] == 'line':
-		print('Sorry, linespectra are not supportet yet.')
-		return
+		raise NotImplementedError('Sorry, linespectra are not supported yet.')
 	
 	# get scan angle
 	scangle = xrobj.attrs['scan angle']*np.pi/180 # in radians
@@ -192,8 +190,7 @@ def polyflatten(xrobj, field_type = 'topography', **kwargs):
 	# check if the right object was passed
 	# the xrobj passed to the function should always be and image
 	if field_type not in xrobj.data_vars:
-		print('Wrong xarray type. The data needs to be an `image`')
-		return
+		raise TypeError('Wrong xarray type. The data needs to be an `image`')
 	
 	# make a copy of the xrobject
 	flatxrobj = copy.deepcopy(xrobj)

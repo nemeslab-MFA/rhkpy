@@ -93,12 +93,13 @@ def test_navigation_plot_spec_false(loaded_fixtures):
 	assert len(plot) == _expected_navigation_layers(args, plot_spec = False)
 
 
-def test_navigation_nothing_to_plot(loaded_fixtures, capsys):
-	"""No image and no spectrum positions: a message instead of a crash."""
+def test_navigation_nothing_to_plot(loaded_fixtures):
 	import rhkpy
 	spec = _first(loaded_fixtures, 'spec')
-	assert rhkpy.navigation(spec, plot_spec = False) is None
-	assert 'Nothing to plot' in capsys.readouterr().out
+	with pytest.raises(ValueError, match = 'Nothing to plot'):
+		rhkpy.navigation(spec, plot_spec = False)
+	with pytest.raises(ValueError, match = 'Please supply'):
+		rhkpy.navigation()
 
 
 def test_navigation_spec_positions_only(loaded_fixtures):
@@ -153,13 +154,35 @@ def test_msw_averages_scan_direction(loaded_fixtures):
 		assert scandir_dim in data.spectra.dims
 
 
-def test_mrep_msw_on_image(loaded_fixtures, capsys):
+def test_mrep_msw_on_image(loaded_fixtures):
 	image = _first(loaded_fixtures, 'image')
-	assert image.mrep() is None
-	assert image.msw() is None
-	out = capsys.readouterr().out
-	assert "doesn't have repetitions" in out
-	assert "doesn't have biasscandir or zscandir" in out
+	with pytest.raises(TypeError, match = "doesn't have repetitions"):
+		image.mrep()
+	with pytest.raises(TypeError, match = "doesn't have biasscandir or zscandir"):
+		image.msw()
+
+
+def test_image_methods_on_spec(loaded_fixtures):
+	spec = _first(loaded_fixtures, 'spec')
+	with pytest.raises(TypeError, match = 'does not contain an image'):
+		spec.coord_to_absolute()
+	with pytest.raises(TypeError, match = 'does not contain an image'):
+		spec.polyflatten()
+
+
+def test_coord_to_absolute_on_line(loaded_fixtures):
+	line = _first(loaded_fixtures, 'line')
+	with pytest.raises(NotImplementedError, match = 'linespectra'):
+		line.coord_to_absolute()
+
+
+def test_ops_on_spectra_dataset(loaded_fixtures):
+	import rhkpy
+	specmap = _first(loaded_fixtures, 'map')
+	with pytest.raises(TypeError, match = 'needs to be an `image`'):
+		rhkpy.coord_to_absolute(specmap.spectra)
+	with pytest.raises(TypeError, match = 'needs to be an `image`'):
+		rhkpy.polyflatten(specmap.spectra)
 
 
 def test_coord_to_absolute(loaded_fixtures):

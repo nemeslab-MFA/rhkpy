@@ -97,8 +97,9 @@ Supporting a new `(datatype, spectype)` combination is registry work:
 
 ## Conventions
 
-- Load-time diagnostics go through `logging.getLogger('rhkpy')`; prints are
-  reserved for user-facing command output (e.g. `print_info`, `genthumbs`
+- Failures raise exceptions, so that code using rhkpy can't miss them. Warnings
+  and other load-time diagnostics go through `logging.getLogger('rhkpy')`; prints
+  are reserved for user-facing command output (e.g. `print_info`, `genthumbs`
   progress).
 - Indentation: tabs (matching the existing code).
 - Historical quirks that the golden tests pin (e.g. the position-dim order of

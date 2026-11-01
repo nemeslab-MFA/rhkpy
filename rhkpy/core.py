@@ -11,6 +11,7 @@ The heavy lifting is delegated to the submodules:
 import copy
 import logging as _logging
 import numbers as _numbers
+import os as _os
 
 import numpy as _np
 
@@ -112,10 +113,13 @@ class rhkdata:
 		# Boolean value, True if alternate scan directions is turned on
 		self.alternate = alternate
 
-		# Load the data using spym
+		if not _os.path.isfile(self.filename):
+			raise FileNotFoundError(f'No such file: {self.filename}')
+
+		# Load the data using the built-in sm4 reader
 		self.spymdata = load_spym(self.filename)
 		if self.spymdata is None:
-			return
+			raise ValueError(f'Could not read {self.filename}: it does not appear to be a valid sm4 file')
 
 		# check software version. Not tested for MinorVer < 6
 		l = list(self.spymdata.keys())
@@ -167,8 +171,7 @@ class rhkdata:
 		"""
 		# function to take the mean along the repetitions coordinate
 		if self.datatype == 'image':
-			print('An image instance doesn\'t have repetitions.')
-			return
+			raise TypeError('An image instance doesn\'t have repetitions.')
 		newdata = copy.deepcopy(self)
 		newdata.spectra = newdata.spectra.mean(dim = 'repetitions')
 		return newdata
@@ -182,8 +185,7 @@ class rhkdata:
 		"""
 		# function to take the mean along the biasscan coordinate
 		if self.datatype == 'image':
-			print('An image instance doesn\'t have biasscandir or zscandir.')
-			return
+			raise TypeError('An image instance doesn\'t have biasscandir or zscandir.')
 		newdata = copy.deepcopy(self)
 		if self.spectype == 'iv':
 			newdata.spectra = newdata.spectra.mean(dim = 'biasscandir')
@@ -243,8 +245,7 @@ class rhkdata:
 		"""
 		# check if 'image' is present
 		if 'image' not in self.__dict__:
-			print('This `rhkdata` instance does not contain an image')
-			return
+			raise TypeError('This `rhkdata` instance does not contain an image')
 
 		# copy the current instance
 		rhkdataobj_new = copy.deepcopy(self)
@@ -264,8 +265,7 @@ class rhkdata:
 
 		# check if 'image' is present
 		if 'image' not in self.__dict__:
-			print('This `rhkdata` instance does not contain an image')
-			return
+			raise TypeError('This `rhkdata` instance does not contain an image')
 		# make a copy of the instance
 		flattened_rhkdataobj = copy.deepcopy(self)
 		# apply flatten to the copy

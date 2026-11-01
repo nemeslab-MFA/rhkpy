@@ -102,8 +102,7 @@ def navigation(*args, **kwargs):
 		return specplot
 
 	if len(args) == 0:
-		print('Please supply some rhkdata instances to plot.')
-		return
+		raise ValueError('Please supply some rhkdata instances to plot.')
 
 	datatypes = []
 	spectypes = []
@@ -122,8 +121,7 @@ def navigation(*args, **kwargs):
 	# indices_topo = [index for index, value in enumerate(datatypes) if value in ('map', 'image')]
 
 	if indices_topo == [] and (plot_spec is not True or indices_spec == []):
-		print('Nothing to plot: the rhkdata instances have no images, and spectrum positions are not requested.')
-		return
+		raise ValueError('Nothing to plot: the rhkdata instances have no images, and spectrum positions are not requested.')
 
 	# plot those images
 	# get a color map for the bounding boxes
