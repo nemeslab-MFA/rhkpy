@@ -16,7 +16,7 @@ import numpy as _np
 
 from .io import load_spym
 from .builders import _load_specmap, _load_line, _load_spec, _load_image
-from .builders.detect import _checkdatatype, _checkrepetitions, _is_single_sweep, _get_filename
+from .builders.detect import _checkdatatype, _checkrepetitions, _is_single_sweep, _may_alternate, _get_filename
 from .analysis import ops as _ops
 from .plotting import quickplot as _quickplot
 
@@ -31,7 +31,7 @@ class rhkdata:
 	:type filename: str
 	:param repetitions: The number of repeated aquisitions of spectra in tip position. If 0, it is inferred from the file, defaults to 0
 	:type repetitions: int, optional
-	:param alternate: `True` if the bias is swept forward and backward, `False` if not, defaults to True. With `False`, every sweep counts as a repetition and the scan direction dimension has a single entry, labelled like the first sweep of an alternating measurement. If the file does alternate, forward and backward sweeps end up mixed in the repetitions and the label doesn't describe them. Files with one spectrum per tip position are always loaded with `False`.
+	:param alternate: `True` if the bias is swept forward and backward, `False` if not, defaults to True. With `False`, every sweep counts as a repetition and the scan direction dimension has a single entry, labelled like the first sweep of an alternating measurement. If the file does alternate, forward and backward sweeps end up mixed in the repetitions and the label doesn't describe them, and a warning is logged when the number of spectra per tip position allows this. Files with one spectrum per tip position are always loaded with `False`.
 	:type alternate: bool, optional
 	:param loadraw: Set to `True` if you want the raw topography data, defaults to False
 	:type loadraw: bool, optional
@@ -125,10 +125,16 @@ class rhkdata:
 		# check type of data and spectra contained in the file
 		self.datatype, self.spectype = _checkdatatype(self)
 
-		# one spectrum per tip position leaves no second sweep to separate
-		if self.datatype in ('map', 'line', 'spec') and self.alternate and _is_single_sweep(self):
-			_logger.warning('%s has one spectrum per tip position, loading it with alternate = False.', _get_filename(self.filename))
-			self.alternate = False
+		if self.datatype in ('map', 'line', 'spec'):
+			# one spectrum per tip position leaves no second sweep to separate
+			if self.alternate and _is_single_sweep(self):
+				_logger.warning('%s has one spectrum per tip position, loading it with alternate = False.', _get_filename(self.filename))
+				self.alternate = False
+			elif not self.alternate and _may_alternate(self):
+				_logger.warning(
+					'%s: alternate = False counts every sweep as a repetition. If this file has forward and backward sweeps, they are mixed in `repetitions`, under a single scan direction label.',
+					_get_filename(self.filename),
+				)
 
 		# number of spectra at a tip position
 		# default value is 0, if this is changed, the code will use the given value, othewise it will try to infer the number of repetitions from the number of identical tip positions

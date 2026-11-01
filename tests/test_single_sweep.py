@@ -4,12 +4,15 @@ alternating measurement. Files with one spectrum per tip position always load
 this way; other files do with alternate = False.
 """
 
+from types import SimpleNamespace
+
 import numpy as np
 import pytest
 import xarray as xr
 
 import rhkpy
 from conftest import TESTDATA_DIR
+from rhkpy.builders.detect import _may_alternate
 from rhkpy.plotting.quickplot import _fwbw_lineplot
 
 MAP_FILE = 'dI-dV_9K_ABC6_2020_07_02_08_50_47_967.sm4'
@@ -87,6 +90,36 @@ def test_spec(monkeypatch):
 	assert dict(data.spectra.sizes) == {'bias': 481, 'repetitions': 1, 'biasscandir': 1}
 	assert list(data.spectra.biasscandir.values) == ['left']
 	assert data.qplot() is not None
+
+
+ALTERNATE_WARNING = 'alternate = False counts every sweep as a repetition'
+
+
+@pytest.mark.parametrize('name', [
+	'dI-dV_ABC_Graphite-Sample5_9K_2021_08_24_11_54_33_632.sm4',
+	'Iz_line_Stripes-9K-HOPG-SPI2-3_2021_09_02_15_15_35_930.sm4',
+	'Iz_Stripes-9K-HOPG-SPI2-3_2021_09_07_10_15_28_529.sm4',
+])
+def test_alternate_false_warns(name, caplog):
+	path = _fixture_path(name)
+	rhkpy.rhkdata(path)
+	assert ALTERNATE_WARNING not in caplog.text
+	rhkpy.rhkdata(path, alternate = False)
+	assert ALTERNATE_WARNING in caplog.text
+
+
+@pytest.mark.parametrize('name', [MAP_FILE, LINE_FILE])
+def test_alternate_false_on_single_sweep_file_does_not_warn(name, caplog):
+	rhkpy.rhkdata(_fixture_path(name), alternate = False)
+	assert ALTERNATE_WARNING not in caplog.text
+
+
+@pytest.mark.parametrize('spectra, expected', [(1, False), (2, True), (3, False), (20, True)])
+def test_may_alternate(spectra, expected):
+	coords = [0.0] * spectra + [1.0] * spectra
+	attrs = {'RHK_SpecDrift_Xcoord': coords, 'RHK_SpecDrift_Ycoord': coords}
+	data = SimpleNamespace(spymdata = SimpleNamespace(Current = SimpleNamespace(attrs = attrs)))
+	assert _may_alternate(data) == expected
 
 
 def test_alternate_false_map():

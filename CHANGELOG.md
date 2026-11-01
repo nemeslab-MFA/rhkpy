@@ -24,7 +24,7 @@ There is no rhkpy replacement for the accessor's filters or its plot. `scipy.ndi
 ### Added
 
 - Files with one spectrum per tip position now load without arguments, instead of failing with a `ZeroDivisionError`. The scan direction dimension (`biasscandir` or `zscandir`) has one entry, labelled like the first sweep of an alternating measurement.
-- `alternate=False` now works on files with several spectra per position, instead of failing with a `ValueError`. Every sweep counts as a repetition, with a one-entry scan direction. If the file does alternate, forward and backward sweeps end up mixed in `repetitions`.
+- `alternate=False` now works on files with several spectra per position, instead of failing with a `ValueError`. Every sweep counts as a repetition, with a one-entry scan direction. If the file does alternate, forward and backward sweeps end up mixed in `repetitions`, and a warning says so whenever the number of spectra per tip position is even.
 - `rhkpy.fixzero` and `rhkpy.destripe`.
 
 ### Changed

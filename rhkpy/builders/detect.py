@@ -33,6 +33,13 @@ def _is_single_sweep(stmdata_object):
 	return _spectra_per_position(stmdata_object) == 1
 
 
+def _may_alternate(stmdata_object):
+	"""`True` if the number of spectra per tip position allows pairs of forward
+	and backward sweeps. The file has no reliable record of whether they are."""
+	spectra = _spectra_per_position(stmdata_object)
+	return spectra > 1 and spectra % 2 == 0
+
+
 def _checkrepetitions(stmdata_object):
 	"""Infer the number of repeated spectra per tip position."""
 	reps = _spectra_per_position(stmdata_object)
