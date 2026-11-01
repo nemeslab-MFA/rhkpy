@@ -1,0 +1,380 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rhkpy.analysis.ops &mdash; rhkpy 2023.08.10 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=0f4f00c4"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            rhkpy
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../intro.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../intro.html#id1">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rhkpy.html">rhkpy package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">rhkpy</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">rhkpy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">rhkpy.analysis.ops</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for rhkpy.analysis.ops</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""Operations on rhkdata xarray Datasets: coordinate transforms, flattening,</span>
+<span class="sd">map sections.</span>
+
+<span class="sd">Moved verbatim from rhkpy_process.py (refactor phase 2).</span>
+<span class="sd">"""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">ndimage</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.fitting</span><span class="w"> </span><span class="kn">import</span> <span class="n">bgsubtract</span>
+
+
+<div class="viewcode-block" id="coord_to_absolute">
+<a class="viewcode-back" href="../../../rhkpy.html#rhkpy.analysis.ops.coord_to_absolute">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">coord_to_absolute</span><span class="p">(</span><span class="n">xrobj</span><span class="p">):</span>
+<span class="w">	</span><span class="sd">"""Takes as input the :class:`rhkdata.image` variable of an :class:`~rhkpy.rhkpy_loader.rhkdata` instance.</span>
+<span class="sd">	Returns a new :py:mod:`xarray` instance, with the coordinates updated to reflect the abolute tip position. This includes X, Y offset and rotation.</span>
+
+<span class="sd">	:param xrobj: :py:mod:`xarray` image variable of an :class:`~rhkpy.rhkpy_loader.rhkdata` object</span>
+<span class="sd">	:type xrobj: :py:mod:`xarray` Dataset</span>
+<span class="sd">	</span>
+<span class="sd">	:return: :py:mod:`xarray` :class:`rhkdata.image` instance, with the same data and metadata as the input and the coordinates shifted to absolute tip positions.</span>
+<span class="sd">	:rtype: :py:mod:`xarray` Dataset</span>
+
+<span class="sd">	:Example:</span>
+<span class="sd">		</span>
+<span class="sd">		.. code-block:: python</span>
+
+<span class="sd">			import rhkpy</span>
+
+<span class="sd">			m = rhkpy.rhkdata('didv map.sm4')</span>
+
+<span class="sd">			# Take the `rhkdata` instance (image or map): `m`,</span>
+<span class="sd">			# and convert the image coordinates to absolute values</span>
+<span class="sd">			m_abs_image = rhkpy.coord_to_absolute(m.image)</span>
+
+<span class="sd">			# coordinates of the instance `m`</span>
+<span class="sd">			# We can see it runs from 0 to 100 nm</span>
+<span class="sd">			print(m.image.x.min().data, m.image.x.max().data)</span>
+<span class="sd">			0.0 100.0</span>
+
+<span class="sd">			# check the same corrdinate for the new `m_abs`</span>
+<span class="sd">			print(m_abs_image.x.min().data, m_abs_image.x.max().data)</span>
+<span class="sd">			-877.0008892433623 -741.0633876547834</span>
+
+<span class="sd">			# we can see it's now shows the exact tip position</span>
+<span class="sd">			# the image is also rotated, as the "scan angle" attribute shows</span>
+<span class="sd">			m_abs_image.attrs['scan angle']</span>
+<span class="sd">			30.0</span>
+<span class="sd">			</span>
+<span class="sd">			# plot the rotated and offset image</span>
+<span class="sd">			m_abs_image.topography.sel(scandir = 'forward').plot()</span>
+<span class="sd">	"""</span>	
+	<span class="c1"># the xrobj passed to the function should always be and image</span>
+	<span class="k">if</span> <span class="s1">'topography'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">xrobj</span><span class="o">.</span><span class="n">data_vars</span><span class="p">:</span>
+		<span class="nb">print</span><span class="p">(</span><span class="s1">'Wrong xarray type. The data needs to be an `image`, not `spectra`'</span><span class="p">)</span>
+		<span class="k">return</span>
+	<span class="k">if</span> <span class="n">xrobj</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'datatype'</span><span class="p">]</span> <span class="o">==</span> <span class="s1">'line'</span><span class="p">:</span>
+		<span class="nb">print</span><span class="p">(</span><span class="s1">'Sorry, linespectra are not supportet yet.'</span><span class="p">)</span>
+		<span class="k">return</span>
+	
+	<span class="c1"># get scan angle</span>
+	<span class="n">scangle</span> <span class="o">=</span> <span class="n">xrobj</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'scan angle'</span><span class="p">]</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">180</span> <span class="c1"># in radians</span>
+
+	<span class="c1"># Get the numpy data</span>
+	<span class="n">datatopofw</span> <span class="o">=</span> <span class="n">xrobj</span><span class="p">[</span><span class="s1">'topography'</span><span class="p">]</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">scandir</span> <span class="o">=</span> <span class="s1">'forward'</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
+	<span class="n">datatopobw</span> <span class="o">=</span> <span class="n">xrobj</span><span class="p">[</span><span class="s1">'topography'</span><span class="p">]</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">scandir</span> <span class="o">=</span> <span class="s1">'backward'</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
+	<span class="n">datacurrentfw</span> <span class="o">=</span> <span class="n">xrobj</span><span class="p">[</span><span class="s1">'current'</span><span class="p">]</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">scandir</span> <span class="o">=</span> <span class="s1">'forward'</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
+	<span class="n">datacurrentbw</span> <span class="o">=</span> <span class="n">xrobj</span><span class="p">[</span><span class="s1">'current'</span><span class="p">]</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">scandir</span> <span class="o">=</span> <span class="s1">'backward'</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
+	<span class="n">dataliafw</span> <span class="o">=</span> <span class="n">xrobj</span><span class="p">[</span><span class="s1">'lia'</span><span class="p">]</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">scandir</span> <span class="o">=</span> <span class="s1">'forward'</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
+	<span class="n">dataliabw</span> <span class="o">=</span> <span class="n">xrobj</span><span class="p">[</span><span class="s1">'lia'</span><span class="p">]</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">scandir</span> <span class="o">=</span> <span class="s1">'backward'</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
+
+	<span class="c1"># rotate the data by the scan angle. Need to have negative degrees, because ndimage rotates clockwise</span>
+	<span class="n">rotatedtopofw</span> <span class="o">=</span> <span class="n">ndimage</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span>
+		<span class="n">datatopofw</span><span class="p">,</span>
+		<span class="o">-</span><span class="n">scangle</span><span class="o">*</span><span class="mi">180</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="c1"># needs to be in degrees</span>
+		<span class="n">reshape</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="c1"># expand</span>
+		<span class="n">mode</span> <span class="o">=</span> <span class="s1">'constant'</span><span class="p">,</span>
+		<span class="n">cval</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+		<span class="p">)</span>
+	<span class="n">rotatedtopobw</span> <span class="o">=</span> <span class="n">ndimage</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span>
+		<span class="n">datatopobw</span><span class="p">,</span>
+		<span class="o">-</span><span class="n">scangle</span><span class="o">*</span><span class="mi">180</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="c1"># needs to be in degrees</span>
+		<span class="n">reshape</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="c1"># expand</span>
+		<span class="n">mode</span> <span class="o">=</span> <span class="s1">'constant'</span><span class="p">,</span>
+		<span class="n">cval</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+		<span class="p">)</span>
+	<span class="n">rotatedcurrentfw</span> <span class="o">=</span> <span class="n">ndimage</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span>
+		<span class="n">datacurrentfw</span><span class="p">,</span>
+		<span class="o">-</span><span class="n">scangle</span><span class="o">*</span><span class="mi">180</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="c1"># needs to be in degrees</span>
+		<span class="n">reshape</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="c1"># expand</span>
+		<span class="n">mode</span> <span class="o">=</span> <span class="s1">'constant'</span><span class="p">,</span>
+		<span class="n">cval</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+		<span class="p">)</span>
+	<span class="n">rotatedcurrentbw</span> <span class="o">=</span> <span class="n">ndimage</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span>
+		<span class="n">datacurrentbw</span><span class="p">,</span>
+		<span class="o">-</span><span class="n">scangle</span><span class="o">*</span><span class="mi">180</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="c1"># needs to be in degrees</span>
+		<span class="n">reshape</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="c1"># expand</span>
+		<span class="n">mode</span> <span class="o">=</span> <span class="s1">'constant'</span><span class="p">,</span>
+		<span class="n">cval</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+		<span class="p">)</span>
+	<span class="n">rotatedliafw</span> <span class="o">=</span> <span class="n">ndimage</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span>
+		<span class="n">dataliafw</span><span class="p">,</span>
+		<span class="o">-</span><span class="n">scangle</span><span class="o">*</span><span class="mi">180</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="c1"># needs to be in degrees</span>
+		<span class="n">reshape</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="c1"># expand</span>
+		<span class="n">mode</span> <span class="o">=</span> <span class="s1">'constant'</span><span class="p">,</span>
+		<span class="n">cval</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+		<span class="p">)</span>
+	<span class="n">rotatedliabw</span> <span class="o">=</span> <span class="n">ndimage</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span>
+		<span class="n">dataliabw</span><span class="p">,</span>
+		<span class="o">-</span><span class="n">scangle</span><span class="o">*</span><span class="mi">180</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="c1"># needs to be in degrees</span>
+		<span class="n">reshape</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="c1"># expand</span>
+		<span class="n">mode</span> <span class="o">=</span> <span class="s1">'constant'</span><span class="p">,</span>
+		<span class="n">cval</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+		<span class="p">)</span>
+
+	<span class="c1"># Create new coordinates for the rotated data</span>
+	<span class="c1"># size of a pixel in nm</span>
+	<span class="n">pixelsizex</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">xrobj</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">xrobj</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+	<span class="n">pixelsizey</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">xrobj</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">xrobj</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+	
+	<span class="c1"># Get the sizes of the x and y coordinates</span>
+	<span class="n">xlen</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">xrobj</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">xrobj</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="n">pixelsizex</span> <span class="c1"># need to add half pixel size twice (on both sides)</span>
+	<span class="n">ylen</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">xrobj</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">xrobj</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="n">pixelsizey</span>
+	
+	<span class="c1"># This gives you the new "bounding box size" of the rotated image</span>
+	<span class="c1"># newxlen = np.abs(xlen * np.sin(scangle)) + np.abs(ylen * np.sin(np.pi/2 - scangle))</span>
+	<span class="c1"># newylen = np.abs(xlen * np.cos(scangle)) + np.abs(ylen * np.cos(np.pi/2 - scangle))</span>
+	<span class="n">newxlen</span> <span class="o">=</span> <span class="n">rotatedtopofw</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">pixelsizex</span>
+	<span class="n">newylen</span> <span class="o">=</span> <span class="n">rotatedtopofw</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">pixelsizey</span>
+
+	<span class="c1"># new coordinate length</span>
+	<span class="c1"># placing the zero in the middle of the image</span>
+	<span class="n">newxx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="n">newxlen</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">newxlen</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">num</span> <span class="o">=</span> <span class="n">rotatedtopofw</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+	<span class="n">newyy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="n">newylen</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">newylen</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">num</span> <span class="o">=</span> <span class="n">rotatedtopofw</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+	<span class="c1"># new pixel size due to rotation</span>
+	<span class="c1"># newpixelsizex = np.abs(newxx[1] - newxx[0])</span>
+	<span class="c1"># newpixelsizey = np.abs(newyy[1] - newyy[0])</span>
+
+	<span class="c1"># correction to the offset of the image</span>
+	<span class="c1"># In the RHK Rev software, the offsets shown in the software refer to the bottom - left corner</span>
+	<span class="c1"># of the image. This does NOT include the rotation. For the proper shift of the image</span>
+	<span class="c1"># coordinates including rotation this has to be taken into account</span>
+	<span class="n">diag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">xlen</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">ylen</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+	<span class="n">offx</span> <span class="o">=</span> <span class="n">diag</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">scangle</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">scangle</span><span class="o">/</span><span class="mi">2</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">4</span><span class="p">)</span> <span class="o">+</span> <span class="n">diag</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">4</span> <span class="o">+</span> <span class="n">scangle</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span> <span class="o">-</span> <span class="n">pixelsizex</span>
+	<span class="n">offy</span> <span class="o">=</span> <span class="n">diag</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">scangle</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">scangle</span><span class="o">/</span><span class="mi">2</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">4</span><span class="p">)</span> <span class="o">+</span> <span class="n">diag</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">4</span> <span class="o">+</span> <span class="n">scangle</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span> <span class="o">-</span> <span class="n">pixelsizey</span>
+
+	<span class="c1"># make a new instance of the object, where we will change the coordinates</span>
+	<span class="n">xrobj_abscoord</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span>
+		<span class="n">data_vars</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+			<span class="n">topography</span> <span class="o">=</span> <span class="p">([</span><span class="s1">'y'</span><span class="p">,</span> <span class="s1">'x'</span><span class="p">,</span> <span class="s1">'scandir'</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">((</span><span class="n">rotatedtopofw</span><span class="p">,</span> <span class="n">rotatedtopobw</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)),</span>
+			<span class="n">current</span> <span class="o">=</span> <span class="p">([</span><span class="s1">'y'</span><span class="p">,</span> <span class="s1">'x'</span><span class="p">,</span> <span class="s1">'scandir'</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">((</span><span class="n">rotatedcurrentfw</span><span class="p">,</span> <span class="n">rotatedcurrentbw</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)),</span>
+			<span class="n">lia</span> <span class="o">=</span> <span class="p">([</span><span class="s1">'y'</span><span class="p">,</span> <span class="s1">'x'</span><span class="p">,</span> <span class="s1">'scandir'</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">((</span><span class="n">rotatedliafw</span><span class="p">,</span> <span class="n">rotatedliabw</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">))</span>
+			<span class="p">),</span>
+		<span class="n">coords</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+			<span class="n">x</span> <span class="o">=</span> <span class="n">newxx</span> <span class="o">+</span> <span class="n">xrobj</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'xoffset'</span><span class="p">]</span> <span class="o">+</span> <span class="n">offx</span><span class="p">,</span>
+			<span class="n">y</span> <span class="o">=</span> <span class="n">newyy</span> <span class="o">+</span> <span class="n">xrobj</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'yoffset'</span><span class="p">]</span> <span class="o">+</span> <span class="n">offy</span><span class="p">,</span>
+			<span class="n">scandir</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="s1">'forward'</span><span class="p">,</span> <span class="s1">'backward'</span><span class="p">])</span>
+			<span class="p">)</span>
+		<span class="p">)</span>
+	<span class="c1"># copy attributes from original dataset and modify them accordingly</span>
+	<span class="n">xrobj_abscoord</span><span class="o">.</span><span class="n">attrs</span> <span class="o">=</span> <span class="n">xrobj</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+	<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">xrobj</span><span class="o">.</span><span class="n">coords</span><span class="p">:</span>
+		<span class="n">xrobj_abscoord</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span> <span class="o">=</span> <span class="n">xrobj</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+	<span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">xrobj</span><span class="o">.</span><span class="n">data_vars</span><span class="p">:</span>
+		<span class="n">xrobj_abscoord</span><span class="p">[</span><span class="n">d</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span> <span class="o">=</span> <span class="n">xrobj</span><span class="p">[</span><span class="n">d</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+	<span class="c1"># append a note to the coordinate x, y attributes</span>
+	<span class="n">xrobj_abscoord</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'comment'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'absolute coordinates'</span>
+	<span class="n">xrobj_abscoord</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s1">'x'</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'note'</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">'absolute coordinates</span><span class="se">\n</span><span class="s1">'</span>
+	<span class="n">xrobj_abscoord</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s1">'y'</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'note'</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">'absolute coordinates</span><span class="se">\n</span><span class="s1">'</span>
+
+	<span class="k">return</span> <span class="n">xrobj_abscoord</span></div>
+
+
+<div class="viewcode-block" id="polyflatten">
+<a class="viewcode-back" href="../../../rhkpy.html#rhkpy.analysis.ops.polyflatten">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">polyflatten</span><span class="p">(</span><span class="n">xrobj</span><span class="p">,</span> <span class="n">field_type</span> <span class="o">=</span> <span class="s1">'topography'</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">	</span><span class="sd">"""Fits a polynomial to the fast scan lines of topography data and subtracts it from the lines.</span>
+<span class="sd">	</span>
+<span class="sd">	The keyword argument ``polyorder`` works the same way as in :func:`bgsubtract`.</span>
+<span class="sd">	Keywords used by :func:`bgsubtract` can be passed.</span>
+<span class="sd">	</span>
+<span class="sd">	Still needs testing.</span>
+
+<span class="sd">	:param xrobj: :py:mod:`xarray` image variable of an :class:`~rhkpy.rhkpy_loader.rhkdata` object</span>
+<span class="sd">	:type xrobj: :py:mod:`xarray` Dataset, :class:`rhkdata.image`</span>
+<span class="sd">	:param field_type: select the DataArray: 'topography', 'current' or 'lia', defaults to 'topography'</span>
+<span class="sd">	:type field_type: str, optional</span>
+<span class="sd">	</span>
+<span class="sd">	:return: New :class:`rhkdata.image` Dataset of :class:`~rhkpy.rhkpy_loader.rhkdata`, with the DataArray specifiec by ``field_type`` flattened.</span>
+<span class="sd">	:rtype: :py:mod:`xarray` Dataset</span>
+<span class="sd">	"""</span>	
+
+	<span class="c1"># check if the right object was passed</span>
+	<span class="c1"># the xrobj passed to the function should always be and image</span>
+	<span class="k">if</span> <span class="n">field_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">xrobj</span><span class="o">.</span><span class="n">data_vars</span><span class="p">:</span>
+		<span class="nb">print</span><span class="p">(</span><span class="s1">'Wrong xarray type. The data needs to be an `image`'</span><span class="p">)</span>
+		<span class="k">return</span>
+	
+	<span class="c1"># make a copy of the xrobject</span>
+	<span class="n">flatxrobj</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">xrobj</span><span class="p">)</span>
+
+	<span class="c1"># iterate through the scan directions of the image</span>
+	<span class="k">for</span> <span class="n">scand</span> <span class="ow">in</span> <span class="n">flatxrobj</span><span class="o">.</span><span class="n">scandir</span><span class="p">:</span>
+		<span class="c1"># select the scan direction</span>
+		<span class="n">datafield</span> <span class="o">=</span> <span class="n">flatxrobj</span><span class="p">[</span><span class="n">field_type</span><span class="p">]</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">scandir</span> <span class="o">=</span> <span class="n">scand</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+		<span class="c1"># iterate through the slow scan direction lines</span>
+		<span class="k">for</span> <span class="n">yy</span> <span class="ow">in</span> <span class="n">datafield</span><span class="o">.</span><span class="n">y</span><span class="p">:</span>
+			<span class="c1"># fit the background</span>
+			<span class="n">_</span><span class="p">,</span> <span class="n">bg_values</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">bgsubtract</span><span class="p">(</span><span class="n">datafield</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">y</span> <span class="o">=</span> <span class="n">yy</span><span class="p">)</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">datafield</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">y</span> <span class="o">=</span> <span class="n">yy</span><span class="p">)</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">exclusion_factor</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+			<span class="c1"># subtract the background</span>
+			<span class="n">datafield</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">y</span> <span class="o">=</span> <span class="n">yy</span><span class="p">)</span><span class="o">.</span><span class="n">data</span> <span class="o">-=</span> <span class="n">bg_values</span>
+
+	<span class="k">return</span> <span class="n">flatxrobj</span></div>
+
+
+<span class="c1">## plotting and data visualization -------------------------------------------</span>
+
+<div class="viewcode-block" id="mapsection">
+<a class="viewcode-back" href="../../../rhkpy.html#rhkpy.analysis.ops.mapsection">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">mapsection</span><span class="p">(</span><span class="n">specmap</span><span class="p">,</span> <span class="n">start_point</span><span class="p">,</span> <span class="n">end_point</span><span class="p">):</span>
+<span class="w">	</span><span class="sd">"""Makes a section across a dI/dV spectroscopy map: ``specmap``. Starting and end points: ``start_point`` to ``end_point``.</span>
+<span class="sd">	It uses :py:mod:`xarray.Dataset.interp` to interpolate between data values.</span>
+
+<span class="sd">	:param specmap: the `spectra` :py:mod:`xarray` variable of an :class:`~rhkpy.rhkpy_loader.rhkdata` instance. Found under: :class:`rhkpy.rhkpy_loader.rhkdata.spectra`.</span>
+<span class="sd">	:type specmap: :py:mod:`xarray` DataSet</span>
+<span class="sd">	:param start_point: starting point for the line section. In the format: `(x, y)`, found in the ``specpos_x``, ``specpos_y`` coordinates of ``specmap``.</span>
+<span class="sd">	:type start_point: tuple: (float, float)</span>
+<span class="sd">	:param end_point: end point for the line section. In the format: `(x, y)`, found in the ``specpos_x``, ``specpos_y`` coordinates of ``specmap``.</span>
+<span class="sd">	:type end_point: tuple: (float, float)</span>
+<span class="sd">	</span>
+<span class="sd">	:return: :py:mod:`xarray` DataSet of the line section</span>
+<span class="sd">	:rtype: :py:mod:`xarray` DataSet</span>
+<span class="sd">	"""</span>	
+	<span class="c1"># Extract the start and end coordinates</span>
+	<span class="n">x_start</span><span class="p">,</span> <span class="n">y_start</span> <span class="o">=</span> <span class="n">start_point</span>
+	<span class="n">x_end</span><span class="p">,</span> <span class="n">y_end</span> <span class="o">=</span> <span class="n">end_point</span>
+	
+	<span class="c1"># Get the pixel resolution needed for the section.</span>
+	<span class="n">pixelsize</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">specmap</span><span class="o">.</span><span class="n">specpos_x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">specmap</span><span class="o">.</span><span class="n">specpos_x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">data</span>
+	<span class="n">dist_length</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">x_end</span> <span class="o">-</span> <span class="n">x_start</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">y_end</span> <span class="o">-</span> <span class="n">y_start</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+
+	<span class="c1"># Define the line coordinates</span>
+	<span class="n">line_x_coords</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">x_start</span><span class="p">,</span> <span class="n">x_end</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">dist_length</span> <span class="o">/</span> <span class="n">pixelsize</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dims</span> <span class="o">=</span> <span class="s1">'dist'</span><span class="p">)</span>
+	<span class="n">line_y_coords</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">y_start</span><span class="p">,</span> <span class="n">y_end</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">dist_length</span> <span class="o">/</span> <span class="n">pixelsize</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dims</span> <span class="o">=</span> <span class="s1">'dist'</span><span class="p">)</span>
+
+	<span class="c1"># Dictionary to store the sections for each variable</span>
+	<span class="n">sections_dict</span> <span class="o">=</span> <span class="p">{}</span>
+
+	<span class="c1"># Loop through the variables in the dataset</span>
+	<span class="k">for</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">var_data</span> <span class="ow">in</span> <span class="n">specmap</span><span class="o">.</span><span class="n">data_vars</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+		<span class="c1"># Interpolate along the specified line</span>
+		<span class="n">interpolated_values</span> <span class="o">=</span> <span class="n">var_data</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">specpos_x</span> <span class="o">=</span> <span class="n">line_x_coords</span><span class="p">,</span> <span class="n">specpos_y</span> <span class="o">=</span> <span class="n">line_y_coords</span><span class="p">)</span>
+		<span class="c1"># Store the interpolated values in the dictionary</span>
+		<span class="n">sections_dict</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">interpolated_values</span>
+	
+	<span class="c1"># Create a new xarray Dataset containing the sections</span>
+	<span class="c1"># new distance dimension coordinates</span>
+	<span class="n">dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">line_x_coords</span><span class="o">.</span><span class="n">data</span> <span class="o">-</span> <span class="n">line_x_coords</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">line_y_coords</span><span class="o">.</span><span class="n">data</span> <span class="o">-</span> <span class="n">line_y_coords</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+	
+	<span class="n">sections_dataset</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span><span class="n">sections_dict</span><span class="p">)</span>
+	<span class="c1"># drop the unused coordinates</span>
+	<span class="n">sections_dataset</span> <span class="o">=</span> <span class="n">sections_dataset</span><span class="o">.</span><span class="n">drop_vars</span><span class="p">([</span><span class="s1">'specpos_x'</span><span class="p">,</span> <span class="s1">'specpos_y'</span><span class="p">])</span>
+	<span class="c1"># assign the dist coordinate</span>
+	<span class="n">sections_dataset</span> <span class="o">=</span> <span class="n">sections_dataset</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">dist</span> <span class="o">=</span> <span class="n">dist</span><span class="p">)</span>
+
+	<span class="c1"># add metadata to dist coordinate</span>
+	<span class="n">sections_dataset</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s1">'dist'</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'units'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'nm'</span>
+	<span class="n">sections_dataset</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="s1">'dist'</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'long units'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'nanometer'</span>
+	
+	<span class="k">return</span> <span class="n">sections_dataset</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Peter Nemes-Incze.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

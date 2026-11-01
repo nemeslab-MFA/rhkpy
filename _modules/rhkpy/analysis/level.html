@@ -1,0 +1,292 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rhkpy.analysis.level &mdash; rhkpy 2023.08.10 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=0f4f00c4"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            rhkpy
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../intro.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../intro.html#id1">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rhkpy.html">rhkpy package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">rhkpy</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">rhkpy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">rhkpy.analysis.level</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for rhkpy.analysis.level</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""Image leveling: row alignment, plane subtraction, zero offset and stripe removal.</span>
+
+<span class="sd">Ported from the spym project by Mirco Panighel</span>
+<span class="sd">(https://github.com/rescipy-project/spym, MIT license). These functions are</span>
+<span class="sd">part of the public rhkpy namespace (``rhkpy.align``, ``rhkpy.plane``,</span>
+<span class="sd">``rhkpy.fixzero``, ``rhkpy.destripe``).</span>
+<span class="sd">"""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">ndimage</span>
+
+
+<div class="viewcode-block" id="fixzero">
+<a class="viewcode-back" href="../../../rhkpy.html#rhkpy.analysis.level.fixzero">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">fixzero</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">to_mean</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">'''Add a constant to the data, moving its minimum or its mean to zero.</span>
+
+<span class="sd">    :param image: image data</span>
+<span class="sd">    :type image: :py:mod:`numpy` array</span>
+<span class="sd">    :param to_mean: move the mean to zero instead of the minimum, defaults to False</span>
+<span class="sd">    :type to_mean: bool, optional</span>
+
+<span class="sd">    :return: the shifted data</span>
+<span class="sd">    :rtype: :py:mod:`numpy` array</span>
+<span class="sd">    '''</span>
+    <span class="k">if</span> <span class="n">to_mean</span><span class="p">:</span>
+        <span class="n">fixed</span> <span class="o">=</span> <span class="n">image</span> <span class="o">-</span> <span class="n">image</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">fixed</span> <span class="o">=</span> <span class="n">image</span> <span class="o">-</span> <span class="n">image</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">fixed</span></div>
+
+
+
+<div class="viewcode-block" id="destripe">
+<a class="viewcode-back" href="../../../rhkpy.html#rhkpy.analysis.level.destripe">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">destripe</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">min_length</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">hard_threshold</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">soft_threshold</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">sign</span><span class="o">=</span><span class="s1">'positive'</span><span class="p">,</span> <span class="n">rel_threshold</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">'''Find scan stripes and replace them with the average of the neighbouring lines.</span>
+
+<span class="sd">    :param image: image data</span>
+<span class="sd">    :type image: 2D :py:mod:`numpy` array</span>
+<span class="sd">    :param min_length: only stripes at least this long (in pixels) are removed, defaults to 20</span>
+<span class="sd">    :type min_length: int, optional</span>
+<span class="sd">    :param hard_threshold: minimum difference from the neighbouring line to mark a stripe, in units of half the data range, defaults to 0.4</span>
+<span class="sd">    :type hard_threshold: float, optional</span>
+<span class="sd">    :param soft_threshold: values differing at least this much can extend a stripe, in units of half the data range, defaults to 0.2</span>
+<span class="sd">    :type soft_threshold: float, optional</span>
+<span class="sd">    :param sign: which stripes to mark: 'positive', 'negative' or 'both', defaults to 'positive'</span>
+<span class="sd">    :type sign: str, optional</span>
+<span class="sd">    :param rel_threshold: if set, replaces `hard_threshold` with this value times half the data range, defaults to None</span>
+<span class="sd">    :type rel_threshold: float, optional</span>
+
+<span class="sd">    :return: the destriped image and the boolean mask of the stripes</span>
+<span class="sd">    :rtype: tuple of 2D :py:mod:`numpy` arrays</span>
+<span class="sd">    '''</span>
+    <span class="c1"># Normalize image</span>
+    <span class="n">rng</span> <span class="o">=</span> <span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">-</span> <span class="n">image</span><span class="o">.</span><span class="n">min</span><span class="p">())</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="n">n_image</span> <span class="o">=</span> <span class="p">(</span><span class="n">image</span> <span class="o">-</span> <span class="n">image</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span><span class="o">/</span><span class="n">rng</span>
+
+    <span class="c1"># Calculate positive line differences</span>
+    <span class="n">d_pos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">n_image</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">d_pos</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">d_pos</span><span class="p">)</span>
+    <span class="n">diff_pos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">diff_pos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">d_pos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">diff_pos</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">=</span> <span class="n">d_pos</span>
+
+    <span class="c1"># Calculate negative line differences</span>
+    <span class="n">d_neg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">n_image</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">d_neg</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">d_neg</span><span class="p">)</span>
+    <span class="n">diff_neg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">diff_neg</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">d_neg</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">diff_neg</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">=</span> <span class="n">d_neg</span>
+
+    <span class="c1"># Calculate physical threshold</span>
+    <span class="k">if</span> <span class="n">rel_threshold</span><span class="p">:</span>
+        <span class="n">hard_threshold</span> <span class="o">=</span> <span class="n">rel_threshold</span><span class="o">*</span><span class="n">rng</span>
+
+    <span class="c1"># Calculate masks for hard and soft thresholds</span>
+    <span class="n">m_hard_pos</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">m_soft_pos</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">m_hard_neg</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">m_soft_neg</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="n">sign</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'positive'</span><span class="p">,</span> <span class="s1">'both'</span><span class="p">]:</span>
+        <span class="n">m_hard_pos</span> <span class="o">=</span> <span class="n">diff_pos</span> <span class="o">&gt;</span> <span class="n">hard_threshold</span>
+        <span class="n">m_soft_pos</span> <span class="o">=</span> <span class="n">diff_pos</span> <span class="o">&gt;</span> <span class="n">soft_threshold</span>
+    <span class="k">if</span> <span class="n">sign</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'negative'</span><span class="p">,</span> <span class="s1">'both'</span><span class="p">]:</span>
+        <span class="n">m_hard_neg</span> <span class="o">=</span> <span class="n">diff_neg</span> <span class="o">&lt;</span> <span class="o">-</span><span class="n">hard_threshold</span>
+        <span class="n">m_soft_neg</span> <span class="o">=</span> <span class="n">diff_neg</span> <span class="o">&lt;</span> <span class="o">-</span><span class="n">soft_threshold</span>
+
+    <span class="c1"># Opening (erosion+dilation) of the masks</span>
+    <span class="n">m_hard</span> <span class="o">=</span> <span class="n">ndimage</span><span class="o">.</span><span class="n">binary_opening</span><span class="p">(</span><span class="n">m_hard_pos</span><span class="o">+</span><span class="n">m_hard_neg</span><span class="p">,</span> <span class="n">structure</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">min_length</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">))</span>
+    <span class="n">m_soft</span> <span class="o">=</span> <span class="n">ndimage</span><span class="o">.</span><span class="n">binary_opening</span><span class="p">(</span><span class="n">m_soft_pos</span><span class="o">+</span><span class="n">m_soft_neg</span><span class="p">,</span> <span class="n">structure</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">min_length</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">))</span>
+
+    <span class="c1"># Addition of hard and soft mask</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">ndimage</span><span class="o">.</span><span class="n">binary_opening</span><span class="p">(</span><span class="n">m_soft</span><span class="o">+</span><span class="n">m_hard</span><span class="p">,</span> <span class="n">structure</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">min_length</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">))</span>
+
+    <span class="c1"># Filter masked values</span>
+    <span class="n">filt</span> <span class="o">=</span> <span class="n">ndimage</span><span class="o">.</span><span class="n">uniform_filter</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+    <span class="n">filtered</span> <span class="o">=</span> <span class="n">image</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">invert</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span> <span class="o">+</span> <span class="n">filt</span><span class="o">*</span><span class="n">mask</span>
+
+    <span class="k">return</span> <span class="n">filtered</span><span class="p">,</span> <span class="n">mask</span></div>
+
+
+
+<div class="viewcode-block" id="plane">
+<a class="viewcode-back" href="../../../rhkpy.html#rhkpy.analysis.level.plane">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">plane</span><span class="p">(</span><span class="n">image</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">'''Corrects for image tilting by subtraction of a plane.</span>
+
+<span class="sd">    :param image: image data</span>
+<span class="sd">    :type image: 2D :py:mod:`numpy` array</span>
+
+<span class="sd">    :return: flattened image ``planned`` and the subtracted background ``bkg``</span>
+<span class="sd">    :rtype: tuple: (2D :py:mod:`numpy` array, 2D :py:mod:`numpy` array)</span>
+
+<span class="sd">    :Example:</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            import rhkpy</span>
+
+<span class="sd">            topo = rhkpy.rhkdata('topography.sm4', loadraw = True)</span>
+<span class="sd">            # plane-fit the forward scan of the raw topography</span>
+<span class="sd">            flattened, background = rhkpy.plane(topo.image.topography.sel(scandir = 'forward').data)</span>
+<span class="sd">    '''</span>
+
+    <span class="n">bkg_x</span> <span class="o">=</span> <span class="n">_poly_bkg</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">bkg_y</span> <span class="o">=</span> <span class="n">_poly_bkg</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">bkg_xx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">apply_along_axis</span><span class="p">(</span><span class="n">_fill</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">bkg_x</span><span class="p">)</span>
+    <span class="n">bkg_yy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">apply_along_axis</span><span class="p">(</span><span class="n">_fill</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">bkg_y</span><span class="p">)</span>
+
+    <span class="n">bkg</span> <span class="o">=</span> <span class="n">bkg_xx</span> <span class="o">+</span> <span class="n">bkg_yy</span>
+    <span class="n">planned</span> <span class="o">=</span> <span class="n">image</span> <span class="o">-</span> <span class="n">bkg</span>
+
+    <span class="k">return</span> <span class="n">planned</span><span class="p">,</span> <span class="n">bkg</span></div>
+
+
+
+<div class="viewcode-block" id="align">
+<a class="viewcode-back" href="../../../rhkpy.html#rhkpy.analysis.level.align">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">align</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">baseline</span><span class="o">=</span><span class="s1">'mean'</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">poly_degree</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">'''Align the rows (scan lines) of an image by subtracting a baseline from each.</span>
+
+<span class="sd">    :param image: image data</span>
+<span class="sd">    :type image: 2D :py:mod:`numpy` array</span>
+<span class="sd">    :param baseline: how the baselines are estimated: 'mean', 'median' or 'poly', defaults to 'mean'</span>
+<span class="sd">    :type baseline: str, optional</span>
+<span class="sd">    :param axis: axis along which the baselines are calculated, defaults to 1</span>
+<span class="sd">    :type axis: int, optional</span>
+<span class="sd">    :param poly_degree: polynomial degree if ``baseline`` = 'poly', defaults to 2</span>
+<span class="sd">    :type poly_degree: int, optional</span>
+
+<span class="sd">    :return: corrected image ``aligned`` and the subtracted background ``bkg``</span>
+<span class="sd">    :rtype: tuple: (2D :py:mod:`numpy` array, 2D :py:mod:`numpy` array)</span>
+<span class="sd">    '''</span>
+
+    <span class="k">if</span> <span class="n">baseline</span> <span class="o">==</span> <span class="s1">'mean'</span><span class="p">:</span>
+        <span class="n">bkg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">apply_along_axis</span><span class="p">(</span><span class="n">_mean_bkg</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">image</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">baseline</span> <span class="o">==</span> <span class="s1">'median'</span><span class="p">:</span>
+        <span class="n">bkg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">apply_along_axis</span><span class="p">(</span><span class="n">_median_bkg</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">image</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">baseline</span> <span class="o">==</span> <span class="s1">'poly'</span><span class="p">:</span>
+        <span class="n">bkg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">apply_along_axis</span><span class="p">(</span><span class="n">_poly_bkg</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">poly_degree</span><span class="p">)</span>
+
+    <span class="n">aligned</span> <span class="o">=</span> <span class="n">image</span> <span class="o">-</span> <span class="n">bkg</span>
+
+    <span class="k">return</span> <span class="n">aligned</span><span class="p">,</span> <span class="n">bkg</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_mean_bkg</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">line</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_median_bkg</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">line</span><span class="p">))</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_poly_bkg</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">poly_degree</span><span class="p">):</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">.5</span><span class="p">,</span> <span class="mf">.5</span><span class="p">,</span> <span class="n">line</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">coefs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polyfit</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">line</span><span class="p">,</span> <span class="n">poly_degree</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">polyval</span><span class="p">(</span><span class="n">coefs</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_fill</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">value</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Peter Nemes-Incze.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,269 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rhkpy.plotting.navigation &mdash; rhkpy 2023.08.10 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=0f4f00c4"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            rhkpy
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../intro.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../intro.html#id1">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rhkpy.html">rhkpy package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">rhkpy</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">rhkpy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">rhkpy.plotting.navigation</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for rhkpy.plotting.navigation</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""Overview plot of multiple rhkdata instances at absolute tip positions.</span>
+
+<span class="sd">Moved verbatim from rhkpy_process.py (refactor phase 2).</span>
+<span class="sd">"""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">hvplot.xarray</span>  <span class="c1"># noqa: F401 - registers the .hvplot accessor</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">holoviews</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">hv</span>
+
+
+<div class="viewcode-block" id="navigation">
+<a class="viewcode-back" href="../../../rhkpy.html#rhkpy.plotting.navigation.navigation">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">navigation</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">	</span><span class="sd">"""Takes any number of :class:`~rhkpy.rhkpy_loader.rhkdata` arguments: 'map', 'line', 'spec' and plots all of them on a single plot.</span>
+<span class="sd">	Plotting of the spectroscopy positions can be skipped by setting the optional keyword: ``plot_spec`` to `False`.</span>
+<span class="sd">	Plotting is done in the order of passing of the arguments. First argument will be plotted first.</span>
+
+<span class="sd">	The color map used for plotting topography images can be specified by the ``cmap`` optional keyword argument. Default value is 'bone'.</span>
+
+<span class="sd">	Colors for use in the labels can be specified by the optional keyword: ``palette_name``. If this is used, the number of colors also needs to be specified, by: ``num_colors``.</span>
+<span class="sd">	For possible palette options look at the `bokeh palettes &lt;https://docs.bokeh.org/en/latest/docs/reference/palettes.html&gt;`_.</span>
+
+<span class="sd">	:return: :py:mod:`holoviews` plot</span>
+<span class="sd">	:rtype: :py:mod:`holoviews`</span>
+
+<span class="sd">	:Example:</span>
+<span class="sd">		</span>
+<span class="sd">		.. code-block:: python</span>
+
+<span class="sd">			import rhkpy</span>
+
+<span class="sd">			# Load some data</span>
+<span class="sd">			didvmap = rhkpy.rhkdata('didvmap path/map.sm4')</span>
+<span class="sd">			topography = rhkpy.rhkdata('topo path/topo1.sm4')</span>
+<span class="sd">			single_spec = rhkpy.rhkdata('single spec path/single spec.sm4')</span>
+
+<span class="sd">			# plot the topography and spectroscopy positions</span>
+<span class="sd">			rhkpy.navigation(topography, didvmap, single_spec)</span>
+
+<span class="sd">			# skip plotting the spectroscopy positions</span>
+<span class="sd">			rhkpy.navigation(topography, didvmap, single_spec, plot_spec = False)</span>
+
+<span class="sd">			# In the above examples, the image from topography</span>
+<span class="sd">			# is plotted before the image data of didivmap!</span>
+<span class="sd">			# You can change the plotting order by changing</span>
+<span class="sd">			# the order of the `rhkdata` instances in the arguments.</span>
+<span class="sd">			rhkpy.navigation(didvmap, topography, single_spec) # now didvmap is plotted first</span>
+
+<span class="sd">	.. note::</span>
+
+<span class="sd">		Arguments are plotted in the order they are passed to :func:`navigation`.</span>
+
+<span class="sd">		The spectroscopy positions in dI/dV maps can be simply visualized by just passing the map :class:`~rhkpy.rhkpy_loader.rhkdata` instance.</span>
+
+<span class="sd">	"""</span>	
+	<span class="c1"># arguments should be rhkdata instances</span>
+	<span class="c1"># take care of optional keyword arguments</span>
+	<span class="c1"># an optional argument is plot_spec. If False, the spectroscopy positions are not plotted</span>
+	<span class="k">if</span> <span class="s1">'plot_spec'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+		<span class="n">plot_spec</span> <span class="o">=</span> <span class="kc">True</span>
+	<span class="k">else</span><span class="p">:</span>
+		<span class="n">plot_spec</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">'plot_spec'</span><span class="p">]</span>
+	<span class="k">if</span> <span class="s1">'cmap'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+		<span class="n">cmap</span> <span class="o">=</span> <span class="s1">'bone'</span>
+	<span class="k">else</span><span class="p">:</span>
+		<span class="n">cmap</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">'cmap'</span><span class="p">]</span>
+	<span class="k">if</span> <span class="s1">'palette_name'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+		<span class="n">palette_name</span> <span class="o">=</span> <span class="s1">'Category10'</span>
+	<span class="k">else</span><span class="p">:</span>
+		<span class="n">palette_name</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">'palette_name'</span><span class="p">]</span>
+	<span class="k">if</span> <span class="s1">'num_colors'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+		<span class="n">num_colors</span> <span class="o">=</span> <span class="mi">10</span>
+	<span class="k">else</span><span class="p">:</span>
+		<span class="n">num_colors</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">'num_colors'</span><span class="p">]</span>
+
+	<span class="c1"># we need a function to plot a bounding box around the topo data</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">bounding_box</span><span class="p">(</span><span class="n">rhkdata_obj</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
+		<span class="n">l_top</span> <span class="o">=</span> <span class="n">rhkdata_obj</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">topography</span><span class="o">.</span><span class="n">drop_vars</span><span class="p">(</span><span class="s1">'scandir'</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">hvplot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="s1">'x'</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="s1">'y'</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="n">c</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="n">rhkdata_obj</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'filename'</span><span class="p">])</span> <span class="c1"># label = rhkdata_obj.image.attrs['filename']</span>
+		<span class="n">l_bottom</span> <span class="o">=</span> <span class="n">rhkdata_obj</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">topography</span><span class="o">.</span><span class="n">drop_vars</span><span class="p">(</span><span class="s1">'scandir'</span><span class="p">)[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">hvplot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="s1">'x'</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="s1">'y'</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="n">c</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="n">rhkdata_obj</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'filename'</span><span class="p">])</span>
+		<span class="n">l_left</span> <span class="o">=</span> <span class="n">rhkdata_obj</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">topography</span><span class="o">.</span><span class="n">drop_vars</span><span class="p">(</span><span class="s1">'scandir'</span><span class="p">)[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">hvplot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="s1">'x'</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="s1">'y'</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="n">c</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="n">rhkdata_obj</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'filename'</span><span class="p">])</span>
+		<span class="n">l_right</span> <span class="o">=</span> <span class="n">rhkdata_obj</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">topography</span><span class="o">.</span><span class="n">drop_vars</span><span class="p">(</span><span class="s1">'scandir'</span><span class="p">)[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">hvplot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="s1">'x'</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="s1">'y'</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="n">c</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="n">rhkdata_obj</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'filename'</span><span class="p">])</span>
+		<span class="k">return</span> <span class="n">l_bottom</span> <span class="o">*</span> <span class="n">l_left</span> <span class="o">*</span> <span class="n">l_right</span> <span class="o">*</span> <span class="n">l_top</span>
+
+	<span class="k">def</span><span class="w"> </span><span class="nf">plot_spec_positions</span><span class="p">(</span><span class="n">rhkdata_obj</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
+		<span class="k">if</span> <span class="n">rhkdata_obj</span><span class="o">.</span><span class="n">datatype</span> <span class="o">==</span> <span class="s1">'map'</span><span class="p">:</span>
+			<span class="k">if</span> <span class="n">rhkdata_obj</span><span class="o">.</span><span class="n">spectype</span> <span class="o">==</span> <span class="s1">'iv'</span><span class="p">:</span>
+				<span class="n">_</span> <span class="o">=</span> <span class="n">rhkdata_obj</span><span class="o">.</span><span class="n">spectra</span><span class="o">.</span><span class="n">drop_vars</span><span class="p">([</span><span class="s1">'bias'</span><span class="p">,</span> <span class="s1">'repetitions'</span><span class="p">,</span> <span class="s1">'biasscandir'</span><span class="p">])</span><span class="o">.</span><span class="n">drop_vars</span><span class="p">([</span><span class="s1">'lia'</span><span class="p">,</span> <span class="s1">'current'</span><span class="p">])</span>
+				<span class="n">specplot</span> <span class="o">=</span> <span class="n">_</span><span class="o">.</span><span class="n">hvplot</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="s1">'x'</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="s1">'y'</span><span class="p">,</span> <span class="n">groupby</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">marker</span> <span class="o">=</span> <span class="s1">'x'</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="n">c</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="s1">'spec pos: '</span> <span class="o">+</span> <span class="n">rhkdata_obj</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'filename'</span><span class="p">])</span>
+			<span class="k">elif</span> <span class="n">rhkdata_obj</span><span class="o">.</span><span class="n">spectype</span> <span class="o">==</span> <span class="s1">'iz'</span><span class="p">:</span>
+				<span class="n">_</span> <span class="o">=</span> <span class="n">rhkdata_obj</span><span class="o">.</span><span class="n">spectra</span><span class="o">.</span><span class="n">drop_vars</span><span class="p">([</span><span class="s1">'z'</span><span class="p">,</span> <span class="s1">'repetitions'</span><span class="p">,</span> <span class="s1">'zscandir'</span><span class="p">])</span><span class="o">.</span><span class="n">drop_vars</span><span class="p">([</span><span class="s1">'current'</span><span class="p">])</span>
+				<span class="n">specplot</span> <span class="o">=</span> <span class="n">_</span><span class="o">.</span><span class="n">hvplot</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="s1">'x'</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="s1">'y'</span><span class="p">,</span> <span class="n">groupby</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">marker</span> <span class="o">=</span> <span class="s1">'x'</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="n">c</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="s1">'spec pos: '</span> <span class="o">+</span> <span class="n">rhkdata_obj</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'filename'</span><span class="p">])</span>
+		<span class="k">elif</span> <span class="n">rhkdata_obj</span><span class="o">.</span><span class="n">datatype</span> <span class="o">==</span> <span class="s1">'line'</span><span class="p">:</span>
+			<span class="k">if</span> <span class="n">rhkdata_obj</span><span class="o">.</span><span class="n">spectype</span> <span class="o">==</span> <span class="s1">'iv'</span><span class="p">:</span>
+				<span class="n">_</span> <span class="o">=</span> <span class="n">rhkdata_obj</span><span class="o">.</span><span class="n">spectra</span><span class="o">.</span><span class="n">drop_vars</span><span class="p">([</span><span class="s1">'lia'</span><span class="p">,</span> <span class="s1">'current'</span><span class="p">])</span><span class="o">.</span><span class="n">drop_vars</span><span class="p">([</span><span class="s1">'biasscandir'</span><span class="p">,</span> <span class="s1">'repetitions'</span><span class="p">,</span> <span class="s1">'bias'</span><span class="p">])</span>
+				<span class="n">specplot</span> <span class="o">=</span> <span class="n">_</span><span class="o">.</span><span class="n">hvplot</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="s1">'x'</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="s1">'y'</span><span class="p">,</span> <span class="n">groupby</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">marker</span> <span class="o">=</span> <span class="s1">'x'</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="n">c</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="s1">'spec pos: '</span> <span class="o">+</span> <span class="n">rhkdata_obj</span><span class="o">.</span><span class="n">spectra</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'filename'</span><span class="p">])</span>
+			<span class="k">elif</span> <span class="n">rhkdata_obj</span><span class="o">.</span><span class="n">spectype</span> <span class="o">==</span> <span class="s1">'iz'</span><span class="p">:</span>
+				<span class="n">_</span> <span class="o">=</span> <span class="n">rhkdata_obj</span><span class="o">.</span><span class="n">spectra</span><span class="o">.</span><span class="n">drop_vars</span><span class="p">([</span><span class="s1">'current'</span><span class="p">])</span><span class="o">.</span><span class="n">drop_vars</span><span class="p">([</span><span class="s1">'zscandir'</span><span class="p">,</span> <span class="s1">'repetitions'</span><span class="p">,</span> <span class="s1">'z'</span><span class="p">])</span>
+				<span class="n">specplot</span> <span class="o">=</span> <span class="n">_</span><span class="o">.</span><span class="n">hvplot</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="s1">'x'</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="s1">'y'</span><span class="p">,</span> <span class="n">groupby</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">marker</span> <span class="o">=</span> <span class="s1">'x'</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="n">c</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="s1">'spec pos: '</span> <span class="o">+</span> <span class="n">rhkdata_obj</span><span class="o">.</span><span class="n">spectra</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'filename'</span><span class="p">])</span>
+		<span class="k">elif</span> <span class="n">rhkdata_obj</span><span class="o">.</span><span class="n">datatype</span> <span class="o">==</span> <span class="s1">'spec'</span><span class="p">:</span>
+			<span class="c1"># specplot = rhkdata_obj.spectra.hvplot.scatter(x = 'x', y = 'y', groupby = [], marker = 'x', color = c, size = 200, line_width = 3, label = 'spec pos: ' + rhkdata_obj.spectra.attrs['filename'])</span>
+			<span class="n">specplot</span> <span class="o">=</span> <span class="n">hv</span><span class="o">.</span><span class="n">Scatter</span><span class="p">((</span><span class="n">rhkdata_obj</span><span class="o">.</span><span class="n">spectra</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">rhkdata_obj</span><span class="o">.</span><span class="n">spectra</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">data</span><span class="p">),</span> <span class="n">label</span> <span class="o">=</span> <span class="s1">'spec pos: '</span> <span class="o">+</span> <span class="n">rhkdata_obj</span><span class="o">.</span><span class="n">spectra</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'filename'</span><span class="p">])</span><span class="o">.</span><span class="n">opts</span><span class="p">(</span><span class="n">marker</span> <span class="o">=</span> <span class="s1">'x'</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span> <span class="n">line_width</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="c1"># it should never get to this point</span>
+			<span class="n">specplot</span> <span class="o">=</span> <span class="n">hv</span><span class="o">.</span><span class="n">Empty</span><span class="p">()</span>
+		<span class="k">return</span> <span class="n">specplot</span>
+
+	<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+		<span class="nb">print</span><span class="p">(</span><span class="s1">'Please supply some rhkdata instances to plot.'</span><span class="p">)</span>
+		<span class="k">return</span>
+
+	<span class="n">datatypes</span> <span class="o">=</span> <span class="p">[]</span>
+	<span class="n">spectypes</span> <span class="o">=</span> <span class="p">[]</span>
+	<span class="k">for</span> <span class="n">stmdata</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+		<span class="n">datatypes</span> <span class="o">+=</span> <span class="p">[</span><span class="n">stmdata</span><span class="o">.</span><span class="n">datatype</span><span class="p">]</span>
+		<span class="n">spectypes</span> <span class="o">+=</span> <span class="p">[</span><span class="n">stmdata</span><span class="o">.</span><span class="n">spectype</span><span class="p">]</span>
+
+	<span class="c1"># get the indices, where the datatype has an image or has spectroscopy data</span>
+	<span class="n">indices_topo</span> <span class="o">=</span> <span class="p">[]</span>
+	<span class="n">indices_spec</span> <span class="o">=</span> <span class="p">[]</span>
+	<span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">datatypes</span><span class="p">):</span>
+		<span class="k">if</span> <span class="n">value</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">'map'</span><span class="p">,</span> <span class="s1">'image'</span><span class="p">):</span>
+			<span class="n">indices_topo</span> <span class="o">+=</span> <span class="p">[</span><span class="n">index</span><span class="p">]</span>
+		<span class="k">if</span> <span class="n">value</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">'map'</span><span class="p">,</span> <span class="s1">'line'</span><span class="p">,</span> <span class="s1">'spec'</span><span class="p">):</span>
+			<span class="n">indices_spec</span> <span class="o">+=</span> <span class="p">[</span><span class="n">index</span><span class="p">]</span>
+	<span class="c1"># indices_topo = [index for index, value in enumerate(datatypes) if value in ('map', 'image')]</span>
+
+	<span class="k">if</span> <span class="n">indices_topo</span> <span class="o">==</span> <span class="p">[]</span> <span class="ow">and</span> <span class="p">(</span><span class="n">plot_spec</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">True</span> <span class="ow">or</span> <span class="n">indices_spec</span> <span class="o">==</span> <span class="p">[]):</span>
+		<span class="nb">print</span><span class="p">(</span><span class="s1">'Nothing to plot: the rhkdata instances have no images, and spectrum positions are not requested.'</span><span class="p">)</span>
+		<span class="k">return</span>
+
+	<span class="c1"># plot those images</span>
+	<span class="c1"># get a color map for the bounding boxes</span>
+	<span class="kn">from</span><span class="w"> </span><span class="nn">bokeh.palettes</span><span class="w"> </span><span class="kn">import</span> <span class="n">all_palettes</span>
+	<span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">cycle</span>
+	<span class="n">colors</span> <span class="o">=</span> <span class="n">all_palettes</span><span class="p">[</span><span class="n">palette_name</span><span class="p">][</span><span class="n">num_colors</span><span class="p">]</span>
+	<span class="c1"># make the color list cyclic</span>
+	<span class="n">color_cycle</span> <span class="o">=</span> <span class="n">cycle</span><span class="p">(</span><span class="n">colors</span><span class="p">)</span>
+
+	<span class="c1"># do the first plot</span>
+	<span class="k">if</span> <span class="n">indices_topo</span> <span class="o">!=</span> <span class="p">[]:</span>
+		<span class="c1"># plot the first one</span>
+		<span class="n">topo_abs</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="n">indices_topo</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">coord_to_absolute</span><span class="p">()</span>
+		<span class="n">navi_plot</span> <span class="o">=</span> <span class="n">topo_abs</span><span class="o">.</span><span class="n">_qplot_topo</span><span class="p">(</span><span class="n">cmap_topo</span> <span class="o">=</span> <span class="n">cmap</span><span class="p">,</span> <span class="n">clabel</span> <span class="o">=</span> <span class="s1">'height (nm)'</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="n">topo_abs</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'filename'</span><span class="p">])</span>
+		<span class="c1"># draw a bounding box</span>
+		<span class="n">navi_plot</span> <span class="o">*=</span> <span class="n">bounding_box</span><span class="p">(</span><span class="n">topo_abs</span><span class="p">,</span> <span class="nb">next</span><span class="p">(</span><span class="n">color_cycle</span><span class="p">))</span>
+		<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indices_topo</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+			<span class="n">topo_abs</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">coord_to_absolute</span><span class="p">()</span>
+			<span class="n">navi_plot</span> <span class="o">*=</span> <span class="n">topo_abs</span><span class="o">.</span><span class="n">_qplot_topo</span><span class="p">(</span><span class="n">cmap_topo</span> <span class="o">=</span> <span class="n">cmap</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="n">topo_abs</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'filename'</span><span class="p">])</span>
+			<span class="c1"># plot a bounding box around the image</span>
+			<span class="n">navi_plot</span> <span class="o">*=</span> <span class="n">bounding_box</span><span class="p">(</span><span class="n">topo_abs</span><span class="p">,</span> <span class="nb">next</span><span class="p">(</span><span class="n">color_cycle</span><span class="p">))</span>
+		
+	<span class="c1"># if plot_spec is True, plot the spectra positions</span>
+	<span class="k">if</span> <span class="n">plot_spec</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+		<span class="k">if</span> <span class="n">indices_spec</span> <span class="o">!=</span> <span class="p">[]:</span>
+			<span class="c1"># plot the first one if no topography data was passed</span>
+			<span class="k">if</span> <span class="n">indices_topo</span> <span class="o">==</span> <span class="p">[]:</span>
+				<span class="n">navi_plot</span> <span class="o">=</span> <span class="n">plot_spec_positions</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="n">indices_spec</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="nb">next</span><span class="p">(</span><span class="n">color_cycle</span><span class="p">))</span>
+			<span class="k">else</span><span class="p">:</span>
+				<span class="n">navi_plot</span> <span class="o">*=</span> <span class="n">plot_spec_positions</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="n">indices_spec</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="nb">next</span><span class="p">(</span><span class="n">color_cycle</span><span class="p">))</span>
+			<span class="c1"># for datatypes containing a spectrum, plot the spectrum positions</span>
+			<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indices_spec</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+				<span class="n">navi_plot</span> <span class="o">*=</span> <span class="n">plot_spec_positions</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="nb">next</span><span class="p">(</span><span class="n">color_cycle</span><span class="p">))</span>
+
+	<span class="k">return</span> <span class="n">navi_plot</span><span class="o">.</span><span class="n">opts</span><span class="p">(</span><span class="n">frame_width</span> <span class="o">=</span> <span class="mi">400</span><span class="p">,</span> <span class="n">frame_height</span> <span class="o">=</span> <span class="mi">400</span><span class="p">,</span> <span class="n">legend_position</span> <span class="o">=</span> <span class="s1">'right'</span><span class="p">,</span> <span class="n">title</span> <span class="o">=</span> <span class="s1">' '</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Peter Nemes-Incze.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

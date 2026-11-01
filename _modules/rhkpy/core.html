@@ -1,0 +1,466 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rhkpy.core &mdash; rhkpy 2023.08.10 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=0f4f00c4"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            rhkpy
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intro.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intro.html#id1">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rhkpy.html">rhkpy package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">rhkpy</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">rhkpy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">rhkpy.core</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for rhkpy.core</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""The rhkdata class: an xarray-based container for RHK .sm4 measurement data.</span>
+
+<span class="sd">The heavy lifting is delegated to the submodules:</span>
+
+<span class="sd">- :mod:`rhkpy.io` - reading the .sm4 file</span>
+<span class="sd">- :mod:`rhkpy.builders` - constructing the `image` and `spectra` Datasets</span>
+<span class="sd">- :mod:`rhkpy.analysis` - coordinate transforms, flattening, fitting</span>
+<span class="sd">- :mod:`rhkpy.plotting` - quick plots</span>
+<span class="sd">"""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">_logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numbers</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">_numbers</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">_np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_spym</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.builders</span><span class="w"> </span><span class="kn">import</span> <span class="n">_load_specmap</span><span class="p">,</span> <span class="n">_load_line</span><span class="p">,</span> <span class="n">_load_spec</span><span class="p">,</span> <span class="n">_load_image</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.builders.detect</span><span class="w"> </span><span class="kn">import</span> <span class="n">_checkdatatype</span><span class="p">,</span> <span class="n">_checkrepetitions</span><span class="p">,</span> <span class="n">_is_single_sweep</span><span class="p">,</span> <span class="n">_may_alternate</span><span class="p">,</span> <span class="n">_get_filename</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.analysis</span><span class="w"> </span><span class="kn">import</span> <span class="n">ops</span> <span class="k">as</span> <span class="n">_ops</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.plotting</span><span class="w"> </span><span class="kn">import</span> <span class="n">quickplot</span> <span class="k">as</span> <span class="n">_quickplot</span>
+
+<span class="n">_logger</span> <span class="o">=</span> <span class="n">_logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">'rhkpy'</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="rhkdata">
+<a class="viewcode-back" href="../../rhkpy.html#rhkpy.core.rhkdata">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">rhkdata</span><span class="p">:</span>
+<span class="w">	</span><span class="sd">"""</span>
+<span class="sd">	A container for the xarray based structure of the RHK data. Loads the RHK "sm4" file from the path at: ``filename``.</span>
+
+<span class="sd">	:param filename: path and filename of the "sm4" file to be loaded</span>
+<span class="sd">	:type filename: str</span>
+<span class="sd">	:param repetitions: The number of repeated aquisitions of spectra in tip position. If 0, it is inferred from the file, defaults to 0</span>
+<span class="sd">	:type repetitions: int, optional</span>
+<span class="sd">	:param alternate: `True` if the bias is swept forward and backward, `False` if not, defaults to True. With `False`, every sweep counts as a repetition and the scan direction dimension has a single entry, labelled like the first sweep of an alternating measurement. If the file does alternate, forward and backward sweeps end up mixed in the repetitions and the label doesn't describe them, and a warning is logged when the number of spectra per tip position allows this. Files with one spectrum per tip position are always loaded with `False`.</span>
+<span class="sd">	:type alternate: bool, optional</span>
+<span class="sd">	:param loadraw: Set to `True` if you want the raw topography data, defaults to False</span>
+<span class="sd">	:type loadraw: bool, optional</span>
+
+<span class="sd">	Some variables of the :class:`rhkdata` class:</span>
+
+<span class="sd">	:var filename: (type str) filename of the "sm4" file</span>
+<span class="sd">	:var image: (type :py:mod:`xarray` Dataset) Dataset containing the image data</span>
+<span class="sd">	:var spectra: (type :py:mod:`xarray` Dataset) Dataset containing the spectroscopy data</span>
+<span class="sd">	:var spymdata: (type :py:mod:`xarray` Dataset) raw Dataset, as loaded by the built-in sm4 reader (:mod:`rhkpy.io.sm4`)</span>
+
+<span class="sd">	All the variables can be listed by calling: :class:`rhkdata.print_info`.</span>
+
+<span class="sd">	.. note::</span>
+<span class="sd">		If you want to skip the "flatten" filter of the topography images, use: `loadraw = True`.</span>
+
+<span class="sd">	:Example:</span>
+
+<span class="sd">		.. code-block:: python</span>
+
+<span class="sd">			import rhkpy</span>
+
+<span class="sd">			# Load dI/dV spectra, measured along a line</span>
+<span class="sd">			filename = 'linespectra.sm4'</span>
+<span class="sd">			linespec = rhkpy.rhkdata(filename)</span>
+
+<span class="sd">			# display the contents of the spectroscopy `xarray` instance</span>
+<span class="sd">			linespec.spectra</span>
+<span class="sd">			&lt;xarray.Dataset&gt;</span>
+<span class="sd">			Dimensions:      (bias: 501, dist: 64, repetitions: 1, biasscandir: 2)</span>
+<span class="sd">			Coordinates:</span>
+<span class="sd">			* bias         (bias) float64 0.5 0.498 0.496 0.494 ... -0.496 -0.498 -0.5</span>
+<span class="sd">			* dist         (dist) float64 0.0 0.5279 1.056 1.584 ... 32.2 32.73 33.26</span>
+<span class="sd">			* repetitions  (repetitions) int32 0</span>
+<span class="sd">			* biasscandir  (biasscandir) &lt;U5 'left' 'right'</span>
+<span class="sd">			Data variables:</span>
+<span class="sd">				lia          (bias, dist, repetitions, biasscandir) float64 3.585 ... 5.185</span>
+<span class="sd">				current      (bias, dist, repetitions, biasscandir) float64 99.49 ... -132.7</span>
+<span class="sd">				x            (dist) float64 -37.48 -36.97 -36.45 ... -5.902 -5.384 -4.866</span>
+<span class="sd">				y            (dist) float64 -173.5 -173.6 -173.7 ... -179.7 -179.9 -180.0</span>
+<span class="sd">			Attributes: (12/15)</span>
+<span class="sd">				filename:           line_9K_ABC6_2020_11_01_12_12_27_213.sm4</span>
+<span class="sd">				bias:               0.49999988</span>
+<span class="sd">				bias units:         V</span>
+<span class="sd">				setpoint:           99.99999439624929</span>
+<span class="sd">				setpoint units:     pA</span>
+<span class="sd">				measurement date:   11/01/20</span>
+<span class="sd">				...                 ...</span>
+<span class="sd">				LI amplitude unit:  mV</span>
+<span class="sd">				LI frequency:       1300.0</span>
+<span class="sd">				LI frequency unit:  Hz</span>
+<span class="sd">				LI phase:           -102.9999998</span>
+<span class="sd">				datatype:           line</span>
+<span class="sd">				spectype:           iv</span>
+
+<span class="sd">			# select the dI/dV signal (lia) and average the</span>
+<span class="sd">			# forward and backward bias sweeps and repetitions</span>
+<span class="sd">			linespec_avg = linespec.spectra.lia.mean(dim = ['biasscandir', 'repetitions'])</span>
+
+<span class="sd">			# plot the dI/dV values along the remaining coordinates: bias, dist</span>
+<span class="sd">			linespec_avg.plot()</span>
+
+<span class="sd">	"""</span>
+	<span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">repetitions</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">alternate</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">loadraw</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">		</span><span class="sd">"""Initialize the :class:`rhkdata` instance</span>
+<span class="sd">		"""</span>
+
+		<span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">alternate</span><span class="p">,</span> <span class="p">(</span><span class="nb">bool</span><span class="p">,</span> <span class="n">_np</span><span class="o">.</span><span class="n">bool_</span><span class="p">)):</span>
+			<span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'alternate needs to be True or False, got: </span><span class="si">{</span><span class="n">alternate</span><span class="si">!r}</span><span class="s1">'</span><span class="p">)</span>
+		<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">repetitions</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">repetitions</span><span class="p">,</span> <span class="n">_numbers</span><span class="o">.</span><span class="n">Integral</span><span class="p">)</span> <span class="ow">or</span> <span class="n">repetitions</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+			<span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'repetitions needs to be an integer, 1 or above, or 0 to infer it from the file, got: </span><span class="si">{</span><span class="n">repetitions</span><span class="si">!r}</span><span class="s1">'</span><span class="p">)</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">filename</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">loadraw</span> <span class="o">=</span> <span class="n">loadraw</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="kc">None</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">spectype</span> <span class="o">=</span> <span class="kc">None</span>
+
+		<span class="c1"># Boolean value, True if alternate scan directions is turned on</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">alternate</span> <span class="o">=</span> <span class="n">alternate</span>
+
+		<span class="c1"># Load the data using spym</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">spymdata</span> <span class="o">=</span> <span class="n">load_spym</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spymdata</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+			<span class="k">return</span>
+
+		<span class="c1"># check software version. Not tested for MinorVer &lt; 6</span>
+		<span class="n">l</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spymdata</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spymdata</span><span class="p">[</span><span class="n">l</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'RHK_MinorVer'</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">6</span><span class="p">:</span>
+			<span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">'stmdatastruct not tested for RHK Rev version &lt; 6. Some things might not work as expected.'</span><span class="p">)</span>
+
+		<span class="c1"># check type of data and spectra contained in the file</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">datatype</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectype</span> <span class="o">=</span> <span class="n">_checkdatatype</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">datatype</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">'map'</span><span class="p">,</span> <span class="s1">'line'</span><span class="p">,</span> <span class="s1">'spec'</span><span class="p">):</span>
+			<span class="c1"># one spectrum per tip position leaves no second sweep to separate</span>
+			<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">alternate</span> <span class="ow">and</span> <span class="n">_is_single_sweep</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+				<span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">'</span><span class="si">%s</span><span class="s1"> has one spectrum per tip position, loading it with alternate = False.'</span><span class="p">,</span> <span class="n">_get_filename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">))</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">alternate</span> <span class="o">=</span> <span class="kc">False</span>
+			<span class="k">elif</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">alternate</span> <span class="ow">and</span> <span class="n">_may_alternate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+				<span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+					<span class="s1">'</span><span class="si">%s</span><span class="s1">: alternate = False counts every sweep as a repetition. If this file has forward and backward sweeps, they are mixed in `repetitions`, under a single scan direction label.'</span><span class="p">,</span>
+					<span class="n">_get_filename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">),</span>
+				<span class="p">)</span>
+
+		<span class="c1"># number of spectra at a tip position</span>
+		<span class="c1"># default value is 0, if this is changed, the code will use the given value, othewise it will try to infer the number of repetitions from the number of identical tip positions</span>
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">datatype</span> <span class="o">!=</span> <span class="s1">'image'</span><span class="p">:</span>
+			<span class="k">if</span> <span class="n">repetitions</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+				<span class="c1"># overwrite the default value and the value inferred from tip coordinates</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">repetitions</span> <span class="o">=</span> <span class="n">repetitions</span>
+			<span class="k">else</span><span class="p">:</span>
+				<span class="c1"># determine the number of repetitions from the number of indentical tip coordinates in the beginning of RHK_SpecDrift_Xcoord</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">repetitions</span> <span class="o">=</span> <span class="n">_checkrepetitions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">repetitions</span> <span class="o">=</span> <span class="n">repetitions</span>
+
+		<span class="c1"># load data into xarray, for all data types</span>
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">datatype</span> <span class="o">==</span> <span class="s1">'map'</span><span class="p">:</span>
+			<span class="bp">self</span> <span class="o">=</span> <span class="n">_load_specmap</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+		<span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">datatype</span> <span class="o">==</span> <span class="s1">'line'</span><span class="p">:</span>
+			<span class="bp">self</span> <span class="o">=</span> <span class="n">_load_line</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+		<span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">datatype</span> <span class="o">==</span> <span class="s1">'spec'</span><span class="p">:</span>
+			<span class="bp">self</span> <span class="o">=</span> <span class="n">_load_spec</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+		<span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">datatype</span> <span class="o">==</span> <span class="s1">'image'</span><span class="p">:</span>
+			<span class="bp">self</span> <span class="o">=</span> <span class="n">_load_image</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+<div class="viewcode-block" id="rhkdata.mrep">
+<a class="viewcode-back" href="../../rhkpy.html#rhkpy.core.rhkdata.mrep">[docs]</a>
+	<span class="k">def</span><span class="w"> </span><span class="nf">mrep</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">		</span><span class="sd">"""Returns a new instance of :class:`rhkdata`, with the data averaged (using :py:mod:`xarray.Variable.mean`) along the 'repetitions' coordinate.</span>
+<span class="sd">		Meant to be shorthand for: ``rhkdata_instance.spectra.mean(dim = 'repetitions')``.</span>
+
+<span class="sd">		:return: :class:`rhkdata` instance</span>
+<span class="sd">		:rtype: :class:`rhkdata`</span>
+<span class="sd">		"""</span>
+		<span class="c1"># function to take the mean along the repetitions coordinate</span>
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">datatype</span> <span class="o">==</span> <span class="s1">'image'</span><span class="p">:</span>
+			<span class="nb">print</span><span class="p">(</span><span class="s1">'An image instance doesn</span><span class="se">\'</span><span class="s1">t have repetitions.'</span><span class="p">)</span>
+			<span class="k">return</span>
+		<span class="n">newdata</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+		<span class="n">newdata</span><span class="o">.</span><span class="n">spectra</span> <span class="o">=</span> <span class="n">newdata</span><span class="o">.</span><span class="n">spectra</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span> <span class="o">=</span> <span class="s1">'repetitions'</span><span class="p">)</span>
+		<span class="k">return</span> <span class="n">newdata</span></div>
+
+
+<div class="viewcode-block" id="rhkdata.msw">
+<a class="viewcode-back" href="../../rhkpy.html#rhkpy.core.rhkdata.msw">[docs]</a>
+	<span class="k">def</span><span class="w"> </span><span class="nf">msw</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">		</span><span class="sd">"""Returns a new instance of :class:`rhkdata`, with the data averaged (using :py:mod:`xarray.Variable.mean`) along the 'biasscandir' or 'zscandir' coordinate.</span>
+<span class="sd">		Meant to be shorthand for: ``rhkdata_instance.spectra.mean(dim = 'biasscandir')``, or ``rhkdata_instance.spectra.mean(dim = 'zscandir')``.</span>
+
+<span class="sd">		:return: :class:`rhkdata` instance</span>
+<span class="sd">		:rtype: :class:`rhkdata`</span>
+<span class="sd">		"""</span>
+		<span class="c1"># function to take the mean along the biasscan coordinate</span>
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">datatype</span> <span class="o">==</span> <span class="s1">'image'</span><span class="p">:</span>
+			<span class="nb">print</span><span class="p">(</span><span class="s1">'An image instance doesn</span><span class="se">\'</span><span class="s1">t have biasscandir or zscandir.'</span><span class="p">)</span>
+			<span class="k">return</span>
+		<span class="n">newdata</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectype</span> <span class="o">==</span> <span class="s1">'iv'</span><span class="p">:</span>
+			<span class="n">newdata</span><span class="o">.</span><span class="n">spectra</span> <span class="o">=</span> <span class="n">newdata</span><span class="o">.</span><span class="n">spectra</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span> <span class="o">=</span> <span class="s1">'biasscandir'</span><span class="p">)</span>
+		<span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectype</span> <span class="o">==</span> <span class="s1">'iz'</span><span class="p">:</span>
+			<span class="n">newdata</span><span class="o">.</span><span class="n">spectra</span> <span class="o">=</span> <span class="n">newdata</span><span class="o">.</span><span class="n">spectra</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span> <span class="o">=</span> <span class="s1">'zscandir'</span><span class="p">)</span>
+		<span class="k">return</span> <span class="n">newdata</span></div>
+
+
+<div class="viewcode-block" id="rhkdata.print_info">
+<a class="viewcode-back" href="../../rhkpy.html#rhkpy.core.rhkdata.print_info">[docs]</a>
+	<span class="k">def</span><span class="w"> </span><span class="nf">print_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">		</span><span class="sd">"""List the variables of the :class:`rhkdata` instance.</span>
+<span class="sd">		"""</span>
+		<span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
+			<span class="nb">print</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+		<span class="k">if</span> <span class="s1">'image'</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
+			<span class="nb">print</span><span class="p">(</span><span class="s1">'</span><span class="se">\n</span><span class="s1">image:'</span><span class="p">)</span>
+			<span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">data_vars</span><span class="p">:</span>
+				<span class="nb">print</span><span class="p">(</span><span class="s1">'</span><span class="se">\t</span><span class="s1">'</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span>
+		<span class="k">if</span> <span class="s1">'spectra'</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
+			<span class="nb">print</span><span class="p">(</span><span class="s1">'</span><span class="se">\n</span><span class="s1">spectra:'</span><span class="p">)</span>
+			<span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectra</span><span class="o">.</span><span class="n">data_vars</span><span class="p">:</span>
+				<span class="nb">print</span><span class="p">(</span><span class="s1">'</span><span class="se">\t</span><span class="s1">'</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="rhkdata.coord_to_absolute">
+<a class="viewcode-back" href="../../rhkpy.html#rhkpy.core.rhkdata.coord_to_absolute">[docs]</a>
+	<span class="k">def</span><span class="w"> </span><span class="nf">coord_to_absolute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">		</span><span class="sd">"""Returns a new :class:`rhkdata` instance, with the coordinates updated to reflect the abolute tip position. This includes X, Y offset and rotation.</span>
+
+<span class="sd">		:return: :class:`rhkdata` instance, with the same data and metadata, but the :class:`rhkdata.image`, :py:mod:`xarray` variable coordinates shifted to absolute tip positions.</span>
+<span class="sd">		:rtype: :class:`rhkdata` instance</span>
+
+<span class="sd">		:Example:</span>
+
+<span class="sd">		.. code-block:: python</span>
+
+<span class="sd">			import rhkpy</span>
+
+<span class="sd">			m = rhkpy.rhkdata('didv map.sm4')</span>
+
+<span class="sd">			# Take the `rhkdata` instance (image or map): `m`,</span>
+<span class="sd">			# and convert the image coordinates to absolute values</span>
+<span class="sd">			m_abs = m.coord_to_absolute()</span>
+
+<span class="sd">			# coordinates of the instance `m`</span>
+<span class="sd">			# We can see it runs from 0 to 100 nm</span>
+<span class="sd">			print(m.image.x.min().data, m.image.x.max().data)</span>
+<span class="sd">			0.0 100.0</span>
+
+<span class="sd">			# check the same corrdinate for the new `m_abs`</span>
+<span class="sd">			print(m_abs.image.x.min().data, m_abs.image.x.max().data)</span>
+<span class="sd">			-877.0008892433623 -741.0633876547834</span>
+
+<span class="sd">			# we can see it's now shows the exact tip position</span>
+<span class="sd">			# the image is also rotated, as the "scan angle" attribute shows</span>
+<span class="sd">			m_abs.image.attrs['scan angle']</span>
+<span class="sd">			30.0</span>
+
+<span class="sd">			# plot the rotated and offset image</span>
+<span class="sd">			m_abs.image.topography.sel(scandir = 'forward').plot()</span>
+
+<span class="sd">		"""</span>
+		<span class="c1"># check if 'image' is present</span>
+		<span class="k">if</span> <span class="s1">'image'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
+			<span class="nb">print</span><span class="p">(</span><span class="s1">'This `rhkdata` instance does not contain an image'</span><span class="p">)</span>
+			<span class="k">return</span>
+
+		<span class="c1"># copy the current instance</span>
+		<span class="n">rhkdataobj_new</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+		<span class="c1"># update the coordinates</span>
+		<span class="n">rhkdataobj_new</span><span class="o">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">_ops</span><span class="o">.</span><span class="n">coord_to_absolute</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">)</span>
+
+		<span class="k">return</span> <span class="n">rhkdataobj_new</span></div>
+
+
+<div class="viewcode-block" id="rhkdata.polyflatten">
+<a class="viewcode-back" href="../../rhkpy.html#rhkpy.core.rhkdata.polyflatten">[docs]</a>
+	<span class="k">def</span><span class="w"> </span><span class="nf">polyflatten</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">		</span><span class="sd">"""Uses :func:`~rhkpy.rhkpy_process.polyflatten` to flatten the selected datafield in the :class:`rhkdata` instance.</span>
+<span class="sd">		All keywords accepted by :func:`~rhkpy.rhkpy_process.polyflatten` can be passed.</span>
+
+<span class="sd">		:return: :class:`rhdata` instance, with the selected ``field_type`` flattened. Default ``field_type`` = 'topography'.</span>
+<span class="sd">		:rtype: :class:`rhdata` instance</span>
+<span class="sd">		"""</span>
+
+		<span class="c1"># check if 'image' is present</span>
+		<span class="k">if</span> <span class="s1">'image'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
+			<span class="nb">print</span><span class="p">(</span><span class="s1">'This `rhkdata` instance does not contain an image'</span><span class="p">)</span>
+			<span class="k">return</span>
+		<span class="c1"># make a copy of the instance</span>
+		<span class="n">flattened_rhkdataobj</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+		<span class="c1"># apply flatten to the copy</span>
+		<span class="n">flattened_rhkdataobj</span><span class="o">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">_ops</span><span class="o">.</span><span class="n">polyflatten</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+		<span class="k">return</span> <span class="n">flattened_rhkdataobj</span></div>
+
+
+<div class="viewcode-block" id="rhkdata.qplot">
+<a class="viewcode-back" href="../../rhkpy.html#rhkpy.core.rhkdata.qplot">[docs]</a>
+	<span class="k">def</span><span class="w"> </span><span class="nf">qplot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">width</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">		</span><span class="sd">"""Quick plot of the :class:`rhkdata` instance</span>
+
+<span class="sd">		:param width: set size of plot, defaults to None</span>
+<span class="sd">		:type width: float, optional</span>
+
+<span class="sd">		The colorscales used for density plots can be specified by the keywords below.</span>
+<span class="sd">		For possible colorscale options see the `HoloViews colormaps &lt;https://holoviews.org/user_guide/Colormaps.html&gt;`_.</span>
+
+<span class="sd">		:param cmap_topo: topography colorscale, defaults to 'fire'</span>
+<span class="sd">		:type cmap_topo: str, optional</span>
+<span class="sd">		:param cmap_spec: colorscale for plotting dI/dV data, defaults to 'viridis'</span>
+<span class="sd">		:type cmap_spec: str, optional</span>
+
+<span class="sd">		:return: :py:mod:`panel` plot</span>
+<span class="sd">		:rtype: :py:mod:`panel`</span>
+<span class="sd">		"""</span>
+		<span class="k">return</span> <span class="n">_quickplot</span><span class="o">.</span><span class="n">qplot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">width</span> <span class="o">=</span> <span class="n">width</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+	<span class="c1">## internal functions -----------------------------------------------------------------------------------------</span>
+	<span class="c1">## plotting functions for qplot, delegating to rhkpy.plotting.quickplot</span>
+
+	<span class="k">def</span><span class="w"> </span><span class="nf">_qplot_topo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmap_topo</span> <span class="o">=</span> <span class="s1">'fire'</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">		</span><span class="sd">"""See :func:`rhkpy.plotting.quickplot.plot_topo`."""</span>
+		<span class="k">return</span> <span class="n">_quickplot</span><span class="o">.</span><span class="n">plot_topo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmap_topo</span> <span class="o">=</span> <span class="n">cmap_topo</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+	<span class="k">def</span><span class="w"> </span><span class="nf">_qplot_lia</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmap_spec</span> <span class="o">=</span> <span class="s1">'viridis'</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">		</span><span class="sd">"""See :func:`rhkpy.plotting.quickplot.plot_lia`."""</span>
+		<span class="k">return</span> <span class="n">_quickplot</span><span class="o">.</span><span class="n">plot_lia</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmap_spec</span> <span class="o">=</span> <span class="n">cmap_spec</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+	<span class="k">def</span><span class="w"> </span><span class="nf">_qplot_map_iv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmap_spec</span> <span class="o">=</span> <span class="s1">'viridis'</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">		</span><span class="sd">"""See :func:`rhkpy.plotting.quickplot.plot_map_iv`."""</span>
+		<span class="k">return</span> <span class="n">_quickplot</span><span class="o">.</span><span class="n">plot_map_iv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmap_spec</span> <span class="o">=</span> <span class="n">cmap_spec</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+	<span class="k">def</span><span class="w"> </span><span class="nf">_qplot_map_iz</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmap_spec</span> <span class="o">=</span> <span class="s1">'viridis'</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">		</span><span class="sd">"""See :func:`rhkpy.plotting.quickplot.plot_map_iz`."""</span>
+		<span class="k">return</span> <span class="n">_quickplot</span><span class="o">.</span><span class="n">plot_map_iz</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmap_spec</span> <span class="o">=</span> <span class="n">cmap_spec</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+	<span class="k">def</span><span class="w"> </span><span class="nf">_qplot_line_iv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmap_spec</span> <span class="o">=</span> <span class="s1">'viridis'</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">		</span><span class="sd">"""See :func:`rhkpy.plotting.quickplot.plot_line_iv`."""</span>
+		<span class="k">return</span> <span class="n">_quickplot</span><span class="o">.</span><span class="n">plot_line_iv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmap_spec</span> <span class="o">=</span> <span class="n">cmap_spec</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+	<span class="k">def</span><span class="w"> </span><span class="nf">_qplot_line_spec_iv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">		</span><span class="sd">"""See :func:`rhkpy.plotting.quickplot.plot_line_spec_iv`."""</span>
+		<span class="k">return</span> <span class="n">_quickplot</span><span class="o">.</span><span class="n">plot_line_spec_iv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+	<span class="k">def</span><span class="w"> </span><span class="nf">_qplot_line_iz</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmap_spec</span> <span class="o">=</span> <span class="s1">'viridis'</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">		</span><span class="sd">"""See :func:`rhkpy.plotting.quickplot.plot_line_iz`."""</span>
+		<span class="k">return</span> <span class="n">_quickplot</span><span class="o">.</span><span class="n">plot_line_iz</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmap_spec</span> <span class="o">=</span> <span class="n">cmap_spec</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+	<span class="k">def</span><span class="w"> </span><span class="nf">_qplot_line_spec_iz</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">		</span><span class="sd">"""See :func:`rhkpy.plotting.quickplot.plot_line_spec_iz`."""</span>
+		<span class="k">return</span> <span class="n">_quickplot</span><span class="o">.</span><span class="n">plot_line_spec_iz</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+	<span class="k">def</span><span class="w"> </span><span class="nf">_qplot_spec_iv_lia</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">		</span><span class="sd">"""See :func:`rhkpy.plotting.quickplot.plot_spec_iv_lia`."""</span>
+		<span class="k">return</span> <span class="n">_quickplot</span><span class="o">.</span><span class="n">plot_spec_iv_lia</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+	<span class="k">def</span><span class="w"> </span><span class="nf">_qplot_spec_iv_curr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">		</span><span class="sd">"""See :func:`rhkpy.plotting.quickplot.plot_spec_iv_curr`."""</span>
+		<span class="k">return</span> <span class="n">_quickplot</span><span class="o">.</span><span class="n">plot_spec_iv_curr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+	<span class="k">def</span><span class="w"> </span><span class="nf">_qplot_spec_iz</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">		</span><span class="sd">"""See :func:`rhkpy.plotting.quickplot.plot_spec_iz`."""</span>
+		<span class="k">return</span> <span class="n">_quickplot</span><span class="o">.</span><span class="n">plot_spec_iz</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Peter Nemes-Incze.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

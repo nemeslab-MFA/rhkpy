@@ -1,0 +1,461 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rhkpy.plotting.quickplot &mdash; rhkpy 2023.08.10 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=0f4f00c4"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            rhkpy
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../intro.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../intro.html#id1">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rhkpy.html">rhkpy package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">rhkpy</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">rhkpy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">rhkpy.plotting.quickplot</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for rhkpy.plotting.quickplot</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""Quick-plot internals for rhkdata instances.</span>
+
+<span class="sd">These are the implementations behind :meth:`rhkpy.rhkdata.qplot` and the</span>
+<span class="sd">``rhkdata._qplot_*`` methods.</span>
+
+<span class="sd">Structure:</span>
+
+<span class="sd">- ``_fwbw_lineplot`` - the shared forward/backward sweep overlay used by every</span>
+<span class="sd">  1D spectrum plot (all repetitions dotted, average in bold)</span>
+<span class="sd">- ``_mean_signal_image`` - the shared 2D density plot of the sweep-averaged</span>
+<span class="sd">  signal used by map and line plots</span>
+<span class="sd">- ``_QPLOT_LAYOUTS`` - registry mapping (datatype, spectype) to the panel</span>
+<span class="sd">  layout of :func:`qplot`; add an entry here to support a new measurement type</span>
+
+<span class="sd">Output is identical to rhkpy &lt;= 1.3 (same data selections, colors, labels and</span>
+<span class="sd">panel arrangement).</span>
+<span class="sd">"""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">hvplot.xarray</span>  <span class="c1"># noqa: F401 - registers the .hvplot accessor</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">panel</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pn</span>
+
+
+<span class="c1">## shared plot building blocks ----------------------------------------</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_fwbw_lineplot</span><span class="p">(</span><span class="n">da</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">scandir_dim</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">labels</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
+<span class="w">	</span><span class="sd">"""Overlay the forward/backward sweeps of a 1D signal.</span>
+
+<span class="sd">	With a single repetition, plots the two sweeps in red/blue with legend</span>
+<span class="sd">	labels. With multiple repetitions, plots every repetition as a dotted</span>
+<span class="sd">	light-colored line and the repetition average in bold on top. A single sweep</span>
+<span class="sd">	measurement only has the forward sweep.</span>
+
+<span class="sd">	:param da: DataArray with dims (..., 'repetitions', scandir_dim)</span>
+<span class="sd">	:param x: name of the sweep coordinate ('bias' or 'z')</span>
+<span class="sd">	:param scandir_dim: name of the sweep direction dim ('biasscandir' or 'zscandir')</span>
+<span class="sd">	:param labels: legend labels for the two sweep directions, e.g. ('left', 'right')</span>
+<span class="sd">	"""</span>
+	<span class="n">label_fw</span><span class="p">,</span> <span class="n">label_bw</span> <span class="o">=</span> <span class="n">labels</span>
+
+	<span class="k">def</span><span class="w"> </span><span class="nf">_sweep_plot</span><span class="p">(</span><span class="n">sweep</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">repetition_color</span><span class="p">):</span>
+		<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">repetitions</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+			<span class="k">return</span> <span class="n">da</span><span class="o">.</span><span class="n">isel</span><span class="p">({</span><span class="s1">'repetitions'</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="n">scandir_dim</span><span class="p">:</span> <span class="n">sweep</span><span class="p">})</span><span class="o">.</span><span class="n">hvplot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="n">color</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="n">label</span><span class="p">)</span>
+		<span class="n">plot</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">isel</span><span class="p">({</span><span class="s1">'repetitions'</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="n">scandir_dim</span><span class="p">:</span> <span class="n">sweep</span><span class="p">})</span><span class="o">.</span><span class="n">hvplot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="n">repetition_color</span><span class="p">,</span> <span class="n">line_dash</span> <span class="o">=</span> <span class="s1">'dotted'</span><span class="p">,</span> <span class="n">line_width</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+		<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">repetitions</span><span class="p">)):</span>
+			<span class="c1"># iterate through the repetitions and plot on the same plot</span>
+			<span class="n">plot</span> <span class="o">*=</span> <span class="n">da</span><span class="o">.</span><span class="n">isel</span><span class="p">({</span><span class="s1">'repetitions'</span><span class="p">:</span> <span class="n">i</span><span class="p">,</span> <span class="n">scandir_dim</span><span class="p">:</span> <span class="n">sweep</span><span class="p">})</span><span class="o">.</span><span class="n">hvplot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="n">repetition_color</span><span class="p">,</span> <span class="n">line_dash</span> <span class="o">=</span> <span class="s1">'dotted'</span><span class="p">,</span> <span class="n">line_width</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+		<span class="n">plot</span> <span class="o">*=</span> <span class="n">da</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span> <span class="o">=</span> <span class="s1">'repetitions'</span><span class="p">)</span><span class="o">.</span><span class="n">isel</span><span class="p">({</span><span class="n">scandir_dim</span><span class="p">:</span> <span class="n">sweep</span><span class="p">})</span><span class="o">.</span><span class="n">hvplot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="n">color</span><span class="p">,</span> <span class="n">line_width</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="s1">'avg '</span> <span class="o">+</span> <span class="n">label</span><span class="p">)</span>
+		<span class="k">return</span> <span class="n">plot</span>
+
+	<span class="n">plot_fw</span> <span class="o">=</span> <span class="n">_sweep_plot</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">label_fw</span><span class="p">,</span> <span class="s1">'red'</span><span class="p">,</span> <span class="s1">'LightCoral'</span><span class="p">)</span>
+	<span class="k">if</span> <span class="n">da</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="n">scandir_dim</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+		<span class="k">return</span> <span class="n">plot_fw</span>
+	<span class="n">plot_bw</span> <span class="o">=</span> <span class="n">_sweep_plot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">label_bw</span><span class="p">,</span> <span class="s1">'blue'</span><span class="p">,</span> <span class="s1">'LightSkyBlue'</span><span class="p">)</span>
+
+	<span class="c1"># combine the forward and backward sweeps</span>
+	<span class="k">return</span> <span class="n">plot_fw</span> <span class="o">*</span> <span class="n">plot_bw</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_mean_signal_image</span><span class="p">(</span><span class="n">rhkdata_obj</span><span class="p">,</span> <span class="n">signal</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">scandir_dim</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">cmap_spec</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">imageopts</span><span class="p">):</span>
+<span class="w">	</span><span class="sd">"""2D density plot of a signal averaged over repetitions and sweep direction.</span>
+
+<span class="sd">	:param rhkdata_obj: the :class:`~rhkpy.rhkpy_loader.rhkdata` instance to plot</span>
+<span class="sd">	:param signal: name of the data variable in ``spectra`` ('lia' or 'current')</span>
+<span class="sd">	:type signal: str</span>
+<span class="sd">	:param scandir_dim: name of the sweep direction dim ('biasscandir' or 'zscandir')</span>
+<span class="sd">	:type scandir_dim: str</span>
+<span class="sd">	:param cmap_spec: colorscale of the density plot</span>
+<span class="sd">	:type cmap_spec: str</span>
+<span class="sd">	:param imageopts: further options passed to :py:mod:`hvplot` (x, y, groupby, title, ...)</span>
+
+<span class="sd">	:return: :py:mod:`holoviews` plot</span>
+<span class="sd">	:rtype: :py:mod:`holoviews`</span>
+<span class="sd">	"""</span>
+	<span class="n">meanmap</span> <span class="o">=</span> <span class="n">rhkdata_obj</span><span class="o">.</span><span class="n">spectra</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'repetitions'</span><span class="p">,</span> <span class="n">scandir_dim</span><span class="p">])</span>
+	<span class="k">return</span> <span class="n">meanmap</span><span class="p">[</span><span class="n">signal</span><span class="p">]</span><span class="o">.</span><span class="n">hvplot</span><span class="o">.</span><span class="n">image</span><span class="p">(</span><span class="n">cmap</span> <span class="o">=</span> <span class="n">cmap_spec</span><span class="p">,</span> <span class="o">**</span><span class="n">imageopts</span><span class="p">)</span>
+
+
+<span class="c1">## plots of the individual panels -------------------------------------</span>
+
+<div class="viewcode-block" id="plot_topo">
+<a class="viewcode-back" href="../../../rhkpy.html#rhkpy.plotting.quickplot.plot_topo">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_topo</span><span class="p">(</span><span class="n">rhkdata_obj</span><span class="p">,</span> <span class="n">cmap_topo</span> <span class="o">=</span> <span class="s1">'fire'</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">	</span><span class="sd">"""Plotting topography data using :py:mod:`hvplot`.</span>
+
+<span class="sd">	:param cmap_topo: colorscale used for topography data, defaults to 'fire'</span>
+<span class="sd">	:type cmap_topo: str, optional</span>
+
+<span class="sd">	:return: :py:mod:`holoviews` plot</span>
+<span class="sd">	:rtype: :py:mod:`holoviews`</span>
+<span class="sd">	"""</span>
+	<span class="c1"># The backward direction should be plotted, since this is the direction in which the tip moves, when the spectroscopy data is measured.</span>
+	<span class="k">return</span> <span class="n">rhkdata_obj</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">topography</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">hvplot</span><span class="o">.</span><span class="n">image</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="s1">'x'</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="s1">'y'</span><span class="p">,</span> <span class="n">cmap</span> <span class="o">=</span> <span class="n">cmap_topo</span><span class="p">,</span> <span class="n">title</span> <span class="o">=</span> <span class="s1">'topography backward'</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="plot_lia">
+<a class="viewcode-back" href="../../../rhkpy.html#rhkpy.plotting.quickplot.plot_lia">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_lia</span><span class="p">(</span><span class="n">rhkdata_obj</span><span class="p">,</span> <span class="n">cmap_spec</span> <span class="o">=</span> <span class="s1">'viridis'</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">	</span><span class="sd">"""Plotting dI/dV image data using :py:mod:`hvplot`.</span>
+
+<span class="sd">	:param cmap_spec: colorscale used for dI/dV data, defaults to 'viridis'</span>
+<span class="sd">	:type cmap_spec: str, optional</span>
+
+<span class="sd">	:return: :py:mod:`holoviews` plot</span>
+<span class="sd">	:rtype: :py:mod:`holoviews`</span>
+<span class="sd">	"""</span>
+	<span class="k">return</span> <span class="n">rhkdata_obj</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">lia</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">hvplot</span><span class="o">.</span><span class="n">image</span><span class="p">(</span><span class="n">cmap</span> <span class="o">=</span> <span class="n">cmap_spec</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="s1">'x'</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="s1">'y'</span><span class="p">,</span> <span class="n">title</span> <span class="o">=</span> <span class="s1">'dI/dV backward'</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="plot_map_iv">
+<a class="viewcode-back" href="../../../rhkpy.html#rhkpy.plotting.quickplot.plot_map_iv">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_map_iv</span><span class="p">(</span><span class="n">rhkdata_obj</span><span class="p">,</span> <span class="n">cmap_spec</span> <span class="o">=</span> <span class="s1">'viridis'</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">	</span><span class="sd">"""Plotting dI/dV map data using :py:mod:`hvplot`.</span>
+<span class="sd">	The mean values (biasscandir and repetitions) of the dI/dV signal are plotted on the density plot.</span>
+
+<span class="sd">	:param rhkdata_obj: the :class:`~rhkpy.rhkpy_loader.rhkdata` instance to plot</span>
+<span class="sd">	:type rhkdata_obj: :class:`~rhkpy.rhkpy_loader.rhkdata`</span>
+<span class="sd">	:param cmap_spec: colorscale used for dI/dV data, defaults to 'viridis'</span>
+<span class="sd">	:type cmap_spec: str, optional</span>
+
+<span class="sd">	:return: :py:mod:`holoviews` plot</span>
+<span class="sd">	:rtype: :py:mod:`holoviews`</span>
+<span class="sd">	"""</span>
+	<span class="k">return</span> <span class="n">_mean_signal_image</span><span class="p">(</span><span class="n">rhkdata_obj</span><span class="p">,</span> <span class="s1">'lia'</span><span class="p">,</span> <span class="s1">'biasscandir'</span><span class="p">,</span> <span class="n">cmap_spec</span><span class="p">,</span>
+		<span class="n">x</span> <span class="o">=</span> <span class="s1">'specpos_x'</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="s1">'specpos_y'</span><span class="p">,</span> <span class="n">groupby</span> <span class="o">=</span> <span class="s1">'bias'</span><span class="p">,</span> <span class="n">title</span> <span class="o">=</span> <span class="s1">'dI/dV map'</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="plot_map_iz">
+<a class="viewcode-back" href="../../../rhkpy.html#rhkpy.plotting.quickplot.plot_map_iz">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_map_iz</span><span class="p">(</span><span class="n">rhkdata_obj</span><span class="p">,</span> <span class="n">cmap_spec</span> <span class="o">=</span> <span class="s1">'viridis'</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">	</span><span class="sd">"""Plotting I(z) map data using :py:mod:`hvplot`.</span>
+<span class="sd">	The mean values (zscandir and repetitions) of the I(z) signal are plotted on the density plot.</span>
+
+<span class="sd">	:param rhkdata_obj: the :class:`~rhkpy.rhkpy_loader.rhkdata` instance to plot</span>
+<span class="sd">	:type rhkdata_obj: :class:`~rhkpy.rhkpy_loader.rhkdata`</span>
+<span class="sd">	:param cmap_spec: colorscale used for I(z) data, defaults to 'viridis'</span>
+<span class="sd">	:type cmap_spec: str, optional</span>
+
+<span class="sd">	:return: :py:mod:`holoviews` plot</span>
+<span class="sd">	:rtype: :py:mod:`holoviews`</span>
+<span class="sd">	"""</span>
+	<span class="k">return</span> <span class="n">_mean_signal_image</span><span class="p">(</span><span class="n">rhkdata_obj</span><span class="p">,</span> <span class="s1">'current'</span><span class="p">,</span> <span class="s1">'zscandir'</span><span class="p">,</span> <span class="n">cmap_spec</span><span class="p">,</span>
+		<span class="n">x</span> <span class="o">=</span> <span class="s1">'specpos_x'</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="s1">'specpos_y'</span><span class="p">,</span> <span class="n">groupby</span> <span class="o">=</span> <span class="s1">'z'</span><span class="p">,</span> <span class="n">title</span> <span class="o">=</span> <span class="s1">'I(z) map'</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="plot_line_iv">
+<a class="viewcode-back" href="../../../rhkpy.html#rhkpy.plotting.quickplot.plot_line_iv">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_line_iv</span><span class="p">(</span><span class="n">rhkdata_obj</span><span class="p">,</span> <span class="n">cmap_spec</span> <span class="o">=</span> <span class="s1">'viridis'</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">	</span><span class="sd">"""Plotting dI/dV line data on a density plot (bias vs distance), using :py:mod:`hvplot`.</span>
+<span class="sd">	The mean values of the dI/dV signal are plotted on the density plot.</span>
+
+<span class="sd">	:param rhkdata_obj: the :class:`~rhkpy.rhkpy_loader.rhkdata` instance to plot</span>
+<span class="sd">	:type rhkdata_obj: :class:`~rhkpy.rhkpy_loader.rhkdata`</span>
+<span class="sd">	:param cmap_spec: colorscale used for dI/dV data, defaults to 'viridis'</span>
+<span class="sd">	:type cmap_spec: str, optional</span>
+
+<span class="sd">	:return: :py:mod:`holoviews` plot</span>
+<span class="sd">	:rtype: :py:mod:`holoviews`</span>
+<span class="sd">	"""</span>
+	<span class="k">return</span> <span class="n">_mean_signal_image</span><span class="p">(</span><span class="n">rhkdata_obj</span><span class="p">,</span> <span class="s1">'lia'</span><span class="p">,</span> <span class="s1">'biasscandir'</span><span class="p">,</span> <span class="n">cmap_spec</span><span class="p">,</span>
+		<span class="n">x</span> <span class="o">=</span> <span class="s1">'bias'</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="s1">'dist'</span><span class="p">,</span> <span class="n">title</span> <span class="o">=</span> <span class="s1">'dI/dV line spectra'</span><span class="p">,</span> <span class="n">aspect</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="plot_line_iz">
+<a class="viewcode-back" href="../../../rhkpy.html#rhkpy.plotting.quickplot.plot_line_iz">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_line_iz</span><span class="p">(</span><span class="n">rhkdata_obj</span><span class="p">,</span> <span class="n">cmap_spec</span> <span class="o">=</span> <span class="s1">'viridis'</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">	</span><span class="sd">"""Plotting I(z) line data on a density plot (tip height vs distance), using :py:mod:`hvplot`.</span>
+<span class="sd">	The mean values of the I(z) signal are plotted.</span>
+
+<span class="sd">	:param rhkdata_obj: the :class:`~rhkpy.rhkpy_loader.rhkdata` instance to plot</span>
+<span class="sd">	:type rhkdata_obj: :class:`~rhkpy.rhkpy_loader.rhkdata`</span>
+<span class="sd">	:param cmap_spec: colorscale used for I(z) data, defaults to 'viridis'</span>
+<span class="sd">	:type cmap_spec: str, optional</span>
+
+<span class="sd">	:return: :py:mod:`holoviews` plot</span>
+<span class="sd">	:rtype: :py:mod:`holoviews`</span>
+<span class="sd">	"""</span>
+	<span class="k">return</span> <span class="n">_mean_signal_image</span><span class="p">(</span><span class="n">rhkdata_obj</span><span class="p">,</span> <span class="s1">'current'</span><span class="p">,</span> <span class="s1">'zscandir'</span><span class="p">,</span> <span class="n">cmap_spec</span><span class="p">,</span>
+		<span class="n">x</span> <span class="o">=</span> <span class="s1">'z'</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="s1">'dist'</span><span class="p">,</span> <span class="n">title</span> <span class="o">=</span> <span class="s1">'I(z) line spectra'</span><span class="p">,</span> <span class="n">aspect</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="plot_line_spec_iv">
+<a class="viewcode-back" href="../../../rhkpy.html#rhkpy.plotting.quickplot.plot_line_spec_iv">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_line_spec_iv</span><span class="p">(</span><span class="n">rhkdata_obj</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">	</span><span class="sd">"""Plotting dI/dV spectra of a line spectroscopy instance, using :py:mod:`hvplot`.</span>
+<span class="sd">	All repetitions are shown as dotted lines, with the repetition average in bold.</span>
+
+<span class="sd">	:param rhkdata_obj: the :class:`~rhkpy.rhkpy_loader.rhkdata` instance to plot</span>
+<span class="sd">	:type rhkdata_obj: :class:`~rhkpy.rhkpy_loader.rhkdata`</span>
+
+<span class="sd">	:return: :py:mod:`holoviews` plot</span>
+<span class="sd">	:rtype: :py:mod:`holoviews`</span>
+<span class="sd">	"""</span>
+	<span class="k">return</span> <span class="n">_fwbw_lineplot</span><span class="p">(</span><span class="n">rhkdata_obj</span><span class="o">.</span><span class="n">spectra</span><span class="o">.</span><span class="n">lia</span><span class="p">,</span> <span class="s1">'bias'</span><span class="p">,</span> <span class="s1">'biasscandir'</span><span class="p">,</span> <span class="p">(</span><span class="s1">'left'</span><span class="p">,</span> <span class="s1">'right'</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="plot_line_spec_iz">
+<a class="viewcode-back" href="../../../rhkpy.html#rhkpy.plotting.quickplot.plot_line_spec_iz">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_line_spec_iz</span><span class="p">(</span><span class="n">rhkdata_obj</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">	</span><span class="sd">"""Plotting I(z) spectra of a line spectroscopy instance, using :py:mod:`hvplot`.</span>
+<span class="sd">	All repetitions are shown as dotted lines, with the repetition average in bold.</span>
+
+<span class="sd">	:param rhkdata_obj: the :class:`~rhkpy.rhkpy_loader.rhkdata` instance to plot</span>
+<span class="sd">	:type rhkdata_obj: :class:`~rhkpy.rhkpy_loader.rhkdata`</span>
+
+<span class="sd">	:return: :py:mod:`holoviews` plot</span>
+<span class="sd">	:rtype: :py:mod:`holoviews`</span>
+<span class="sd">	"""</span>
+	<span class="k">return</span> <span class="n">_fwbw_lineplot</span><span class="p">(</span><span class="n">rhkdata_obj</span><span class="o">.</span><span class="n">spectra</span><span class="o">.</span><span class="n">current</span><span class="p">,</span> <span class="s1">'z'</span><span class="p">,</span> <span class="s1">'zscandir'</span><span class="p">,</span> <span class="p">(</span><span class="s1">'up'</span><span class="p">,</span> <span class="s1">'down'</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="plot_spec_iv_lia">
+<a class="viewcode-back" href="../../../rhkpy.html#rhkpy.plotting.quickplot.plot_spec_iv_lia">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_spec_iv_lia</span><span class="p">(</span><span class="n">rhkdata_obj</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">	</span><span class="sd">"""Plotting the dI/dV signal of a single spectrum instance, using :py:mod:`hvplot`.</span>
+<span class="sd">	All repetitions are shown as dotted lines, with the repetition average in bold.</span>
+
+<span class="sd">	:param rhkdata_obj: the :class:`~rhkpy.rhkpy_loader.rhkdata` instance to plot</span>
+<span class="sd">	:type rhkdata_obj: :class:`~rhkpy.rhkpy_loader.rhkdata`</span>
+
+<span class="sd">	:return: :py:mod:`holoviews` plot</span>
+<span class="sd">	:rtype: :py:mod:`holoviews`</span>
+<span class="sd">	"""</span>
+	<span class="n">overlay</span> <span class="o">=</span> <span class="n">_fwbw_lineplot</span><span class="p">(</span><span class="n">rhkdata_obj</span><span class="o">.</span><span class="n">spectra</span><span class="o">.</span><span class="n">lia</span><span class="p">,</span> <span class="s1">'bias'</span><span class="p">,</span> <span class="s1">'biasscandir'</span><span class="p">,</span> <span class="p">(</span><span class="s1">'left'</span><span class="p">,</span> <span class="s1">'right'</span><span class="p">))</span>
+	<span class="k">return</span> <span class="n">overlay</span><span class="o">.</span><span class="n">opts</span><span class="p">(</span><span class="n">width</span> <span class="o">=</span> <span class="mi">400</span><span class="p">,</span> <span class="n">title</span> <span class="o">=</span> <span class="s1">'dI/dV'</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="plot_spec_iv_curr">
+<a class="viewcode-back" href="../../../rhkpy.html#rhkpy.plotting.quickplot.plot_spec_iv_curr">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_spec_iv_curr</span><span class="p">(</span><span class="n">rhkdata_obj</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">	</span><span class="sd">"""Plotting the current signal of a single spectrum instance, using :py:mod:`hvplot`.</span>
+<span class="sd">	All repetitions are shown as dotted lines, with the repetition average in bold.</span>
+
+<span class="sd">	:param rhkdata_obj: the :class:`~rhkpy.rhkpy_loader.rhkdata` instance to plot</span>
+<span class="sd">	:type rhkdata_obj: :class:`~rhkpy.rhkpy_loader.rhkdata`</span>
+
+<span class="sd">	:return: :py:mod:`holoviews` plot</span>
+<span class="sd">	:rtype: :py:mod:`holoviews`</span>
+<span class="sd">	"""</span>
+	<span class="n">overlay</span> <span class="o">=</span> <span class="n">_fwbw_lineplot</span><span class="p">(</span><span class="n">rhkdata_obj</span><span class="o">.</span><span class="n">spectra</span><span class="o">.</span><span class="n">current</span><span class="p">,</span> <span class="s1">'bias'</span><span class="p">,</span> <span class="s1">'biasscandir'</span><span class="p">,</span> <span class="p">(</span><span class="s1">'left'</span><span class="p">,</span> <span class="s1">'right'</span><span class="p">))</span>
+	<span class="k">return</span> <span class="n">overlay</span><span class="o">.</span><span class="n">opts</span><span class="p">(</span><span class="n">width</span> <span class="o">=</span> <span class="mi">400</span><span class="p">,</span> <span class="n">title</span> <span class="o">=</span> <span class="s1">'current'</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="plot_spec_iz">
+<a class="viewcode-back" href="../../../rhkpy.html#rhkpy.plotting.quickplot.plot_spec_iz">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_spec_iz</span><span class="p">(</span><span class="n">rhkdata_obj</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">	</span><span class="sd">"""Plotting an I(z) single spectrum instance, using :py:mod:`hvplot`.</span>
+<span class="sd">	All repetitions are shown as dotted lines, with the repetition average in bold.</span>
+
+<span class="sd">	:param rhkdata_obj: the :class:`~rhkpy.rhkpy_loader.rhkdata` instance to plot</span>
+<span class="sd">	:type rhkdata_obj: :class:`~rhkpy.rhkpy_loader.rhkdata`</span>
+
+<span class="sd">	:return: :py:mod:`holoviews` plot</span>
+<span class="sd">	:rtype: :py:mod:`holoviews`</span>
+<span class="sd">	"""</span>
+	<span class="k">return</span> <span class="n">_fwbw_lineplot</span><span class="p">(</span><span class="n">rhkdata_obj</span><span class="o">.</span><span class="n">spectra</span><span class="o">.</span><span class="n">current</span><span class="p">,</span> <span class="s1">'z'</span><span class="p">,</span> <span class="s1">'zscandir'</span><span class="p">,</span> <span class="p">(</span><span class="s1">'up'</span><span class="p">,</span> <span class="s1">'down'</span><span class="p">))</span></div>
+
+
+
+<span class="c1">## qplot layouts per (datatype, spectype) ------------------------------</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_layout_image</span><span class="p">(</span><span class="n">rhkdata_obj</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">	</span><span class="sd">"""Topography and dI/dV image side by side."""</span>
+	<span class="n">topo_plot</span> <span class="o">=</span> <span class="n">plot_topo</span><span class="p">(</span><span class="n">rhkdata_obj</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+	<span class="n">lia_plot</span> <span class="o">=</span> <span class="n">plot_lia</span><span class="p">(</span><span class="n">rhkdata_obj</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+	<span class="k">return</span> <span class="n">pn</span><span class="o">.</span><span class="n">Row</span><span class="p">(</span><span class="n">pn</span><span class="o">.</span><span class="n">panel</span><span class="p">(</span><span class="n">topo_plot</span><span class="p">),</span> <span class="n">pn</span><span class="o">.</span><span class="n">panel</span><span class="p">(</span><span class="n">lia_plot</span><span class="p">))</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_layout_map</span><span class="p">(</span><span class="n">plot2d</span><span class="p">):</span>
+<span class="w">	</span><span class="sd">"""Topography next to the (widget-driven) 2D spectroscopy plot."""</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">layout</span><span class="p">(</span><span class="n">rhkdata_obj</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+		<span class="n">specplot</span> <span class="o">=</span> <span class="n">plot2d</span><span class="p">(</span><span class="n">rhkdata_obj</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+		<span class="c1"># plot the topography</span>
+		<span class="n">topoplot</span> <span class="o">=</span> <span class="n">plot_topo</span><span class="p">(</span><span class="n">rhkdata_obj</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+		<span class="c1"># adjust options</span>
+		<span class="n">topoplot</span><span class="o">.</span><span class="n">opts</span><span class="p">(</span><span class="n">frame_width</span> <span class="o">=</span> <span class="n">width</span><span class="p">)</span>
+		<span class="n">specplot</span><span class="o">.</span><span class="n">opts</span><span class="p">(</span><span class="n">frame_width</span> <span class="o">=</span> <span class="n">width</span><span class="p">)</span>
+		<span class="c1"># separate the plots and the widget into panels, so I can place the widget</span>
+		<span class="n">topo_static</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">panel</span><span class="p">(</span><span class="n">topoplot</span><span class="p">)</span>
+		<span class="n">spec_dynamic</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">panel</span><span class="p">(</span><span class="n">specplot</span><span class="p">)</span>
+		<span class="c1"># extract the widget</span>
+		<span class="n">widget_panel</span> <span class="o">=</span> <span class="n">spec_dynamic</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+		<span class="n">specplot_static</span> <span class="o">=</span> <span class="n">spec_dynamic</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+		<span class="c1"># combined plot</span>
+		<span class="k">return</span> <span class="n">pn</span><span class="o">.</span><span class="n">Row</span><span class="p">(</span><span class="n">topo_static</span><span class="p">,</span> <span class="n">pn</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">widget_panel</span><span class="p">,</span> <span class="n">specplot_static</span><span class="p">))</span>
+	<span class="k">return</span> <span class="n">layout</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_layout_line</span><span class="p">(</span><span class="n">plot2d</span><span class="p">,</span> <span class="n">plotspec</span><span class="p">):</span>
+<span class="w">	</span><span class="sd">"""2D density plot next to the (widget-driven) spectra overlay."""</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">layout</span><span class="p">(</span><span class="n">rhkdata_obj</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+		<span class="n">specplot</span> <span class="o">=</span> <span class="n">plot2d</span><span class="p">(</span><span class="n">rhkdata_obj</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+		<span class="c1"># plot a selected spectrum along the dist dimension</span>
+		<span class="n">combined</span> <span class="o">=</span> <span class="n">plotspec</span><span class="p">(</span><span class="n">rhkdata_obj</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+		<span class="c1"># if the width parameter is specified, set the size of the plots</span>
+		<span class="k">if</span> <span class="n">width</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+			<span class="n">twod_plot_panel</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">panel</span><span class="p">(</span><span class="n">specplot</span><span class="p">)</span>
+			<span class="n">combined_panel</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">panel</span><span class="p">(</span><span class="n">combined</span><span class="p">)</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="n">twod_plot_panel</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">panel</span><span class="p">(</span><span class="n">specplot</span><span class="o">.</span><span class="n">opts</span><span class="p">(</span><span class="n">frame_width</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mf">0.8</span><span class="o">*</span><span class="n">width</span><span class="p">)))</span>
+			<span class="n">combined_panel</span> <span class="o">=</span> <span class="n">pn</span><span class="o">.</span><span class="n">panel</span><span class="p">(</span><span class="n">combined</span><span class="o">.</span><span class="n">opts</span><span class="p">(</span><span class="n">frame_width</span> <span class="o">=</span> <span class="n">width</span><span class="p">))</span>
+		<span class="c1"># separate the widget and plot into panels</span>
+		<span class="n">plot_panel</span> <span class="o">=</span> <span class="n">combined_panel</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+		<span class="n">plot_widget</span> <span class="o">=</span> <span class="n">combined_panel</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+		<span class="c1"># combined plot</span>
+		<span class="k">return</span> <span class="n">pn</span><span class="o">.</span><span class="n">Row</span><span class="p">(</span><span class="n">twod_plot_panel</span><span class="p">,</span> <span class="n">pn</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">plot_widget</span><span class="p">,</span> <span class="n">plot_panel</span><span class="p">))</span>
+	<span class="k">return</span> <span class="n">layout</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_layout_spec_iv</span><span class="p">(</span><span class="n">rhkdata_obj</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">	</span><span class="sd">"""dI/dV and current signal of a single spectrum side by side."""</span>
+	<span class="n">leftpanel</span> <span class="o">=</span> <span class="n">plot_spec_iv_lia</span><span class="p">(</span><span class="n">rhkdata_obj</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+	<span class="n">rightpanel</span> <span class="o">=</span> <span class="n">plot_spec_iv_curr</span><span class="p">(</span><span class="n">rhkdata_obj</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+	<span class="k">return</span> <span class="n">pn</span><span class="o">.</span><span class="n">Row</span><span class="p">(</span><span class="n">pn</span><span class="o">.</span><span class="n">panel</span><span class="p">(</span><span class="n">leftpanel</span><span class="p">),</span> <span class="n">pn</span><span class="o">.</span><span class="n">panel</span><span class="p">(</span><span class="n">rightpanel</span><span class="p">))</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_layout_spec_iz</span><span class="p">(</span><span class="n">rhkdata_obj</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">	</span><span class="sd">"""Single panel with the I(z) sweep overlay."""</span>
+	<span class="n">combined</span> <span class="o">=</span> <span class="n">plot_spec_iz</span><span class="p">(</span><span class="n">rhkdata_obj</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+	<span class="k">return</span> <span class="n">pn</span><span class="o">.</span><span class="n">panel</span><span class="p">(</span><span class="n">combined</span><span class="o">.</span><span class="n">opts</span><span class="p">(</span><span class="n">width</span> <span class="o">=</span> <span class="mi">400</span><span class="p">,</span> <span class="n">title</span> <span class="o">=</span> <span class="s1">'current'</span><span class="p">))</span>
+
+
+<span class="c1">#: (datatype, spectype) -&gt; layout function; register new measurement types here</span>
+<span class="n">_QPLOT_LAYOUTS</span> <span class="o">=</span> <span class="p">{</span>
+	<span class="p">(</span><span class="s1">'image'</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span> <span class="n">_layout_image</span><span class="p">,</span>
+	<span class="p">(</span><span class="s1">'map'</span><span class="p">,</span> <span class="s1">'iv'</span><span class="p">):</span> <span class="n">_layout_map</span><span class="p">(</span><span class="n">plot_map_iv</span><span class="p">),</span>
+	<span class="p">(</span><span class="s1">'map'</span><span class="p">,</span> <span class="s1">'iz'</span><span class="p">):</span> <span class="n">_layout_map</span><span class="p">(</span><span class="n">plot_map_iz</span><span class="p">),</span>
+	<span class="p">(</span><span class="s1">'line'</span><span class="p">,</span> <span class="s1">'iv'</span><span class="p">):</span> <span class="n">_layout_line</span><span class="p">(</span><span class="n">plot_line_iv</span><span class="p">,</span> <span class="n">plot_line_spec_iv</span><span class="p">),</span>
+	<span class="p">(</span><span class="s1">'line'</span><span class="p">,</span> <span class="s1">'iz'</span><span class="p">):</span> <span class="n">_layout_line</span><span class="p">(</span><span class="n">plot_line_iz</span><span class="p">,</span> <span class="n">plot_line_spec_iz</span><span class="p">),</span>
+	<span class="p">(</span><span class="s1">'spec'</span><span class="p">,</span> <span class="s1">'iv'</span><span class="p">):</span> <span class="n">_layout_spec_iv</span><span class="p">,</span>
+	<span class="p">(</span><span class="s1">'spec'</span><span class="p">,</span> <span class="s1">'iz'</span><span class="p">):</span> <span class="n">_layout_spec_iz</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="qplot">
+<a class="viewcode-back" href="../../../rhkpy.html#rhkpy.plotting.quickplot.qplot">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">qplot</span><span class="p">(</span><span class="n">rhkdata_obj</span><span class="p">,</span> <span class="n">width</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">	</span><span class="sd">"""Quick plot of an :class:`~rhkpy.rhkpy_loader.rhkdata` instance.</span>
+<span class="sd">	See :meth:`rhkpy.rhkpy_loader.rhkdata.qplot` for the documented interface.</span>
+<span class="sd">	"""</span>
+	<span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">rhkdata_obj</span><span class="o">.</span><span class="n">datatype</span><span class="p">,</span> <span class="n">rhkdata_obj</span><span class="o">.</span><span class="n">spectype</span><span class="p">)</span>
+	<span class="k">try</span><span class="p">:</span>
+		<span class="n">layout</span> <span class="o">=</span> <span class="n">_QPLOT_LAYOUTS</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+	<span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+		<span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'qplot does not support datatype/spectype combination: </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
+	<span class="k">return</span> <span class="n">layout</span><span class="p">(</span><span class="n">rhkdata_obj</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Peter Nemes-Incze.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
