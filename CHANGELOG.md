@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.5.0 (unreleased)
+## 1.5.0 (2026-11-01)
 
 Makes rhkpy usable without a notebook or browser, by scripts and AI agents. Data loading is unchanged.
 
@@ -24,6 +24,10 @@ Failures now raise exceptions, instead of printing a message and returning `None
 - `rhkpy.agent_guide()`: a guide for scripts and AI agents, shipped with the package.
 - A useful `repr()` for `rhkdata`.
 - `colorcet` is now declared as a dependency. It was already installed through `holoviews`.
+
+### Known issue
+
+On maps, `spectra.x` and `spectra.y` aren't flipped along with the spectra, so the spectrum at `[i, j]` was measured at `x[-1 - i, -1 - j]`, `y[-1 - i, -1 - j]`. Displayed maps aren't affected. Earlier versions behave the same. See `TODO.md`.
 
 ## 1.4.0 (2026-11-01)
 
