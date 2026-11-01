@@ -10,6 +10,9 @@ The heavy lifting is delegated to the submodules:
 
 import copy
 import logging as _logging
+import numbers as _numbers
+
+import numpy as _np
 
 from .io import load_spym
 from .builders import _load_specmap, _load_line, _load_spec, _load_image
@@ -26,7 +29,7 @@ class rhkdata:
 
 	:param filename: path and filename of the "sm4" file to be loaded
 	:type filename: str
-	:param repetitions: The number of repeated aquisitions of spectra in tip position, defaults to 0
+	:param repetitions: The number of repeated aquisitions of spectra in tip position. If 0, it is inferred from the file, defaults to 0
 	:type repetitions: int, optional
 	:param alternate: `True` if the bias is swept forward and backward, `False` if not, defaults to True. Files with one spectrum per tip position are always loaded with `False`: the scan direction dimension then has a single entry.
 	:type alternate: bool, optional
@@ -96,8 +99,10 @@ class rhkdata:
 		"""Initialize the :class:`rhkdata` instance
 		"""
 
-		if isinstance(alternate, bool) == False:
-			_logger.warning("alternate needs to be a bool variable: True or False. Default is True")
+		if not isinstance(alternate, (bool, _np.bool_)):
+			raise ValueError(f'alternate needs to be True or False, got: {alternate!r}')
+		if isinstance(repetitions, bool) or not isinstance(repetitions, _numbers.Integral) or repetitions < 0:
+			raise ValueError(f'repetitions needs to be an integer, 1 or above, or 0 to infer it from the file, got: {repetitions!r}')
 
 		self.filename = filename
 		self.loadraw = loadraw
@@ -130,11 +135,6 @@ class rhkdata:
 		if self.datatype != 'image':
 			if repetitions != 0:
 				# overwrite the default value and the value inferred from tip coordinates
-				# check if parameters passed to the class are valid
-				if repetitions <= 0:
-					_logger.warning("repetitions needs to be an integer, with a value of 1 or above. Default is 1")
-				elif isinstance(repetitions, int) == False:
-					_logger.warning("repetitions needs to be an integer. Default is 1")
 				self.repetitions = repetitions
 			else:
 				# determine the number of repetitions from the number of indentical tip coordinates in the beginning of RHK_SpecDrift_Xcoord

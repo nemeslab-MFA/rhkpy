@@ -5,11 +5,13 @@ spectroscopy types that aren't supported still load.
 import subprocess
 import sys
 
+import numpy as np
 import pytest
 
 import rhkpy
 from conftest import REPO_ROOT, TESTDATA_DIR
 
+LINE_FILE = 'line_9K_ABC6_2020_11_01_12_12_27_213.sm4'
 OLD_REV_FILE = 'Iz_gold_9K_2019_12_18_13_49_32_752.sm4'
 SINGLE_SWEEP_FILE = 'line_hopg_300k_2020_08_11_16_20_04_378.sm4'
 
@@ -46,9 +48,30 @@ def test_bokeh_warnings_stay_suppressed():
 	assert 'probe message' not in stderr
 
 
+@pytest.mark.parametrize('kwargs, argument', [
+	({'alternate': 'yes'}, 'alternate'),
+	({'alternate': 1}, 'alternate'),
+	({'alternate': None}, 'alternate'),
+	({'repetitions': -2}, 'repetitions'),
+	({'repetitions': 2.5}, 'repetitions'),
+	({'repetitions': '2'}, 'repetitions'),
+	({'repetitions': True}, 'repetitions'),
+])
+def test_invalid_arguments_raise(kwargs, argument):
+	"""Raised before the file is read, so no data is needed."""
+	with pytest.raises(ValueError, match = argument):
+		rhkpy.rhkdata('not_read.sm4', **kwargs)
+
+
+def test_numpy_arguments_are_valid():
+	path = _fixture_path(LINE_FILE)
+	data = rhkpy.rhkdata(path, repetitions = np.int64(1), alternate = np.bool_(True))
+	assert data.spectra.identical(rhkpy.rhkdata(path, repetitions = 1, alternate = True).spectra)
+
+
 @pytest.mark.parametrize('name, datatype, has_image', [
 	('hopg_300k_2020_08_11_16_04_06_999.sm4', 'map', True),
-	('line_9K_ABC6_2020_11_01_12_12_27_213.sm4', 'line', True),
+	(LINE_FILE, 'line', True),
 	('dI-dV_Stripes-9K-HOPG-SPI2-3_2021_09_07_10_23_58_152.sm4', 'spec', False),
 	(OLD_REV_FILE, 'spec', False),
 ])
