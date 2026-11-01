@@ -4,6 +4,7 @@ Test data: the .sm4 files in the (gitignored) ``test/`` directory at the repo
 root. The suite is meant to be run locally, where that data is present.
 """
 
+import os
 import pathlib
 import sys
 
@@ -20,7 +21,7 @@ sys.path.insert(0, str(REPO_ROOT))
 def normalize_path(s):
 	"""Replace the machine-specific test data path with a stable placeholder,
 	so snapshots are comparable across machines/checkouts."""
-	return s.replace(str(TESTDATA_DIR) + '/', '<TESTDATA>/').replace(str(TESTDATA_DIR), '<TESTDATA>')
+	return s.replace(str(TESTDATA_DIR) + os.sep, '<TESTDATA>/').replace(str(TESTDATA_DIR), '<TESTDATA>')
 
 
 def sm4_fixture_paths():

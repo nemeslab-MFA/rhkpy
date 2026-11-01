@@ -66,8 +66,11 @@ def jsonify(value, norm=None):
 	if isinstance(value, (list, tuple)):
 		if len(value) > MAX_INLINE_SEQ:
 			try:
-				arr = np.asarray(value, dtype=float)
-				return {'__seq__': {'len': len(value), 'sha256': _hash_array(arr)}}
+				# only real numbers: np.asarray(value, dtype=float) would also
+				# convert numeric strings, hiding a change from float to str
+				if np.asarray(value).dtype.kind in 'biuf':
+					arr = np.asarray(value, dtype=float)
+					return {'__seq__': {'len': len(value), 'sha256': _hash_array(arr)}}
 			except (ValueError, TypeError):
 				pass
 		return [jsonify(v, norm) for v in value]

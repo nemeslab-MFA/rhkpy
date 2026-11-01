@@ -1,5 +1,5 @@
 #!/bin/sh
-# Run the fast test suite before every commit.
+# Run the fast test suite on the staged files before every commit.
 # The full suite (including the browser-based genthumbs test) runs on pre-push.
 # Bypass in an emergency with: git commit --no-verify
 
@@ -14,8 +14,18 @@ if [ -z "$PYTHON" ]; then
 	fi
 fi
 
-echo "pre-commit: running fast test suite (pytest -m 'not slow') ..."
-"$PYTHON" -m pytest -q -m "not slow" || {
+# Test the staged files, not the working tree: export the index to a temporary
+# directory, and link the (gitignored) test data into it.
+REPO="$(git rev-parse --show-toplevel)" || exit 1
+STAGED="$(mktemp -d)" || exit 1
+trap 'rm -rf "$STAGED"' EXIT
+git checkout-index -a --prefix="$STAGED/" || exit 1
+if [ -d "$REPO/test" ]; then
+	ln -s "$REPO/test" "$STAGED/test"
+fi
+
+echo "pre-commit: running fast test suite on the staged files (pytest -m 'not slow') ..."
+(cd "$STAGED" && "$PYTHON" -m pytest -q -m "not slow") || {
 	echo ""
 	echo "pre-commit: TESTS FAILED - commit aborted."
 	echo "            (bypass with 'git commit --no-verify' if you must)"
