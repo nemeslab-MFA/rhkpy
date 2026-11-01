@@ -27,7 +27,8 @@ def _fwbw_lineplot(da, x: str, scandir_dim: str, labels: tuple[str, str]):
 
 	With a single repetition, plots the two sweeps in red/blue with legend
 	labels. With multiple repetitions, plots every repetition as a dotted
-	light-colored line and the repetition average in bold on top.
+	light-colored line and the repetition average in bold on top. A single sweep
+	measurement only has the forward sweep.
 
 	:param da: DataArray with dims (..., 'repetitions', scandir_dim)
 	:param x: name of the sweep coordinate ('bias' or 'z')
@@ -35,18 +36,21 @@ def _fwbw_lineplot(da, x: str, scandir_dim: str, labels: tuple[str, str]):
 	:param labels: legend labels for the two sweep directions, e.g. ('left', 'right')
 	"""
 	label_fw, label_bw = labels
-	if len(da.repetitions) == 1:
-		plot_fw = da.isel({'repetitions': 0, scandir_dim: 0}).hvplot.line(x = x, color = 'red', label = label_fw)
-		plot_bw = da.isel({'repetitions': 0, scandir_dim: 1}).hvplot.line(x = x, color = 'blue', label = label_bw)
-	elif len(da.repetitions) > 1:
-		plot_fw = da.isel({'repetitions': 0, scandir_dim: 0}).hvplot.line(x = x, color = 'LightCoral', line_dash = 'dotted', line_width = 0.5, alpha = 1)
-		plot_bw = da.isel({'repetitions': 0, scandir_dim: 1}).hvplot.line(x = x, color = 'LightSkyBlue', line_dash = 'dotted', line_width = 0.5, alpha = 1)
+
+	def _sweep_plot(sweep, label, color, repetition_color):
+		if len(da.repetitions) == 1:
+			return da.isel({'repetitions': 0, scandir_dim: sweep}).hvplot.line(x = x, color = color, label = label)
+		plot = da.isel({'repetitions': 0, scandir_dim: sweep}).hvplot.line(x = x, color = repetition_color, line_dash = 'dotted', line_width = 0.5, alpha = 1)
 		for i in range(1, len(da.repetitions)):
 			# iterate through the repetitions and plot on the same plot
-			plot_fw *= da.isel({'repetitions': i, scandir_dim: 0}).hvplot.line(x = x, color = 'LightCoral', line_dash = 'dotted', line_width = 0.5, alpha = 1)
-			plot_bw *= da.isel({'repetitions': i, scandir_dim: 1}).hvplot.line(x = x, color = 'LightSkyBlue', line_dash = 'dotted', line_width = 0.5, alpha = 1)
-		plot_fw *= da.mean(dim = 'repetitions').isel({scandir_dim: 0}).hvplot.line(x = x, color = 'red', line_width = 2, label = 'avg ' + label_fw)
-		plot_bw *= da.mean(dim = 'repetitions').isel({scandir_dim: 1}).hvplot.line(x = x, color = 'blue', line_width = 2, label = 'avg ' + label_bw)
+			plot *= da.isel({'repetitions': i, scandir_dim: sweep}).hvplot.line(x = x, color = repetition_color, line_dash = 'dotted', line_width = 0.5, alpha = 1)
+		plot *= da.mean(dim = 'repetitions').isel({scandir_dim: sweep}).hvplot.line(x = x, color = color, line_width = 2, label = 'avg ' + label)
+		return plot
+
+	plot_fw = _sweep_plot(0, label_fw, 'red', 'LightCoral')
+	if da.sizes[scandir_dim] == 1:
+		return plot_fw
+	plot_bw = _sweep_plot(1, label_bw, 'blue', 'LightSkyBlue')
 
 	# combine the forward and backward sweeps
 	return plot_fw * plot_bw

@@ -1,7 +1,2085 @@
 {
- "error": {
-  "exception": "ZeroDivisionError",
-  "message": "division by zero"
+ "data": {
+  "alternate": false,
+  "datatype": "line",
+  "filename": "<TESTDATA>/line_hopg_300k_2020_08_11_16_20_04_378.sm4",
+  "image": {
+   "__dataset__": {
+    "attrs": {
+     "bias": 0.3999999761581421,
+     "bias units": "V",
+     "datatype": "line",
+     "filename": "line_hopg_300k_2020_08_11_16_20_04_378.sm4",
+     "measurement date": "08/11/20",
+     "measurement time": "16:13:02",
+     "scan angle": 147.34811401367188,
+     "setpoint": 499.9999694824219,
+     "setpoint units": "pA",
+     "spectype": "iv",
+     "xoffset": -25.888962685433057,
+     "xoffset_units": "nm",
+     "yoffset": -30.151678709344765,
+     "yoffset_units": "nm"
+    },
+    "coords": {
+     "scandir": {
+      "attrs": {},
+      "dims": [
+       "scandir"
+      ],
+      "dtype": "<U8",
+      "sha256": "fac048ca37440b890442e6b18c666d183a381d9c11f37e2e4c4c76ff0acdc711",
+      "shape": [
+       2
+      ]
+     },
+     "x": {
+      "attrs": {
+       "long units": "nanometer",
+       "note": "fast scan direction\n",
+       "units": "nm"
+      },
+      "dims": [
+       "x"
+      ],
+      "dtype": "float64",
+      "sha256": "5c40ca47752c0d33765644c2d6cafd750ea4d47b7f548685915183def4ec1da6",
+      "shape": [
+       8
+      ],
+      "stats": {
+       "nanmax": 41.39241349676581,
+       "nanmean": 20.696206748382906,
+       "nanmin": 0.0
+      }
+     },
+     "y": {
+      "attrs": {
+       "note": "repetitions of the topography line\n",
+       "units": null
+      },
+      "dims": [
+       "y"
+      ],
+      "dtype": "float64",
+      "sha256": "ac4b5c5fae870e81e8e543a5a0b5d2d2167fb30721899f5ffea1e0e8e787bdad",
+      "shape": [
+       512
+      ],
+      "stats": {
+       "nanmax": 47.2132216447485,
+       "nanmean": 23.60661082237425,
+       "nanmin": 0.0
+      }
+     }
+    },
+    "data_vars": {
+     "current": {
+      "attrs": {
+       "long units": "picoampere",
+       "units": "pA"
+      },
+      "dims": [
+       "y",
+       "x",
+       "scandir"
+      ],
+      "dtype": "float64",
+      "sha256": "7806cc1024a0bfe7dc8617a06b2501496c410410ec740fc74bac7a6edf3ee0d4",
+      "shape": [
+       512,
+       8,
+       2
+      ],
+      "stats": {
+       "nanmax": 547.2480239615396,
+       "nanmean": 500.0137442141596,
+       "nanmin": 455.48787529361664
+      }
+     },
+     "lia": {
+      "attrs": {
+       "long units": "picoampere",
+       "units": "pA"
+      },
+      "dims": [
+       "y",
+       "x",
+       "scandir"
+      ],
+      "dtype": "float64",
+      "sha256": "8d563ad4bc205a2dbc09e4b6a315c4c433e71facfb2f27ee5f28688f09c95cd7",
+      "shape": [
+       512,
+       8,
+       2
+      ],
+      "stats": {
+       "nanmax": 9.537218080613387,
+       "nanmean": 0.04294949436644013,
+       "nanmin": -11.694678034339846
+      }
+     },
+     "topography": {
+      "attrs": {
+       "long units": "nanometer",
+       "units": "nm"
+      },
+      "dims": [
+       "y",
+       "x",
+       "scandir"
+      ],
+      "dtype": "float64",
+      "sha256": "c08d3ea756e2c6c02c9ac61819f2bc01dc80a5856385fdb7b37d0abecc0109cc",
+      "shape": [
+       512,
+       8,
+       2
+      ],
+      "stats": {
+       "nanmax": 0.020233704000020225,
+       "nanmean": 1.3894400013869657e-07,
+       "nanmin": -0.01953736311514831
+      }
+     }
+    },
+    "dims": {
+     "scandir": 2,
+     "x": 8,
+     "y": 512
+    }
+   }
+  },
+  "loadraw": false,
+  "numberofspectra": 1,
+  "repetitions": 1,
+  "spectra": {
+   "__dataset__": {
+    "attrs": {
+     "LI amplitude": 4.999957799,
+     "LI amplitude unit": "mV",
+     "LI frequency": 1300.0,
+     "LI frequency unit": "Hz",
+     "LI phase": -103.9999999,
+     "bias": 0.3999999761581421,
+     "bias units": "V",
+     "datatype": "line",
+     "filename": "line_hopg_300k_2020_08_11_16_20_04_378.sm4",
+     "measurement date": "08/11/20",
+     "measurement time": "16:13:16",
+     "scan angle": 147.34811401367188,
+     "setpoint": 499.9999694824219,
+     "setpoint units": "pA",
+     "spectype": "iv"
+    },
+    "coords": {
+     "bias": {
+      "attrs": {
+       "long units": "Volt",
+       "units": "V"
+      },
+      "dims": [
+       "bias"
+      ],
+      "dtype": "float64",
+      "sha256": "6042e0c267ebab26c6bce4441fe059b0c7c886b002c63457766c988b9da5a32f",
+      "shape": [
+       241
+      ],
+      "stats": {
+       "nanmax": 0.6000000238418579,
+       "nanmean": 3.725290298461914e-08,
+       "nanmin": -0.5999999493360519
+      }
+     },
+     "biasscandir": {
+      "attrs": {},
+      "dims": [
+       "biasscandir"
+      ],
+      "dtype": "<U4",
+      "sha256": "80f5194f5af0ca66d056a4310de1f3f91239038da7e88b702b6b20050fad0f82",
+      "shape": [
+       1
+      ]
+     },
+     "dist": {
+      "attrs": {
+       "long units": "nanometer",
+       "units": "nm"
+      },
+      "dims": [
+       "dist"
+      ],
+      "dtype": "float32",
+      "sha256": "cabe24f507b0ba7013ac227b655ed3d846e46aaf0a3b931da6c0365174a103a0",
+      "shape": [
+       32
+      ],
+      "stats": {
+       "nanmax": 47.305633544921875,
+       "nanmean": 23.652815759181976,
+       "nanmin": 0.0
+      }
+     },
+     "repetitions": {
+      "attrs": {},
+      "dims": [
+       "repetitions"
+      ],
+      "dtype": "int64",
+      "sha256": "af5570f5a1810b7af78caf4bc70a660f0df51e42baf91d4de5b2328de0e83dfc",
+      "shape": [
+       1
+      ],
+      "stats": {
+       "nanmax": 0.0,
+       "nanmean": 0.0,
+       "nanmin": 0.0
+      }
+     }
+    },
+    "data_vars": {
+     "current": {
+      "attrs": {
+       "bias": 0.3999999761581421,
+       "bias units": "V",
+       "long units": "picoampere",
+       "setpoint": 499.9999694824219,
+       "setpoint units": "pA",
+       "time_per_point": 9.999999747378752e-05,
+       "units": "pA"
+      },
+      "dims": [
+       "bias",
+       "dist",
+       "repetitions",
+       "biasscandir"
+      ],
+      "dtype": "float64",
+      "sha256": "57d97884f97caca2db65ec6525fa26ac00548d316958f2edd7b6019d115b0608",
+      "shape": [
+       241,
+       32,
+       1,
+       1
+      ],
+      "stats": {
+       "nanmax": 1332.061431657014,
+       "nanmean": -22.65491599893759,
+       "nanmin": -1393.4273933125676
+      }
+     },
+     "lia": {
+      "attrs": {
+       "bias": 0.3999999761581421,
+       "bias units": "V",
+       "long units": "picoampere",
+       "setpoint": 499.9999694824219,
+       "setpoint units": "pA",
+       "time_per_point": 9.999999747378752e-05,
+       "units": "pA"
+      },
+      "dims": [
+       "bias",
+       "dist",
+       "repetitions",
+       "biasscandir"
+      ],
+      "dtype": "float64",
+      "sha256": "a4b11cfe1ad9f7857d4fbf29e6ceb588893799b18aff18b58b6a5e3c1eff1113",
+      "shape": [
+       241,
+       32,
+       1,
+       1
+      ],
+      "stats": {
+       "nanmax": 30.842916852543492,
+       "nanmean": 9.687348259926596,
+       "nanmin": 1.932382571874165
+      }
+     },
+     "x": {
+      "attrs": {
+       "long units": "nanometer",
+       "units": "nm"
+      },
+      "dims": [
+       "dist"
+      ],
+      "dtype": "float32",
+      "sha256": "8757a024ccf4681a13aca7ffb4643b37a0e7a8af3e01dc1329e865e2cce06da2",
+      "shape": [
+       32
+      ],
+      "stats": {
+       "nanmax": 17.632484436035156,
+       "nanmean": -2.2823482425883412,
+       "nanmin": -22.197174072265625
+      }
+     },
+     "y": {
+      "attrs": {
+       "long units": "nanometer",
+       "units": "nm"
+      },
+      "dims": [
+       "dist"
+      ],
+      "dtype": "float32",
+      "sha256": "69696d1f298b2ca634d531246b6e10ae65390895e3c8e721e71ed31ed6b4c85d",
+      "shape": [
+       32
+      ],
+      "stats": {
+       "nanmax": 3.306001663208008,
+       "nanmean": -9.455474297283217,
+       "nanmin": -22.216955184936523
+      }
+     }
+    },
+    "dims": {
+     "bias": 241,
+     "biasscandir": 1,
+     "dist": 32,
+     "repetitions": 1
+    }
+   }
+  },
+  "spectype": "iv",
+  "spymdata": {
+   "__dataset__": {
+    "attrs": {},
+    "coords": {
+     "Current_Backward_x": {
+      "attrs": {
+       "long_name": "Current_Backward_x",
+       "offset": -2.282351863058807e-09,
+       "units": "m"
+      },
+      "dims": [
+       "Current_Backward_x"
+      ],
+      "dtype": "float64",
+      "sha256": "222a86e3c25cd482fb7700f6ed7d7f75b17dd1ec997e5553ec087350b2807342",
+      "shape": [
+       512
+      ],
+      "stats": {
+       "nanmax": 4.7213221644748504e-08,
+       "nanmean": 2.3606610822374252e-08,
+       "nanmin": 0.0
+      }
+     },
+     "Current_Backward_y": {
+      "attrs": {
+       "long_name": "Current_Backward_y",
+       "offset": -9.455471960961859e-09,
+       "units": "m"
+      },
+      "dims": [
+       "Current_Backward_y"
+      ],
+      "dtype": "float64",
+      "sha256": "23f206e37423bac126c56ac2566e43a1a3705297fb7d7dc90f90183dabd6ea6d",
+      "shape": [
+       8
+      ],
+      "stats": {
+       "nanmax": 4.139241349676581e-08,
+       "nanmean": 2.0696206748382906e-08,
+       "nanmin": 0.0
+      }
+     },
+     "Current_Forward_x": {
+      "attrs": {
+       "long_name": "Current_Forward_x",
+       "offset": -2.282351863058807e-09,
+       "units": "m"
+      },
+      "dims": [
+       "Current_Forward_x"
+      ],
+      "dtype": "float64",
+      "sha256": "222a86e3c25cd482fb7700f6ed7d7f75b17dd1ec997e5553ec087350b2807342",
+      "shape": [
+       512
+      ],
+      "stats": {
+       "nanmax": 4.7213221644748504e-08,
+       "nanmean": 2.3606610822374252e-08,
+       "nanmin": 0.0
+      }
+     },
+     "Current_Forward_y": {
+      "attrs": {
+       "long_name": "Current_Forward_y",
+       "offset": -9.455471960961859e-09,
+       "units": "m"
+      },
+      "dims": [
+       "Current_Forward_y"
+      ],
+      "dtype": "float64",
+      "sha256": "23f206e37423bac126c56ac2566e43a1a3705297fb7d7dc90f90183dabd6ea6d",
+      "shape": [
+       8
+      ],
+      "stats": {
+       "nanmax": 4.139241349676581e-08,
+       "nanmean": 2.0696206748382906e-08,
+       "nanmin": 0.0
+      }
+     },
+     "Current_x": {
+      "attrs": {
+       "long_name": "Voltage",
+       "offset": 0.6000000238418579,
+       "units": "V"
+      },
+      "dims": [
+       "Current_x"
+      ],
+      "dtype": "float64",
+      "sha256": "6042e0c267ebab26c6bce4441fe059b0c7c886b002c63457766c988b9da5a32f",
+      "shape": [
+       241
+      ],
+      "stats": {
+       "nanmax": 0.6000000238418579,
+       "nanmean": 3.725290298461914e-08,
+       "nanmin": -0.5999999493360519
+      }
+     },
+     "Current_y": {
+      "attrs": {
+       "long_name": "Trace",
+       "offset": 0.0,
+       "units": " "
+      },
+      "dims": [
+       "Current_y"
+      ],
+      "dtype": "uint32",
+      "sha256": "afbc67011b6f94a508935ad8edcbdd3c9b56c4db336f8d3847a8a1815183828f",
+      "shape": [
+       32
+      ],
+      "stats": {
+       "nanmax": 31.0,
+       "nanmean": 15.5,
+       "nanmin": 0.0
+      }
+     },
+     "LIA_Current_Backward_x": {
+      "attrs": {
+       "long_name": "LIA_Current_Backward_x",
+       "offset": -2.282351863058807e-09,
+       "units": "m"
+      },
+      "dims": [
+       "LIA_Current_Backward_x"
+      ],
+      "dtype": "float64",
+      "sha256": "222a86e3c25cd482fb7700f6ed7d7f75b17dd1ec997e5553ec087350b2807342",
+      "shape": [
+       512
+      ],
+      "stats": {
+       "nanmax": 4.7213221644748504e-08,
+       "nanmean": 2.3606610822374252e-08,
+       "nanmin": 0.0
+      }
+     },
+     "LIA_Current_Backward_y": {
+      "attrs": {
+       "long_name": "LIA_Current_Backward_y",
+       "offset": -9.455471960961859e-09,
+       "units": "m"
+      },
+      "dims": [
+       "LIA_Current_Backward_y"
+      ],
+      "dtype": "float64",
+      "sha256": "23f206e37423bac126c56ac2566e43a1a3705297fb7d7dc90f90183dabd6ea6d",
+      "shape": [
+       8
+      ],
+      "stats": {
+       "nanmax": 4.139241349676581e-08,
+       "nanmean": 2.0696206748382906e-08,
+       "nanmin": 0.0
+      }
+     },
+     "LIA_Current_Forward_x": {
+      "attrs": {
+       "long_name": "LIA_Current_Forward_x",
+       "offset": -2.282351863058807e-09,
+       "units": "m"
+      },
+      "dims": [
+       "LIA_Current_Forward_x"
+      ],
+      "dtype": "float64",
+      "sha256": "222a86e3c25cd482fb7700f6ed7d7f75b17dd1ec997e5553ec087350b2807342",
+      "shape": [
+       512
+      ],
+      "stats": {
+       "nanmax": 4.7213221644748504e-08,
+       "nanmean": 2.3606610822374252e-08,
+       "nanmin": 0.0
+      }
+     },
+     "LIA_Current_Forward_y": {
+      "attrs": {
+       "long_name": "LIA_Current_Forward_y",
+       "offset": -9.455471960961859e-09,
+       "units": "m"
+      },
+      "dims": [
+       "LIA_Current_Forward_y"
+      ],
+      "dtype": "float64",
+      "sha256": "23f206e37423bac126c56ac2566e43a1a3705297fb7d7dc90f90183dabd6ea6d",
+      "shape": [
+       8
+      ],
+      "stats": {
+       "nanmax": 4.139241349676581e-08,
+       "nanmean": 2.0696206748382906e-08,
+       "nanmin": 0.0
+      }
+     },
+     "LIA_Current_x": {
+      "attrs": {
+       "long_name": "Voltage",
+       "offset": 0.6000000238418579,
+       "units": "V"
+      },
+      "dims": [
+       "LIA_Current_x"
+      ],
+      "dtype": "float64",
+      "sha256": "6042e0c267ebab26c6bce4441fe059b0c7c886b002c63457766c988b9da5a32f",
+      "shape": [
+       241
+      ],
+      "stats": {
+       "nanmax": 0.6000000238418579,
+       "nanmean": 3.725290298461914e-08,
+       "nanmin": -0.5999999493360519
+      }
+     },
+     "LIA_Current_y": {
+      "attrs": {
+       "long_name": "Trace",
+       "offset": 0.0,
+       "units": " "
+      },
+      "dims": [
+       "LIA_Current_y"
+      ],
+      "dtype": "uint32",
+      "sha256": "afbc67011b6f94a508935ad8edcbdd3c9b56c4db336f8d3847a8a1815183828f",
+      "shape": [
+       32
+      ],
+      "stats": {
+       "nanmax": 31.0,
+       "nanmean": 15.5,
+       "nanmin": 0.0
+      }
+     },
+     "Topography_Backward_x": {
+      "attrs": {
+       "long_name": "Topography_Backward_x",
+       "offset": -2.282351863058807e-09,
+       "units": "m"
+      },
+      "dims": [
+       "Topography_Backward_x"
+      ],
+      "dtype": "float64",
+      "sha256": "222a86e3c25cd482fb7700f6ed7d7f75b17dd1ec997e5553ec087350b2807342",
+      "shape": [
+       512
+      ],
+      "stats": {
+       "nanmax": 4.7213221644748504e-08,
+       "nanmean": 2.3606610822374252e-08,
+       "nanmin": 0.0
+      }
+     },
+     "Topography_Backward_y": {
+      "attrs": {
+       "long_name": "Topography_Backward_y",
+       "offset": -9.455471960961859e-09,
+       "units": "m"
+      },
+      "dims": [
+       "Topography_Backward_y"
+      ],
+      "dtype": "float64",
+      "sha256": "23f206e37423bac126c56ac2566e43a1a3705297fb7d7dc90f90183dabd6ea6d",
+      "shape": [
+       8
+      ],
+      "stats": {
+       "nanmax": 4.139241349676581e-08,
+       "nanmean": 2.0696206748382906e-08,
+       "nanmin": 0.0
+      }
+     },
+     "Topography_Forward_x": {
+      "attrs": {
+       "long_name": "Topography_Forward_x",
+       "offset": -2.282351863058807e-09,
+       "units": "m"
+      },
+      "dims": [
+       "Topography_Forward_x"
+      ],
+      "dtype": "float64",
+      "sha256": "222a86e3c25cd482fb7700f6ed7d7f75b17dd1ec997e5553ec087350b2807342",
+      "shape": [
+       512
+      ],
+      "stats": {
+       "nanmax": 4.7213221644748504e-08,
+       "nanmean": 2.3606610822374252e-08,
+       "nanmin": 0.0
+      }
+     },
+     "Topography_Forward_y": {
+      "attrs": {
+       "long_name": "Topography_Forward_y",
+       "offset": -9.455471960961859e-09,
+       "units": "m"
+      },
+      "dims": [
+       "Topography_Forward_y"
+      ],
+      "dtype": "float64",
+      "sha256": "23f206e37423bac126c56ac2566e43a1a3705297fb7d7dc90f90183dabd6ea6d",
+      "shape": [
+       8
+      ],
+      "stats": {
+       "nanmax": 4.139241349676581e-08,
+       "nanmean": 2.0696206748382906e-08,
+       "nanmin": 0.0
+      }
+     }
+    },
+    "data_vars": {
+     "Current": {
+      "attrs": {
+       "RHK_Angle": 0.0,
+       "RHK_Bias": 0.3999999761581421,
+       "RHK_CH1DriveValue": 400.0,
+       "RHK_CH1DriveValueUnits": "mV",
+       "RHK_CH1Drive_Amplitude": 0.004999957799,
+       "RHK_CH1Drive_AmplitudeUnit": "V",
+       "RHK_CH1Drive_Frequency": 1300.0,
+       "RHK_CH1Drive_FrequencyUnit": "Hz",
+       "RHK_CH1Drive_HarmonicFactor": 1.0,
+       "RHK_CH1Drive_MasterOscillator": 1,
+       "RHK_CH1Drive_PhaseOffset": 0.0,
+       "RHK_CH1Drive_PhaseOffsetUnit": "deg",
+       "RHK_CH1Drive_ReservedUnit": "",
+       "RHK_CH2DriveValue": 0.0,
+       "RHK_CH2DriveValueUnits": "V",
+       "RHK_CH2Drive_Amplitude": 0.0,
+       "RHK_CH2Drive_AmplitudeUnit": "V",
+       "RHK_CH2Drive_Frequency": 0.0,
+       "RHK_CH2Drive_FrequencyUnit": "Hz",
+       "RHK_CH2Drive_HarmonicFactor": 0.0,
+       "RHK_CH2Drive_MasterOscillator": 0,
+       "RHK_CH2Drive_PhaseOffset": 0.0,
+       "RHK_CH2Drive_PhaseOffsetUnit": "deg",
+       "RHK_CH2Drive_ReservedUnit": "",
+       "RHK_CompletedLineCount": 0,
+       "RHK_Current": 4.999999858590343e-10,
+       "RHK_DataSubSource": 0,
+       "RHK_Date": "08/11/20",
+       "RHK_DateTime": "2020-08-11T16:13:16.000",
+       "RHK_GridXsize": 4294967295,
+       "RHK_GridYsize": 4294967295,
+       "RHK_GroupId": 0,
+       "RHK_ImageType": 0,
+       "RHK_ImageTypeName": "RHK_IMAGE_NORMAL",
+       "RHK_Label": "Current",
+       "RHK_LineType": 7,
+       "RHK_LineTypeName": "RHK_LINE_IV_SPECTRUM",
+       "RHK_Lockin0_FilterCutoffFrequency": "40Hz Order 2",
+       "RHK_Lockin0_FreqUnit": "Hz",
+       "RHK_Lockin0_Frequency": 0.0,
+       "RHK_Lockin0_HarmonicFactor": 1.0,
+       "RHK_Lockin0_NonMasterOscillator": 1,
+       "RHK_Lockin0_PhaseOffset": -103.9999999,
+       "RHK_Lockin0_PhaseUnit": "deg",
+       "RHK_LowPassFilter1_CutoffFrequency": 2.0,
+       "RHK_LowPassFilter1_CutoffFrequencyUnits": "kHz",
+       "RHK_MaxZvalue": 0,
+       "RHK_MinZvalue": 0,
+       "RHK_MinorVer": 6,
+       "RHK_OverSamplingCount": 0,
+       "RHK_PLLProStatus": "",
+       "RHK_PRMdata": "",
+       "RHK_PageDataType": 1,
+       "RHK_PageDataTypeName": "RHK_DATA_LINE",
+       "RHK_PageID": 32238,
+       "RHK_PageSourceType": 0,
+       "RHK_PageSourceTypeName": "RHK_SOURCE_RAW",
+       "RHK_PageType": 16,
+       "RHK_PageTypeName": "RHK_PAGE_INTERACTIVE_SPECTRA",
+       "RHK_Period": 9.999999747378752e-05,
+       "RHK_PiezoSensitivity_Actuator": 0.0,
+       "RHK_PiezoSensitivity_ActuatorCalibration": "",
+       "RHK_PiezoSensitivity_ActuatorUnit": "",
+       "RHK_PiezoSensitivity_ScanCalibration": "",
+       "RHK_PiezoSensitivity_ScanX": 0.0,
+       "RHK_PiezoSensitivity_ScanXUnit": "",
+       "RHK_PiezoSensitivity_ScanY": 0.0,
+       "RHK_PiezoSensitivity_ScanYUnit": "",
+       "RHK_PiezoSensitivity_ScanZ": 0.0,
+       "RHK_PiezoSensitivity_ScanZUnit": "",
+       "RHK_PiezoSensitivity_TubeCalibration": "300K",
+       "RHK_PiezoSensitivity_TubeX": 3e-08,
+       "RHK_PiezoSensitivity_TubeXUnit": "m/V",
+       "RHK_PiezoSensitivity_TubeY": 3e-08,
+       "RHK_PiezoSensitivity_TubeYUnit": "m/V",
+       "RHK_PiezoSensitivity_TubeZ": -4e-09,
+       "RHK_PiezoSensitivity_TubeZOffset": -4e-09,
+       "RHK_PiezoSensitivity_TubeZOffsetUnit": "m/V",
+       "RHK_PiezoSensitivity_TubeZUnit": "m/V",
+       "RHK_ScanProcessor_XSlopeCompensation": 0.0,
+       "RHK_ScanProcessor_XSlopeCompensationUnit": "%",
+       "RHK_ScanProcessor_YSlopeCompensation": 0.0,
+       "RHK_ScanProcessor_YSlopeCompensationUnit": "%",
+       "RHK_ScanType": 0,
+       "RHK_ScanTypeName": "RHK_SCAN_RIGHT",
+       "RHK_SessionText": "",
+       "RHK_SetpointUnit": "A",
+       "RHK_Signature": "STiMage 005.004 1",
+       "RHK_SlicedVoltage": "",
+       "RHK_SpecDrift_Channel": "",
+       "RHK_SpecDrift_CumulativeX": {
+        "__seq__": {
+         "len": 32,
+         "sha256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1"
+        }
+       },
+       "RHK_SpecDrift_CumulativeY": {
+        "__seq__": {
+         "len": 32,
+         "sha256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1"
+        }
+       },
+       "RHK_SpecDrift_DriftOptionType": 0,
+       "RHK_SpecDrift_DriftOptionTypeName": "RHK_DRIFT_DISABLED",
+       "RHK_SpecDrift_Filetime": 0,
+       "RHK_SpecDrift_Time": {
+        "__seq__": {
+         "len": 32,
+         "sha256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1"
+        }
+       },
+       "RHK_SpecDrift_Xcoord": {
+        "__seq__": {
+         "len": 32,
+         "sha256": "9b3c7a3e216a1f1c23e1a7d7cfcf07fb7a31265fd14c39e501c2409b654daf33"
+        }
+       },
+       "RHK_SpecDrift_Ycoord": {
+        "__seq__": {
+         "len": 32,
+         "sha256": "30de1435646de28899ae4c64fb46fa377df5bbc2609dfbed2731cbd197cbf63a"
+        }
+       },
+       "RHK_SpecDrift_dX": {
+        "__seq__": {
+         "len": 32,
+         "sha256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1"
+        }
+       },
+       "RHK_SpecDrift_dY": {
+        "__seq__": {
+         "len": 32,
+         "sha256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1"
+        }
+       },
+       "RHK_StatusChannelText": "",
+       "RHK_SystemText": "",
+       "RHK_Time": "16:13:16",
+       "RHK_UserText": "",
+       "RHK_XYscale": 0.0,
+       "RHK_Xcorner": 0,
+       "RHK_Xlabel": "Voltage",
+       "RHK_Xoffset": 0.6000000238418579,
+       "RHK_Xscale": -0.004999999888241291,
+       "RHK_Xsize": 241,
+       "RHK_Xunits": "V",
+       "RHK_Ycorner": 0,
+       "RHK_Ylabel": "Current",
+       "RHK_Yoffset": 0.0,
+       "RHK_Yscale": 1.0,
+       "RHK_Ysize": 32,
+       "RHK_Yunits": " ",
+       "RHK_ZPI_FeedbackType": "Linear",
+       "RHK_ZPI_IntegralGain": 500.0,
+       "RHK_ZPI_IntegralGainUnit": "m/As",
+       "RHK_ZPI_LowerBound": -5.99999999e-07,
+       "RHK_ZPI_OutputUnit": "m",
+       "RHK_ZPI_ProportionalGain": 1e-07,
+       "RHK_ZPI_ProportionalGainUnit": "m/A",
+       "RHK_ZPI_SetPoint": 4.999999998e-10,
+       "RHK_ZPI_SetPointUnit": "A",
+       "RHK_ZPI_UpperBound": 5.99999999e-07,
+       "RHK_Zoffset": 0.0,
+       "RHK_Zscale": 4.656612844776963e-18,
+       "RHK_Zunits": "A",
+       "bias": 0.3999999761581421,
+       "bias_units": "V",
+       "feedback_active": true,
+       "feedback_pgain": 1e-07,
+       "filename": "line_hopg_300k_2020_08_11_16_20_04_378.sm4",
+       "interpretation": "spectrum",
+       "long_name": "Current",
+       "notes": "",
+       "offset": 0.0,
+       "scaling_factor": 1.0,
+       "scan_angle": 0.0,
+       "setpoint": 4.999999998e-10,
+       "setpoint_units": "A",
+       "start_time": "2020-08-11T16:13:16.000",
+       "time_per_point": 9.999999747378752e-05,
+       "units": "A"
+      },
+      "dims": [
+       "Current_x",
+       "Current_y"
+      ],
+      "dtype": "float64",
+      "sha256": "71aeabd6e2433c00913f36518a4af8f3731fc102a805721f13dc5ba0a18fc41a",
+      "shape": [
+       241,
+       32
+      ],
+      "stats": {
+       "nanmax": 1.332061431657014e-09,
+       "nanmean": -2.2654915998937582e-11,
+       "nanmin": -1.3934273933125676e-09
+      }
+     },
+     "Current_Backward": {
+      "attrs": {
+       "RHK_Angle": 147.34811401367188,
+       "RHK_Bias": 0.3999999761581421,
+       "RHK_CH1DriveValue": 400.0,
+       "RHK_CH1DriveValueUnits": "mV",
+       "RHK_CH1Drive_Amplitude": 0.004999957799,
+       "RHK_CH1Drive_AmplitudeUnit": "V",
+       "RHK_CH1Drive_Frequency": 1300.0,
+       "RHK_CH1Drive_FrequencyUnit": "Hz",
+       "RHK_CH1Drive_HarmonicFactor": 1.0,
+       "RHK_CH1Drive_MasterOscillator": 1,
+       "RHK_CH1Drive_PhaseOffset": 0.0,
+       "RHK_CH1Drive_PhaseOffsetUnit": "deg",
+       "RHK_CH1Drive_ReservedUnit": "",
+       "RHK_CH2DriveValue": 0.0,
+       "RHK_CH2DriveValueUnits": "V",
+       "RHK_CH2Drive_Amplitude": 0.0,
+       "RHK_CH2Drive_AmplitudeUnit": "V",
+       "RHK_CH2Drive_Frequency": 0.0,
+       "RHK_CH2Drive_FrequencyUnit": "Hz",
+       "RHK_CH2Drive_HarmonicFactor": 0.0,
+       "RHK_CH2Drive_MasterOscillator": 0,
+       "RHK_CH2Drive_PhaseOffset": 0.0,
+       "RHK_CH2Drive_PhaseOffsetUnit": "deg",
+       "RHK_CH2Drive_ReservedUnit": "",
+       "RHK_CompletedLineCount": 8,
+       "RHK_Current": 4.999999858590343e-10,
+       "RHK_DataSubSource": 0,
+       "RHK_Date": "08/11/20",
+       "RHK_DateTime": "2020-08-11T16:13:02.000",
+       "RHK_GridXsize": 0,
+       "RHK_GridYsize": 0,
+       "RHK_GroupId": 0,
+       "RHK_ImageDrift_CumulativeX": 0.0,
+       "RHK_ImageDrift_CumulativeY": 0.0,
+       "RHK_ImageDrift_DriftOptionType": 0,
+       "RHK_ImageDrift_DriftOptionTypeName": "RHK_DRIFT_DISABLED",
+       "RHK_ImageDrift_Filetime": 132416287825822150,
+       "RHK_ImageDrift_Time": 0.0,
+       "RHK_ImageDrift_VectorX": 0.0,
+       "RHK_ImageDrift_VectorY": 0.0,
+       "RHK_ImageDrift_dX": 0.0,
+       "RHK_ImageDrift_dY": 0.0,
+       "RHK_ImageType": 0,
+       "RHK_ImageTypeName": "RHK_IMAGE_NORMAL",
+       "RHK_Label": "Current",
+       "RHK_LineType": 0,
+       "RHK_LineTypeName": "RHK_LINE_NOT_A_LINE",
+       "RHK_Lockin0_FilterCutoffFrequency": "40Hz Order 2",
+       "RHK_Lockin0_FreqUnit": "Hz",
+       "RHK_Lockin0_Frequency": 0.0,
+       "RHK_Lockin0_HarmonicFactor": 1.0,
+       "RHK_Lockin0_NonMasterOscillator": 1,
+       "RHK_Lockin0_PhaseOffset": -103.9999999,
+       "RHK_Lockin0_PhaseUnit": "deg",
+       "RHK_LowPassFilter1_CutoffFrequency": 2.0,
+       "RHK_LowPassFilter1_CutoffFrequencyUnits": "kHz",
+       "RHK_MaxZvalue": 0,
+       "RHK_MinZvalue": 0,
+       "RHK_MinorVer": 6,
+       "RHK_OverSamplingCount": 0,
+       "RHK_PLLProStatus": "",
+       "RHK_PRMdata": "",
+       "RHK_PageDataType": 0,
+       "RHK_PageDataTypeName": "RHK_DATA_IMAGE",
+       "RHK_PageID": 12859,
+       "RHK_PageSourceType": 0,
+       "RHK_PageSourceTypeName": "RHK_SOURCE_RAW",
+       "RHK_PageType": 2,
+       "RHK_PageTypeName": "RHK_PAGE_CURRENT",
+       "RHK_Period": 0.0003079792659264058,
+       "RHK_PiezoSensitivity_Actuator": 0.0,
+       "RHK_PiezoSensitivity_ActuatorCalibration": "",
+       "RHK_PiezoSensitivity_ActuatorUnit": "",
+       "RHK_PiezoSensitivity_ScanCalibration": "",
+       "RHK_PiezoSensitivity_ScanX": 0.0,
+       "RHK_PiezoSensitivity_ScanXUnit": "",
+       "RHK_PiezoSensitivity_ScanY": 0.0,
+       "RHK_PiezoSensitivity_ScanYUnit": "",
+       "RHK_PiezoSensitivity_ScanZ": 0.0,
+       "RHK_PiezoSensitivity_ScanZUnit": "",
+       "RHK_PiezoSensitivity_TubeCalibration": "300K",
+       "RHK_PiezoSensitivity_TubeX": 3e-08,
+       "RHK_PiezoSensitivity_TubeXUnit": "m/V",
+       "RHK_PiezoSensitivity_TubeY": 3e-08,
+       "RHK_PiezoSensitivity_TubeYUnit": "m/V",
+       "RHK_PiezoSensitivity_TubeZ": -4e-09,
+       "RHK_PiezoSensitivity_TubeZOffset": -4e-09,
+       "RHK_PiezoSensitivity_TubeZOffsetUnit": "m/V",
+       "RHK_PiezoSensitivity_TubeZUnit": "m/V",
+       "RHK_ScanProcessor_XSlopeCompensation": 0.0,
+       "RHK_ScanProcessor_XSlopeCompensationUnit": "%",
+       "RHK_ScanProcessor_YSlopeCompensation": 0.0,
+       "RHK_ScanProcessor_YSlopeCompensationUnit": "%",
+       "RHK_ScanType": 1,
+       "RHK_ScanTypeName": "RHK_SCAN_LEFT",
+       "RHK_SessionText": "",
+       "RHK_SetpointUnit": "A",
+       "RHK_Signature": "STiMage 005.004 1",
+       "RHK_SlicedVoltage": "",
+       "RHK_StatusChannelText": "",
+       "RHK_SystemText": "",
+       "RHK_Time": "16:13:02",
+       "RHK_UserText": "",
+       "RHK_XYscale": 0.0,
+       "RHK_Xcorner": 0,
+       "RHK_Xlabel": "",
+       "RHK_Xoffset": -2.282351863058807e-09,
+       "RHK_Xscale": -9.23937801267094e-11,
+       "RHK_Xsize": 512,
+       "RHK_Xunits": "m",
+       "RHK_Ycorner": 0,
+       "RHK_Ylabel": "Current",
+       "RHK_Yoffset": -9.455471960961859e-09,
+       "RHK_Yscale": -5.913201928109402e-09,
+       "RHK_Ysize": 8,
+       "RHK_Yunits": "m",
+       "RHK_ZPI_FeedbackType": "Linear",
+       "RHK_ZPI_IntegralGain": 500.0,
+       "RHK_ZPI_IntegralGainUnit": "m/As",
+       "RHK_ZPI_LowerBound": -5.99999999e-07,
+       "RHK_ZPI_OutputUnit": "m",
+       "RHK_ZPI_ProportionalGain": 1e-07,
+       "RHK_ZPI_ProportionalGainUnit": "m/A",
+       "RHK_ZPI_SetPoint": 4.999999998e-10,
+       "RHK_ZPI_SetPointUnit": "A",
+       "RHK_ZPI_UpperBound": 5.99999999e-07,
+       "RHK_Zoffset": 0.0,
+       "RHK_Zscale": 4.656612844776963e-18,
+       "RHK_Zunits": "A",
+       "bias": 0.3999999761581421,
+       "bias_units": "V",
+       "feedback_active": true,
+       "feedback_pgain": 1e-07,
+       "filename": "line_hopg_300k_2020_08_11_16_20_04_378.sm4",
+       "interpretation": "image",
+       "long_name": "Current Backward",
+       "notes": "",
+       "offset": 0.0,
+       "scaling_factor": 1.0,
+       "scan_angle": 147.34811401367188,
+       "setpoint": 4.999999998e-10,
+       "setpoint_units": "A",
+       "start_time": "2020-08-11T16:13:02.000",
+       "time_per_point": 0.0003079792659264058,
+       "units": "A"
+      },
+      "dims": [
+       "Current_Backward_x",
+       "Current_Backward_y"
+      ],
+      "dtype": "float64",
+      "sha256": "f14021ae27e67cdc8727743d465582b33b006266d55c080edc5dc212581b87a7",
+      "shape": [
+       512,
+       8
+      ],
+      "stats": {
+       "nanmax": 5.459880236881613e-10,
+       "nanmean": 5.000935646041851e-10,
+       "nanmin": 4.5548787529361664e-10
+      }
+     },
+     "Current_Forward": {
+      "attrs": {
+       "RHK_Angle": 147.34811401367188,
+       "RHK_Bias": 0.3999999761581421,
+       "RHK_CH1DriveValue": 400.0,
+       "RHK_CH1DriveValueUnits": "mV",
+       "RHK_CH1Drive_Amplitude": 0.004999957799,
+       "RHK_CH1Drive_AmplitudeUnit": "V",
+       "RHK_CH1Drive_Frequency": 1300.0,
+       "RHK_CH1Drive_FrequencyUnit": "Hz",
+       "RHK_CH1Drive_HarmonicFactor": 1.0,
+       "RHK_CH1Drive_MasterOscillator": 1,
+       "RHK_CH1Drive_PhaseOffset": 0.0,
+       "RHK_CH1Drive_PhaseOffsetUnit": "deg",
+       "RHK_CH1Drive_ReservedUnit": "",
+       "RHK_CH2DriveValue": 0.0,
+       "RHK_CH2DriveValueUnits": "V",
+       "RHK_CH2Drive_Amplitude": 0.0,
+       "RHK_CH2Drive_AmplitudeUnit": "V",
+       "RHK_CH2Drive_Frequency": 0.0,
+       "RHK_CH2Drive_FrequencyUnit": "Hz",
+       "RHK_CH2Drive_HarmonicFactor": 0.0,
+       "RHK_CH2Drive_MasterOscillator": 0,
+       "RHK_CH2Drive_PhaseOffset": 0.0,
+       "RHK_CH2Drive_PhaseOffsetUnit": "deg",
+       "RHK_CH2Drive_ReservedUnit": "",
+       "RHK_CompletedLineCount": 8,
+       "RHK_Current": 4.999999858590343e-10,
+       "RHK_DataSubSource": 0,
+       "RHK_Date": "08/11/20",
+       "RHK_DateTime": "2020-08-11T16:13:02.000",
+       "RHK_GridXsize": 0,
+       "RHK_GridYsize": 0,
+       "RHK_GroupId": 0,
+       "RHK_ImageDrift_CumulativeX": 0.0,
+       "RHK_ImageDrift_CumulativeY": 0.0,
+       "RHK_ImageDrift_DriftOptionType": 0,
+       "RHK_ImageDrift_DriftOptionTypeName": "RHK_DRIFT_DISABLED",
+       "RHK_ImageDrift_Filetime": 132416287825822150,
+       "RHK_ImageDrift_Time": 0.0,
+       "RHK_ImageDrift_VectorX": 0.0,
+       "RHK_ImageDrift_VectorY": 0.0,
+       "RHK_ImageDrift_dX": 0.0,
+       "RHK_ImageDrift_dY": 0.0,
+       "RHK_ImageType": 0,
+       "RHK_ImageTypeName": "RHK_IMAGE_NORMAL",
+       "RHK_Label": "Current",
+       "RHK_LineType": 0,
+       "RHK_LineTypeName": "RHK_LINE_NOT_A_LINE",
+       "RHK_Lockin0_FilterCutoffFrequency": "40Hz Order 2",
+       "RHK_Lockin0_FreqUnit": "Hz",
+       "RHK_Lockin0_Frequency": 0.0,
+       "RHK_Lockin0_HarmonicFactor": 1.0,
+       "RHK_Lockin0_NonMasterOscillator": 1,
+       "RHK_Lockin0_PhaseOffset": -103.9999999,
+       "RHK_Lockin0_PhaseUnit": "deg",
+       "RHK_LowPassFilter1_CutoffFrequency": 2.0,
+       "RHK_LowPassFilter1_CutoffFrequencyUnits": "kHz",
+       "RHK_MaxZvalue": 0,
+       "RHK_MinZvalue": 0,
+       "RHK_MinorVer": 6,
+       "RHK_OverSamplingCount": 0,
+       "RHK_PLLProStatus": "",
+       "RHK_PRMdata": "",
+       "RHK_PageDataType": 0,
+       "RHK_PageDataTypeName": "RHK_DATA_IMAGE",
+       "RHK_PageID": 38278,
+       "RHK_PageSourceType": 0,
+       "RHK_PageSourceTypeName": "RHK_SOURCE_RAW",
+       "RHK_PageType": 2,
+       "RHK_PageTypeName": "RHK_PAGE_CURRENT",
+       "RHK_Period": 0.0003079792659264058,
+       "RHK_PiezoSensitivity_Actuator": 0.0,
+       "RHK_PiezoSensitivity_ActuatorCalibration": "",
+       "RHK_PiezoSensitivity_ActuatorUnit": "",
+       "RHK_PiezoSensitivity_ScanCalibration": "",
+       "RHK_PiezoSensitivity_ScanX": 0.0,
+       "RHK_PiezoSensitivity_ScanXUnit": "",
+       "RHK_PiezoSensitivity_ScanY": 0.0,
+       "RHK_PiezoSensitivity_ScanYUnit": "",
+       "RHK_PiezoSensitivity_ScanZ": 0.0,
+       "RHK_PiezoSensitivity_ScanZUnit": "",
+       "RHK_PiezoSensitivity_TubeCalibration": "300K",
+       "RHK_PiezoSensitivity_TubeX": 3e-08,
+       "RHK_PiezoSensitivity_TubeXUnit": "m/V",
+       "RHK_PiezoSensitivity_TubeY": 3e-08,
+       "RHK_PiezoSensitivity_TubeYUnit": "m/V",
+       "RHK_PiezoSensitivity_TubeZ": -4e-09,
+       "RHK_PiezoSensitivity_TubeZOffset": -4e-09,
+       "RHK_PiezoSensitivity_TubeZOffsetUnit": "m/V",
+       "RHK_PiezoSensitivity_TubeZUnit": "m/V",
+       "RHK_ScanProcessor_XSlopeCompensation": 0.0,
+       "RHK_ScanProcessor_XSlopeCompensationUnit": "%",
+       "RHK_ScanProcessor_YSlopeCompensation": 0.0,
+       "RHK_ScanProcessor_YSlopeCompensationUnit": "%",
+       "RHK_ScanType": 0,
+       "RHK_ScanTypeName": "RHK_SCAN_RIGHT",
+       "RHK_SessionText": "",
+       "RHK_SetpointUnit": "A",
+       "RHK_Signature": "STiMage 005.004 1",
+       "RHK_SlicedVoltage": "",
+       "RHK_StatusChannelText": "",
+       "RHK_SystemText": "",
+       "RHK_Time": "16:13:02",
+       "RHK_UserText": "",
+       "RHK_XYscale": 0.0,
+       "RHK_Xcorner": 0,
+       "RHK_Xlabel": "",
+       "RHK_Xoffset": -2.282351863058807e-09,
+       "RHK_Xscale": -9.23937801267094e-11,
+       "RHK_Xsize": 512,
+       "RHK_Xunits": "m",
+       "RHK_Ycorner": 0,
+       "RHK_Ylabel": "Current",
+       "RHK_Yoffset": -9.455471960961859e-09,
+       "RHK_Yscale": -5.913201928109402e-09,
+       "RHK_Ysize": 8,
+       "RHK_Yunits": "m",
+       "RHK_ZPI_FeedbackType": "Linear",
+       "RHK_ZPI_IntegralGain": 500.0,
+       "RHK_ZPI_IntegralGainUnit": "m/As",
+       "RHK_ZPI_LowerBound": -5.99999999e-07,
+       "RHK_ZPI_OutputUnit": "m",
+       "RHK_ZPI_ProportionalGain": 1e-07,
+       "RHK_ZPI_ProportionalGainUnit": "m/A",
+       "RHK_ZPI_SetPoint": 4.999999998e-10,
+       "RHK_ZPI_SetPointUnit": "A",
+       "RHK_ZPI_UpperBound": 5.99999999e-07,
+       "RHK_Zoffset": 0.0,
+       "RHK_Zscale": 4.656612844776963e-18,
+       "RHK_Zunits": "A",
+       "bias": 0.3999999761581421,
+       "bias_units": "V",
+       "feedback_active": true,
+       "feedback_pgain": 1e-07,
+       "filename": "line_hopg_300k_2020_08_11_16_20_04_378.sm4",
+       "interpretation": "image",
+       "long_name": "Current Forward",
+       "notes": "",
+       "offset": 0.0,
+       "scaling_factor": 1.0,
+       "scan_angle": 147.34811401367188,
+       "setpoint": 4.999999998e-10,
+       "setpoint_units": "A",
+       "start_time": "2020-08-11T16:13:02.000",
+       "time_per_point": 0.0003079792659264058,
+       "units": "A"
+      },
+      "dims": [
+       "Current_Forward_x",
+       "Current_Forward_y"
+      ],
+      "dtype": "float64",
+      "sha256": "b7e8039a9443a77cbccb6c967383ec40f4684636b3e3437cf79a6fb56c3fc1de",
+      "shape": [
+       512,
+       8
+      ],
+      "stats": {
+       "nanmax": 5.472480239615396e-10,
+       "nanmean": 4.999339238241342e-10,
+       "nanmin": 4.672211380219883e-10
+      }
+     },
+     "LIA_Current": {
+      "attrs": {
+       "RHK_Angle": 0.0,
+       "RHK_Bias": 0.3999999761581421,
+       "RHK_CH1DriveValue": 400.0,
+       "RHK_CH1DriveValueUnits": "mV",
+       "RHK_CH1Drive_Amplitude": 0.004999957799,
+       "RHK_CH1Drive_AmplitudeUnit": "V",
+       "RHK_CH1Drive_Frequency": 1300.0,
+       "RHK_CH1Drive_FrequencyUnit": "Hz",
+       "RHK_CH1Drive_HarmonicFactor": 1.0,
+       "RHK_CH1Drive_MasterOscillator": 1,
+       "RHK_CH1Drive_PhaseOffset": 0.0,
+       "RHK_CH1Drive_PhaseOffsetUnit": "deg",
+       "RHK_CH1Drive_ReservedUnit": "",
+       "RHK_CH2DriveValue": 0.0,
+       "RHK_CH2DriveValueUnits": "V",
+       "RHK_CH2Drive_Amplitude": 0.0,
+       "RHK_CH2Drive_AmplitudeUnit": "V",
+       "RHK_CH2Drive_Frequency": 0.0,
+       "RHK_CH2Drive_FrequencyUnit": "Hz",
+       "RHK_CH2Drive_HarmonicFactor": 0.0,
+       "RHK_CH2Drive_MasterOscillator": 0,
+       "RHK_CH2Drive_PhaseOffset": 0.0,
+       "RHK_CH2Drive_PhaseOffsetUnit": "deg",
+       "RHK_CH2Drive_ReservedUnit": "",
+       "RHK_CompletedLineCount": 0,
+       "RHK_Current": 4.999999858590343e-10,
+       "RHK_DataSubSource": 0,
+       "RHK_Date": "08/11/20",
+       "RHK_DateTime": "2020-08-11T16:13:16.000",
+       "RHK_GridXsize": 4294967295,
+       "RHK_GridYsize": 4294967295,
+       "RHK_GroupId": 0,
+       "RHK_ImageType": 0,
+       "RHK_ImageTypeName": "RHK_IMAGE_NORMAL",
+       "RHK_Label": "LIA Current",
+       "RHK_LineType": 7,
+       "RHK_LineTypeName": "RHK_LINE_IV_SPECTRUM",
+       "RHK_Lockin0_FilterCutoffFrequency": "40Hz Order 2",
+       "RHK_Lockin0_FreqUnit": "Hz",
+       "RHK_Lockin0_Frequency": 0.0,
+       "RHK_Lockin0_HarmonicFactor": 1.0,
+       "RHK_Lockin0_NonMasterOscillator": 1,
+       "RHK_Lockin0_PhaseOffset": -103.9999999,
+       "RHK_Lockin0_PhaseUnit": "deg",
+       "RHK_LowPassFilter1_CutoffFrequency": 2.0,
+       "RHK_LowPassFilter1_CutoffFrequencyUnits": "kHz",
+       "RHK_MaxZvalue": 0,
+       "RHK_MinZvalue": 0,
+       "RHK_MinorVer": 6,
+       "RHK_OverSamplingCount": 0,
+       "RHK_PLLProStatus": "",
+       "RHK_PRMdata": "",
+       "RHK_PageDataType": 1,
+       "RHK_PageDataTypeName": "RHK_DATA_LINE",
+       "RHK_PageID": 51645,
+       "RHK_PageSourceType": 0,
+       "RHK_PageSourceTypeName": "RHK_SOURCE_RAW",
+       "RHK_PageType": 16,
+       "RHK_PageTypeName": "RHK_PAGE_INTERACTIVE_SPECTRA",
+       "RHK_Period": 9.999999747378752e-05,
+       "RHK_PiezoSensitivity_Actuator": 0.0,
+       "RHK_PiezoSensitivity_ActuatorCalibration": "",
+       "RHK_PiezoSensitivity_ActuatorUnit": "",
+       "RHK_PiezoSensitivity_ScanCalibration": "",
+       "RHK_PiezoSensitivity_ScanX": 0.0,
+       "RHK_PiezoSensitivity_ScanXUnit": "",
+       "RHK_PiezoSensitivity_ScanY": 0.0,
+       "RHK_PiezoSensitivity_ScanYUnit": "",
+       "RHK_PiezoSensitivity_ScanZ": 0.0,
+       "RHK_PiezoSensitivity_ScanZUnit": "",
+       "RHK_PiezoSensitivity_TubeCalibration": "300K",
+       "RHK_PiezoSensitivity_TubeX": 3e-08,
+       "RHK_PiezoSensitivity_TubeXUnit": "m/V",
+       "RHK_PiezoSensitivity_TubeY": 3e-08,
+       "RHK_PiezoSensitivity_TubeYUnit": "m/V",
+       "RHK_PiezoSensitivity_TubeZ": -4e-09,
+       "RHK_PiezoSensitivity_TubeZOffset": -4e-09,
+       "RHK_PiezoSensitivity_TubeZOffsetUnit": "m/V",
+       "RHK_PiezoSensitivity_TubeZUnit": "m/V",
+       "RHK_ScanProcessor_XSlopeCompensation": 0.0,
+       "RHK_ScanProcessor_XSlopeCompensationUnit": "%",
+       "RHK_ScanProcessor_YSlopeCompensation": 0.0,
+       "RHK_ScanProcessor_YSlopeCompensationUnit": "%",
+       "RHK_ScanType": 0,
+       "RHK_ScanTypeName": "RHK_SCAN_RIGHT",
+       "RHK_SessionText": "",
+       "RHK_SetpointUnit": "A",
+       "RHK_Signature": "STiMage 005.004 1",
+       "RHK_SlicedVoltage": "",
+       "RHK_SpecDrift_Channel": "",
+       "RHK_SpecDrift_CumulativeX": {
+        "__seq__": {
+         "len": 32,
+         "sha256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1"
+        }
+       },
+       "RHK_SpecDrift_CumulativeY": {
+        "__seq__": {
+         "len": 32,
+         "sha256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1"
+        }
+       },
+       "RHK_SpecDrift_DriftOptionType": 0,
+       "RHK_SpecDrift_DriftOptionTypeName": "RHK_DRIFT_DISABLED",
+       "RHK_SpecDrift_Filetime": 0,
+       "RHK_SpecDrift_Time": {
+        "__seq__": {
+         "len": 32,
+         "sha256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1"
+        }
+       },
+       "RHK_SpecDrift_Xcoord": {
+        "__seq__": {
+         "len": 32,
+         "sha256": "9b3c7a3e216a1f1c23e1a7d7cfcf07fb7a31265fd14c39e501c2409b654daf33"
+        }
+       },
+       "RHK_SpecDrift_Ycoord": {
+        "__seq__": {
+         "len": 32,
+         "sha256": "30de1435646de28899ae4c64fb46fa377df5bbc2609dfbed2731cbd197cbf63a"
+        }
+       },
+       "RHK_SpecDrift_dX": {
+        "__seq__": {
+         "len": 32,
+         "sha256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1"
+        }
+       },
+       "RHK_SpecDrift_dY": {
+        "__seq__": {
+         "len": 32,
+         "sha256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1"
+        }
+       },
+       "RHK_StatusChannelText": "",
+       "RHK_SystemText": "",
+       "RHK_Time": "16:13:16",
+       "RHK_UserText": "",
+       "RHK_XYscale": 0.0,
+       "RHK_Xcorner": 0,
+       "RHK_Xlabel": "Voltage",
+       "RHK_Xoffset": 0.6000000238418579,
+       "RHK_Xscale": -0.004999999888241291,
+       "RHK_Xsize": 241,
+       "RHK_Xunits": "V",
+       "RHK_Ycorner": 0,
+       "RHK_Ylabel": "LIA Current",
+       "RHK_Yoffset": 0.0,
+       "RHK_Yscale": 1.0,
+       "RHK_Ysize": 32,
+       "RHK_Yunits": " ",
+       "RHK_ZPI_FeedbackType": "Linear",
+       "RHK_ZPI_IntegralGain": 500.0,
+       "RHK_ZPI_IntegralGainUnit": "m/As",
+       "RHK_ZPI_LowerBound": -5.99999999e-07,
+       "RHK_ZPI_OutputUnit": "m",
+       "RHK_ZPI_ProportionalGain": 1e-07,
+       "RHK_ZPI_ProportionalGainUnit": "m/A",
+       "RHK_ZPI_SetPoint": 4.999999998e-10,
+       "RHK_ZPI_SetPointUnit": "A",
+       "RHK_ZPI_UpperBound": 5.99999999e-07,
+       "RHK_Zoffset": 0.0,
+       "RHK_Zscale": 4.656612844776963e-18,
+       "RHK_Zunits": "A",
+       "bias": 0.3999999761581421,
+       "bias_units": "V",
+       "feedback_active": true,
+       "feedback_pgain": 1e-07,
+       "filename": "line_hopg_300k_2020_08_11_16_20_04_378.sm4",
+       "interpretation": "spectrum",
+       "long_name": "LIA Current",
+       "notes": "",
+       "offset": 0.0,
+       "scaling_factor": 1.0,
+       "scan_angle": 0.0,
+       "setpoint": 4.999999998e-10,
+       "setpoint_units": "A",
+       "start_time": "2020-08-11T16:13:16.000",
+       "time_per_point": 9.999999747378752e-05,
+       "units": "A"
+      },
+      "dims": [
+       "LIA_Current_x",
+       "LIA_Current_y"
+      ],
+      "dtype": "float64",
+      "sha256": "4477d8d6ce2f5b8bfe2babd21865289bb1b68089df995cd2adc67894ba9f5c2f",
+      "shape": [
+       241,
+       32
+      ],
+      "stats": {
+       "nanmax": 3.084291685254349e-11,
+       "nanmean": 9.687348259926594e-12,
+       "nanmin": 1.932382571874165e-12
+      }
+     },
+     "LIA_Current_Backward": {
+      "attrs": {
+       "RHK_Angle": 147.34811401367188,
+       "RHK_Bias": 0.3999999761581421,
+       "RHK_CH1DriveValue": 400.0,
+       "RHK_CH1DriveValueUnits": "mV",
+       "RHK_CH1Drive_Amplitude": 0.004999957799,
+       "RHK_CH1Drive_AmplitudeUnit": "V",
+       "RHK_CH1Drive_Frequency": 1300.0,
+       "RHK_CH1Drive_FrequencyUnit": "Hz",
+       "RHK_CH1Drive_HarmonicFactor": 1.0,
+       "RHK_CH1Drive_MasterOscillator": 1,
+       "RHK_CH1Drive_PhaseOffset": 0.0,
+       "RHK_CH1Drive_PhaseOffsetUnit": "deg",
+       "RHK_CH1Drive_ReservedUnit": "",
+       "RHK_CH2DriveValue": 0.0,
+       "RHK_CH2DriveValueUnits": "V",
+       "RHK_CH2Drive_Amplitude": 0.0,
+       "RHK_CH2Drive_AmplitudeUnit": "V",
+       "RHK_CH2Drive_Frequency": 0.0,
+       "RHK_CH2Drive_FrequencyUnit": "Hz",
+       "RHK_CH2Drive_HarmonicFactor": 0.0,
+       "RHK_CH2Drive_MasterOscillator": 0,
+       "RHK_CH2Drive_PhaseOffset": 0.0,
+       "RHK_CH2Drive_PhaseOffsetUnit": "deg",
+       "RHK_CH2Drive_ReservedUnit": "",
+       "RHK_CompletedLineCount": 8,
+       "RHK_Current": 4.999999858590343e-10,
+       "RHK_DataSubSource": 0,
+       "RHK_Date": "08/11/20",
+       "RHK_DateTime": "2020-08-11T16:13:02.000",
+       "RHK_GridXsize": 0,
+       "RHK_GridYsize": 0,
+       "RHK_GroupId": 0,
+       "RHK_ImageDrift_CumulativeX": 0.0,
+       "RHK_ImageDrift_CumulativeY": 0.0,
+       "RHK_ImageDrift_DriftOptionType": 0,
+       "RHK_ImageDrift_DriftOptionTypeName": "RHK_DRIFT_DISABLED",
+       "RHK_ImageDrift_Filetime": 132416287825822150,
+       "RHK_ImageDrift_Time": 0.0,
+       "RHK_ImageDrift_VectorX": 0.0,
+       "RHK_ImageDrift_VectorY": 0.0,
+       "RHK_ImageDrift_dX": 0.0,
+       "RHK_ImageDrift_dY": 0.0,
+       "RHK_ImageType": 0,
+       "RHK_ImageTypeName": "RHK_IMAGE_NORMAL",
+       "RHK_Label": "LIA Current",
+       "RHK_LineType": 0,
+       "RHK_LineTypeName": "RHK_LINE_NOT_A_LINE",
+       "RHK_Lockin0_FilterCutoffFrequency": "40Hz Order 2",
+       "RHK_Lockin0_FreqUnit": "Hz",
+       "RHK_Lockin0_Frequency": 0.0,
+       "RHK_Lockin0_HarmonicFactor": 1.0,
+       "RHK_Lockin0_NonMasterOscillator": 1,
+       "RHK_Lockin0_PhaseOffset": -103.9999999,
+       "RHK_Lockin0_PhaseUnit": "deg",
+       "RHK_LowPassFilter1_CutoffFrequency": 2.0,
+       "RHK_LowPassFilter1_CutoffFrequencyUnits": "kHz",
+       "RHK_MaxZvalue": 0,
+       "RHK_MinZvalue": 0,
+       "RHK_MinorVer": 6,
+       "RHK_OverSamplingCount": 0,
+       "RHK_PLLProStatus": "",
+       "RHK_PRMdata": "",
+       "RHK_PageDataType": 0,
+       "RHK_PageDataTypeName": "RHK_DATA_IMAGE",
+       "RHK_PageID": 27799,
+       "RHK_PageSourceType": 0,
+       "RHK_PageSourceTypeName": "RHK_SOURCE_RAW",
+       "RHK_PageType": 2,
+       "RHK_PageTypeName": "RHK_PAGE_CURRENT",
+       "RHK_Period": 0.0003079792659264058,
+       "RHK_PiezoSensitivity_Actuator": 0.0,
+       "RHK_PiezoSensitivity_ActuatorCalibration": "",
+       "RHK_PiezoSensitivity_ActuatorUnit": "",
+       "RHK_PiezoSensitivity_ScanCalibration": "",
+       "RHK_PiezoSensitivity_ScanX": 0.0,
+       "RHK_PiezoSensitivity_ScanXUnit": "",
+       "RHK_PiezoSensitivity_ScanY": 0.0,
+       "RHK_PiezoSensitivity_ScanYUnit": "",
+       "RHK_PiezoSensitivity_ScanZ": 0.0,
+       "RHK_PiezoSensitivity_ScanZUnit": "",
+       "RHK_PiezoSensitivity_TubeCalibration": "300K",
+       "RHK_PiezoSensitivity_TubeX": 3e-08,
+       "RHK_PiezoSensitivity_TubeXUnit": "m/V",
+       "RHK_PiezoSensitivity_TubeY": 3e-08,
+       "RHK_PiezoSensitivity_TubeYUnit": "m/V",
+       "RHK_PiezoSensitivity_TubeZ": -4e-09,
+       "RHK_PiezoSensitivity_TubeZOffset": -4e-09,
+       "RHK_PiezoSensitivity_TubeZOffsetUnit": "m/V",
+       "RHK_PiezoSensitivity_TubeZUnit": "m/V",
+       "RHK_ScanProcessor_XSlopeCompensation": 0.0,
+       "RHK_ScanProcessor_XSlopeCompensationUnit": "%",
+       "RHK_ScanProcessor_YSlopeCompensation": 0.0,
+       "RHK_ScanProcessor_YSlopeCompensationUnit": "%",
+       "RHK_ScanType": 1,
+       "RHK_ScanTypeName": "RHK_SCAN_LEFT",
+       "RHK_SessionText": "",
+       "RHK_SetpointUnit": "A",
+       "RHK_Signature": "STiMage 005.004 1",
+       "RHK_SlicedVoltage": "",
+       "RHK_StatusChannelText": "",
+       "RHK_SystemText": "",
+       "RHK_Time": "16:13:02",
+       "RHK_UserText": "",
+       "RHK_XYscale": 0.0,
+       "RHK_Xcorner": 0,
+       "RHK_Xlabel": "",
+       "RHK_Xoffset": -2.282351863058807e-09,
+       "RHK_Xscale": -9.23937801267094e-11,
+       "RHK_Xsize": 512,
+       "RHK_Xunits": "m",
+       "RHK_Ycorner": 0,
+       "RHK_Ylabel": "LIA Current",
+       "RHK_Yoffset": -9.455471960961859e-09,
+       "RHK_Yscale": -5.913201928109402e-09,
+       "RHK_Ysize": 8,
+       "RHK_Yunits": "m",
+       "RHK_ZPI_FeedbackType": "Linear",
+       "RHK_ZPI_IntegralGain": 500.0,
+       "RHK_ZPI_IntegralGainUnit": "m/As",
+       "RHK_ZPI_LowerBound": -5.99999999e-07,
+       "RHK_ZPI_OutputUnit": "m",
+       "RHK_ZPI_ProportionalGain": 1e-07,
+       "RHK_ZPI_ProportionalGainUnit": "m/A",
+       "RHK_ZPI_SetPoint": 4.999999998e-10,
+       "RHK_ZPI_SetPointUnit": "A",
+       "RHK_ZPI_UpperBound": 5.99999999e-07,
+       "RHK_Zoffset": 0.0,
+       "RHK_Zscale": 4.656612844776963e-18,
+       "RHK_Zunits": "A",
+       "bias": 0.3999999761581421,
+       "bias_units": "V",
+       "feedback_active": true,
+       "feedback_pgain": 1e-07,
+       "filename": "line_hopg_300k_2020_08_11_16_20_04_378.sm4",
+       "interpretation": "image",
+       "long_name": "LIA Current Backward",
+       "notes": "",
+       "offset": 0.0,
+       "scaling_factor": 1.0,
+       "scan_angle": 147.34811401367188,
+       "setpoint": 4.999999998e-10,
+       "setpoint_units": "A",
+       "start_time": "2020-08-11T16:13:02.000",
+       "time_per_point": 0.0003079792659264058,
+       "units": "A"
+      },
+      "dims": [
+       "LIA_Current_Backward_x",
+       "LIA_Current_Backward_y"
+      ],
+      "dtype": "float64",
+      "sha256": "bd6dee655f42bd7fd0aecd87f4be6dde42eac575da71ad0d615b9833557740f5",
+      "shape": [
+       512,
+       8
+      ],
+      "stats": {
+       "nanmax": 9.07065806985665e-12,
+       "nanmean": 4.2938177978682105e-14,
+       "nanmin": -1.1694678034339847e-11
+      }
+     },
+     "LIA_Current_Forward": {
+      "attrs": {
+       "RHK_Angle": 147.34811401367188,
+       "RHK_Bias": 0.3999999761581421,
+       "RHK_CH1DriveValue": 400.0,
+       "RHK_CH1DriveValueUnits": "mV",
+       "RHK_CH1Drive_Amplitude": 0.004999957799,
+       "RHK_CH1Drive_AmplitudeUnit": "V",
+       "RHK_CH1Drive_Frequency": 1300.0,
+       "RHK_CH1Drive_FrequencyUnit": "Hz",
+       "RHK_CH1Drive_HarmonicFactor": 1.0,
+       "RHK_CH1Drive_MasterOscillator": 1,
+       "RHK_CH1Drive_PhaseOffset": 0.0,
+       "RHK_CH1Drive_PhaseOffsetUnit": "deg",
+       "RHK_CH1Drive_ReservedUnit": "",
+       "RHK_CH2DriveValue": 0.0,
+       "RHK_CH2DriveValueUnits": "V",
+       "RHK_CH2Drive_Amplitude": 0.0,
+       "RHK_CH2Drive_AmplitudeUnit": "V",
+       "RHK_CH2Drive_Frequency": 0.0,
+       "RHK_CH2Drive_FrequencyUnit": "Hz",
+       "RHK_CH2Drive_HarmonicFactor": 0.0,
+       "RHK_CH2Drive_MasterOscillator": 0,
+       "RHK_CH2Drive_PhaseOffset": 0.0,
+       "RHK_CH2Drive_PhaseOffsetUnit": "deg",
+       "RHK_CH2Drive_ReservedUnit": "",
+       "RHK_CompletedLineCount": 8,
+       "RHK_Current": 4.999999858590343e-10,
+       "RHK_DataSubSource": 0,
+       "RHK_Date": "08/11/20",
+       "RHK_DateTime": "2020-08-11T16:13:02.000",
+       "RHK_GridXsize": 0,
+       "RHK_GridYsize": 0,
+       "RHK_GroupId": 0,
+       "RHK_ImageDrift_CumulativeX": 0.0,
+       "RHK_ImageDrift_CumulativeY": 0.0,
+       "RHK_ImageDrift_DriftOptionType": 0,
+       "RHK_ImageDrift_DriftOptionTypeName": "RHK_DRIFT_DISABLED",
+       "RHK_ImageDrift_Filetime": 132416287825822150,
+       "RHK_ImageDrift_Time": 0.0,
+       "RHK_ImageDrift_VectorX": 0.0,
+       "RHK_ImageDrift_VectorY": 0.0,
+       "RHK_ImageDrift_dX": 0.0,
+       "RHK_ImageDrift_dY": 0.0,
+       "RHK_ImageType": 0,
+       "RHK_ImageTypeName": "RHK_IMAGE_NORMAL",
+       "RHK_Label": "LIA Current",
+       "RHK_LineType": 0,
+       "RHK_LineTypeName": "RHK_LINE_NOT_A_LINE",
+       "RHK_Lockin0_FilterCutoffFrequency": "40Hz Order 2",
+       "RHK_Lockin0_FreqUnit": "Hz",
+       "RHK_Lockin0_Frequency": 0.0,
+       "RHK_Lockin0_HarmonicFactor": 1.0,
+       "RHK_Lockin0_NonMasterOscillator": 1,
+       "RHK_Lockin0_PhaseOffset": -103.9999999,
+       "RHK_Lockin0_PhaseUnit": "deg",
+       "RHK_LowPassFilter1_CutoffFrequency": 2.0,
+       "RHK_LowPassFilter1_CutoffFrequencyUnits": "kHz",
+       "RHK_MaxZvalue": 0,
+       "RHK_MinZvalue": 0,
+       "RHK_MinorVer": 6,
+       "RHK_OverSamplingCount": 0,
+       "RHK_PLLProStatus": "",
+       "RHK_PRMdata": "",
+       "RHK_PageDataType": 0,
+       "RHK_PageDataTypeName": "RHK_DATA_IMAGE",
+       "RHK_PageID": 59170,
+       "RHK_PageSourceType": 0,
+       "RHK_PageSourceTypeName": "RHK_SOURCE_RAW",
+       "RHK_PageType": 2,
+       "RHK_PageTypeName": "RHK_PAGE_CURRENT",
+       "RHK_Period": 0.0003079792659264058,
+       "RHK_PiezoSensitivity_Actuator": 0.0,
+       "RHK_PiezoSensitivity_ActuatorCalibration": "",
+       "RHK_PiezoSensitivity_ActuatorUnit": "",
+       "RHK_PiezoSensitivity_ScanCalibration": "",
+       "RHK_PiezoSensitivity_ScanX": 0.0,
+       "RHK_PiezoSensitivity_ScanXUnit": "",
+       "RHK_PiezoSensitivity_ScanY": 0.0,
+       "RHK_PiezoSensitivity_ScanYUnit": "",
+       "RHK_PiezoSensitivity_ScanZ": 0.0,
+       "RHK_PiezoSensitivity_ScanZUnit": "",
+       "RHK_PiezoSensitivity_TubeCalibration": "300K",
+       "RHK_PiezoSensitivity_TubeX": 3e-08,
+       "RHK_PiezoSensitivity_TubeXUnit": "m/V",
+       "RHK_PiezoSensitivity_TubeY": 3e-08,
+       "RHK_PiezoSensitivity_TubeYUnit": "m/V",
+       "RHK_PiezoSensitivity_TubeZ": -4e-09,
+       "RHK_PiezoSensitivity_TubeZOffset": -4e-09,
+       "RHK_PiezoSensitivity_TubeZOffsetUnit": "m/V",
+       "RHK_PiezoSensitivity_TubeZUnit": "m/V",
+       "RHK_ScanProcessor_XSlopeCompensation": 0.0,
+       "RHK_ScanProcessor_XSlopeCompensationUnit": "%",
+       "RHK_ScanProcessor_YSlopeCompensation": 0.0,
+       "RHK_ScanProcessor_YSlopeCompensationUnit": "%",
+       "RHK_ScanType": 0,
+       "RHK_ScanTypeName": "RHK_SCAN_RIGHT",
+       "RHK_SessionText": "",
+       "RHK_SetpointUnit": "A",
+       "RHK_Signature": "STiMage 005.004 1",
+       "RHK_SlicedVoltage": "",
+       "RHK_StatusChannelText": "",
+       "RHK_SystemText": "",
+       "RHK_Time": "16:13:02",
+       "RHK_UserText": "",
+       "RHK_XYscale": 0.0,
+       "RHK_Xcorner": 0,
+       "RHK_Xlabel": "",
+       "RHK_Xoffset": -2.282351863058807e-09,
+       "RHK_Xscale": -9.23937801267094e-11,
+       "RHK_Xsize": 512,
+       "RHK_Xunits": "m",
+       "RHK_Ycorner": 0,
+       "RHK_Ylabel": "LIA Current",
+       "RHK_Yoffset": -9.455471960961859e-09,
+       "RHK_Yscale": -5.913201928109402e-09,
+       "RHK_Ysize": 8,
+       "RHK_Yunits": "m",
+       "RHK_ZPI_FeedbackType": "Linear",
+       "RHK_ZPI_IntegralGain": 500.0,
+       "RHK_ZPI_IntegralGainUnit": "m/As",
+       "RHK_ZPI_LowerBound": -5.99999999e-07,
+       "RHK_ZPI_OutputUnit": "m",
+       "RHK_ZPI_ProportionalGain": 1e-07,
+       "RHK_ZPI_ProportionalGainUnit": "m/A",
+       "RHK_ZPI_SetPoint": 4.999999998e-10,
+       "RHK_ZPI_SetPointUnit": "A",
+       "RHK_ZPI_UpperBound": 5.99999999e-07,
+       "RHK_Zoffset": 0.0,
+       "RHK_Zscale": 4.656612844776963e-18,
+       "RHK_Zunits": "A",
+       "bias": 0.3999999761581421,
+       "bias_units": "V",
+       "feedback_active": true,
+       "feedback_pgain": 1e-07,
+       "filename": "line_hopg_300k_2020_08_11_16_20_04_378.sm4",
+       "interpretation": "image",
+       "long_name": "LIA Current Forward",
+       "notes": "",
+       "offset": 0.0,
+       "scaling_factor": 1.0,
+       "scan_angle": 147.34811401367188,
+       "setpoint": 4.999999998e-10,
+       "setpoint_units": "A",
+       "start_time": "2020-08-11T16:13:02.000",
+       "time_per_point": 0.0003079792659264058,
+       "units": "A"
+      },
+      "dims": [
+       "LIA_Current_Forward_x",
+       "LIA_Current_Forward_y"
+      ],
+      "dtype": "float64",
+      "sha256": "13c1e71c1680bf6855c60baef70e87424e0bde50fd14e77aea99c3e84cdc467b",
+      "shape": [
+       512,
+       8
+      ],
+      "stats": {
+       "nanmax": 9.537218080613388e-12,
+       "nanmean": 4.2960810754198174e-14,
+       "nanmin": -1.0746880369139634e-11
+      }
+     },
+     "Topography_Backward": {
+      "attrs": {
+       "RHK_Angle": 147.34811401367188,
+       "RHK_Bias": 0.3999999761581421,
+       "RHK_CH1DriveValue": 400.0,
+       "RHK_CH1DriveValueUnits": "mV",
+       "RHK_CH1Drive_Amplitude": 0.004999957799,
+       "RHK_CH1Drive_AmplitudeUnit": "V",
+       "RHK_CH1Drive_Frequency": 1300.0,
+       "RHK_CH1Drive_FrequencyUnit": "Hz",
+       "RHK_CH1Drive_HarmonicFactor": 1.0,
+       "RHK_CH1Drive_MasterOscillator": 1,
+       "RHK_CH1Drive_PhaseOffset": 0.0,
+       "RHK_CH1Drive_PhaseOffsetUnit": "deg",
+       "RHK_CH1Drive_ReservedUnit": "",
+       "RHK_CH2DriveValue": 0.0,
+       "RHK_CH2DriveValueUnits": "V",
+       "RHK_CH2Drive_Amplitude": 0.0,
+       "RHK_CH2Drive_AmplitudeUnit": "V",
+       "RHK_CH2Drive_Frequency": 0.0,
+       "RHK_CH2Drive_FrequencyUnit": "Hz",
+       "RHK_CH2Drive_HarmonicFactor": 0.0,
+       "RHK_CH2Drive_MasterOscillator": 0,
+       "RHK_CH2Drive_PhaseOffset": 0.0,
+       "RHK_CH2Drive_PhaseOffsetUnit": "deg",
+       "RHK_CH2Drive_ReservedUnit": "",
+       "RHK_CompletedLineCount": 8,
+       "RHK_Current": 4.999999858590343e-10,
+       "RHK_DataSubSource": 0,
+       "RHK_Date": "08/11/20",
+       "RHK_DateTime": "2020-08-11T16:13:02.000",
+       "RHK_GridXsize": 0,
+       "RHK_GridYsize": 0,
+       "RHK_GroupId": 0,
+       "RHK_ImageDrift_CumulativeX": 0.0,
+       "RHK_ImageDrift_CumulativeY": 0.0,
+       "RHK_ImageDrift_DriftOptionType": 0,
+       "RHK_ImageDrift_DriftOptionTypeName": "RHK_DRIFT_DISABLED",
+       "RHK_ImageDrift_Filetime": 132416287825822150,
+       "RHK_ImageDrift_Time": 0.0,
+       "RHK_ImageDrift_VectorX": 0.0,
+       "RHK_ImageDrift_VectorY": 0.0,
+       "RHK_ImageDrift_dX": 0.0,
+       "RHK_ImageDrift_dY": 0.0,
+       "RHK_ImageType": 0,
+       "RHK_ImageTypeName": "RHK_IMAGE_NORMAL",
+       "RHK_Label": "Topography",
+       "RHK_LineType": 0,
+       "RHK_LineTypeName": "RHK_LINE_NOT_A_LINE",
+       "RHK_Lockin0_FilterCutoffFrequency": "40Hz Order 2",
+       "RHK_Lockin0_FreqUnit": "Hz",
+       "RHK_Lockin0_Frequency": 0.0,
+       "RHK_Lockin0_HarmonicFactor": 1.0,
+       "RHK_Lockin0_NonMasterOscillator": 1,
+       "RHK_Lockin0_PhaseOffset": -103.9999999,
+       "RHK_Lockin0_PhaseUnit": "deg",
+       "RHK_LowPassFilter1_CutoffFrequency": 2.0,
+       "RHK_LowPassFilter1_CutoffFrequencyUnits": "kHz",
+       "RHK_MaxZvalue": 0,
+       "RHK_MinZvalue": 0,
+       "RHK_MinorVer": 6,
+       "RHK_OverSamplingCount": 0,
+       "RHK_PLLProStatus": "",
+       "RHK_PRMdata": "",
+       "RHK_PageDataType": 0,
+       "RHK_PageDataTypeName": "RHK_DATA_IMAGE",
+       "RHK_PageID": 22798,
+       "RHK_PageSourceType": 0,
+       "RHK_PageSourceTypeName": "RHK_SOURCE_RAW",
+       "RHK_PageType": 1,
+       "RHK_PageTypeName": "RHK_PAGE_TOPOGRAPHIC",
+       "RHK_Period": 0.0003079792659264058,
+       "RHK_PiezoSensitivity_Actuator": 0.0,
+       "RHK_PiezoSensitivity_ActuatorCalibration": "",
+       "RHK_PiezoSensitivity_ActuatorUnit": "",
+       "RHK_PiezoSensitivity_ScanCalibration": "",
+       "RHK_PiezoSensitivity_ScanX": 0.0,
+       "RHK_PiezoSensitivity_ScanXUnit": "",
+       "RHK_PiezoSensitivity_ScanY": 0.0,
+       "RHK_PiezoSensitivity_ScanYUnit": "",
+       "RHK_PiezoSensitivity_ScanZ": 0.0,
+       "RHK_PiezoSensitivity_ScanZUnit": "",
+       "RHK_PiezoSensitivity_TubeCalibration": "300K",
+       "RHK_PiezoSensitivity_TubeX": 3e-08,
+       "RHK_PiezoSensitivity_TubeXUnit": "m/V",
+       "RHK_PiezoSensitivity_TubeY": 3e-08,
+       "RHK_PiezoSensitivity_TubeYUnit": "m/V",
+       "RHK_PiezoSensitivity_TubeZ": -4e-09,
+       "RHK_PiezoSensitivity_TubeZOffset": -4e-09,
+       "RHK_PiezoSensitivity_TubeZOffsetUnit": "m/V",
+       "RHK_PiezoSensitivity_TubeZUnit": "m/V",
+       "RHK_ScanProcessor_XSlopeCompensation": 0.0,
+       "RHK_ScanProcessor_XSlopeCompensationUnit": "%",
+       "RHK_ScanProcessor_YSlopeCompensation": 0.0,
+       "RHK_ScanProcessor_YSlopeCompensationUnit": "%",
+       "RHK_ScanType": 1,
+       "RHK_ScanTypeName": "RHK_SCAN_LEFT",
+       "RHK_SessionText": "",
+       "RHK_SetpointUnit": "A",
+       "RHK_Signature": "STiMage 005.004 1",
+       "RHK_SlicedVoltage": "",
+       "RHK_StatusChannelText": "",
+       "RHK_SystemText": "",
+       "RHK_Time": "16:13:02",
+       "RHK_UserText": "",
+       "RHK_XYscale": 0.0,
+       "RHK_Xcorner": 0,
+       "RHK_Xlabel": "",
+       "RHK_Xoffset": -2.282351863058807e-09,
+       "RHK_Xscale": -9.23937801267094e-11,
+       "RHK_Xsize": 512,
+       "RHK_Xunits": "m",
+       "RHK_Ycorner": 0,
+       "RHK_Ylabel": "Topography",
+       "RHK_Yoffset": -9.455471960961859e-09,
+       "RHK_Yscale": -5.913201928109402e-09,
+       "RHK_Ysize": 8,
+       "RHK_Yunits": "m",
+       "RHK_ZPI_FeedbackType": "Linear",
+       "RHK_ZPI_IntegralGain": 500.0,
+       "RHK_ZPI_IntegralGainUnit": "m/As",
+       "RHK_ZPI_LowerBound": -5.99999999e-07,
+       "RHK_ZPI_OutputUnit": "m",
+       "RHK_ZPI_ProportionalGain": 1e-07,
+       "RHK_ZPI_ProportionalGainUnit": "m/A",
+       "RHK_ZPI_SetPoint": 4.999999998e-10,
+       "RHK_ZPI_SetPointUnit": "A",
+       "RHK_ZPI_UpperBound": 5.99999999e-07,
+       "RHK_Zoffset": 0.0,
+       "RHK_Zscale": -2.7939678226714636e-16,
+       "RHK_Zunits": "m",
+       "bias": 0.3999999761581421,
+       "bias_units": "V",
+       "feedback_active": true,
+       "feedback_pgain": 1e-07,
+       "filename": "line_hopg_300k_2020_08_11_16_20_04_378.sm4",
+       "interpretation": "image",
+       "long_name": "Topography Backward",
+       "notes": "",
+       "offset": 0.0,
+       "scaling_factor": 1.0,
+       "scan_angle": 147.34811401367188,
+       "setpoint": 4.999999998e-10,
+       "setpoint_units": "A",
+       "start_time": "2020-08-11T16:13:02.000",
+       "time_per_point": 0.0003079792659264058,
+       "units": "m"
+      },
+      "dims": [
+       "Topography_Backward_x",
+       "Topography_Backward_y"
+      ],
+      "dtype": "float64",
+      "sha256": "a22af98256921c58aea054aa934588be9870b6d42c39936efe2bd0118249f2bc",
+      "shape": [
+       512,
+       8
+      ],
+      "stats": {
+       "nanmax": -3.7286634665089904e-07,
+       "nanmean": -3.731433734450493e-07,
+       "nanmin": -3.734646075254996e-07
+      }
+     },
+     "Topography_Forward": {
+      "attrs": {
+       "RHK_Angle": 147.34811401367188,
+       "RHK_Bias": 0.3999999761581421,
+       "RHK_CH1DriveValue": 400.0,
+       "RHK_CH1DriveValueUnits": "mV",
+       "RHK_CH1Drive_Amplitude": 0.004999957799,
+       "RHK_CH1Drive_AmplitudeUnit": "V",
+       "RHK_CH1Drive_Frequency": 1300.0,
+       "RHK_CH1Drive_FrequencyUnit": "Hz",
+       "RHK_CH1Drive_HarmonicFactor": 1.0,
+       "RHK_CH1Drive_MasterOscillator": 1,
+       "RHK_CH1Drive_PhaseOffset": 0.0,
+       "RHK_CH1Drive_PhaseOffsetUnit": "deg",
+       "RHK_CH1Drive_ReservedUnit": "",
+       "RHK_CH2DriveValue": 0.0,
+       "RHK_CH2DriveValueUnits": "V",
+       "RHK_CH2Drive_Amplitude": 0.0,
+       "RHK_CH2Drive_AmplitudeUnit": "V",
+       "RHK_CH2Drive_Frequency": 0.0,
+       "RHK_CH2Drive_FrequencyUnit": "Hz",
+       "RHK_CH2Drive_HarmonicFactor": 0.0,
+       "RHK_CH2Drive_MasterOscillator": 0,
+       "RHK_CH2Drive_PhaseOffset": 0.0,
+       "RHK_CH2Drive_PhaseOffsetUnit": "deg",
+       "RHK_CH2Drive_ReservedUnit": "",
+       "RHK_CompletedLineCount": 8,
+       "RHK_Current": 4.999999858590343e-10,
+       "RHK_DataSubSource": 0,
+       "RHK_Date": "08/11/20",
+       "RHK_DateTime": "2020-08-11T16:13:02.000",
+       "RHK_GridXsize": 0,
+       "RHK_GridYsize": 0,
+       "RHK_GroupId": 0,
+       "RHK_ImageDrift_CumulativeX": 0.0,
+       "RHK_ImageDrift_CumulativeY": 0.0,
+       "RHK_ImageDrift_DriftOptionType": 0,
+       "RHK_ImageDrift_DriftOptionTypeName": "RHK_DRIFT_DISABLED",
+       "RHK_ImageDrift_Filetime": 132416287825822150,
+       "RHK_ImageDrift_Time": 0.0,
+       "RHK_ImageDrift_VectorX": 0.0,
+       "RHK_ImageDrift_VectorY": 0.0,
+       "RHK_ImageDrift_dX": 0.0,
+       "RHK_ImageDrift_dY": 0.0,
+       "RHK_ImageType": 0,
+       "RHK_ImageTypeName": "RHK_IMAGE_NORMAL",
+       "RHK_Label": "Topography",
+       "RHK_LineType": 0,
+       "RHK_LineTypeName": "RHK_LINE_NOT_A_LINE",
+       "RHK_Lockin0_FilterCutoffFrequency": "40Hz Order 2",
+       "RHK_Lockin0_FreqUnit": "Hz",
+       "RHK_Lockin0_Frequency": 0.0,
+       "RHK_Lockin0_HarmonicFactor": 1.0,
+       "RHK_Lockin0_NonMasterOscillator": 1,
+       "RHK_Lockin0_PhaseOffset": -103.9999999,
+       "RHK_Lockin0_PhaseUnit": "deg",
+       "RHK_LowPassFilter1_CutoffFrequency": 2.0,
+       "RHK_LowPassFilter1_CutoffFrequencyUnits": "kHz",
+       "RHK_MaxZvalue": 0,
+       "RHK_MinZvalue": 0,
+       "RHK_MinorVer": 6,
+       "RHK_OverSamplingCount": 0,
+       "RHK_PLLProStatus": "",
+       "RHK_PRMdata": "",
+       "RHK_PageDataType": 0,
+       "RHK_PageDataTypeName": "RHK_DATA_IMAGE",
+       "RHK_PageID": 26602,
+       "RHK_PageSourceType": 0,
+       "RHK_PageSourceTypeName": "RHK_SOURCE_RAW",
+       "RHK_PageType": 1,
+       "RHK_PageTypeName": "RHK_PAGE_TOPOGRAPHIC",
+       "RHK_Period": 0.0003079792659264058,
+       "RHK_PiezoSensitivity_Actuator": 0.0,
+       "RHK_PiezoSensitivity_ActuatorCalibration": "",
+       "RHK_PiezoSensitivity_ActuatorUnit": "",
+       "RHK_PiezoSensitivity_ScanCalibration": "",
+       "RHK_PiezoSensitivity_ScanX": 0.0,
+       "RHK_PiezoSensitivity_ScanXUnit": "",
+       "RHK_PiezoSensitivity_ScanY": 0.0,
+       "RHK_PiezoSensitivity_ScanYUnit": "",
+       "RHK_PiezoSensitivity_ScanZ": 0.0,
+       "RHK_PiezoSensitivity_ScanZUnit": "",
+       "RHK_PiezoSensitivity_TubeCalibration": "300K",
+       "RHK_PiezoSensitivity_TubeX": 3e-08,
+       "RHK_PiezoSensitivity_TubeXUnit": "m/V",
+       "RHK_PiezoSensitivity_TubeY": 3e-08,
+       "RHK_PiezoSensitivity_TubeYUnit": "m/V",
+       "RHK_PiezoSensitivity_TubeZ": -4e-09,
+       "RHK_PiezoSensitivity_TubeZOffset": -4e-09,
+       "RHK_PiezoSensitivity_TubeZOffsetUnit": "m/V",
+       "RHK_PiezoSensitivity_TubeZUnit": "m/V",
+       "RHK_ScanProcessor_XSlopeCompensation": 0.0,
+       "RHK_ScanProcessor_XSlopeCompensationUnit": "%",
+       "RHK_ScanProcessor_YSlopeCompensation": 0.0,
+       "RHK_ScanProcessor_YSlopeCompensationUnit": "%",
+       "RHK_ScanType": 0,
+       "RHK_ScanTypeName": "RHK_SCAN_RIGHT",
+       "RHK_SessionText": "",
+       "RHK_SetpointUnit": "A",
+       "RHK_Signature": "STiMage 005.004 1",
+       "RHK_SlicedVoltage": "",
+       "RHK_StatusChannelText": "",
+       "RHK_SystemText": "",
+       "RHK_Time": "16:13:02",
+       "RHK_UserText": "",
+       "RHK_XYscale": 0.0,
+       "RHK_Xcorner": 0,
+       "RHK_Xlabel": "",
+       "RHK_Xoffset": -2.282351863058807e-09,
+       "RHK_Xscale": -9.23937801267094e-11,
+       "RHK_Xsize": 512,
+       "RHK_Xunits": "m",
+       "RHK_Ycorner": 0,
+       "RHK_Ylabel": "Topography",
+       "RHK_Yoffset": -9.455471960961859e-09,
+       "RHK_Yscale": -5.913201928109402e-09,
+       "RHK_Ysize": 8,
+       "RHK_Yunits": "m",
+       "RHK_ZPI_FeedbackType": "Linear",
+       "RHK_ZPI_IntegralGain": 500.0,
+       "RHK_ZPI_IntegralGainUnit": "m/As",
+       "RHK_ZPI_LowerBound": -5.99999999e-07,
+       "RHK_ZPI_OutputUnit": "m",
+       "RHK_ZPI_ProportionalGain": 1e-07,
+       "RHK_ZPI_ProportionalGainUnit": "m/A",
+       "RHK_ZPI_SetPoint": 4.999999998e-10,
+       "RHK_ZPI_SetPointUnit": "A",
+       "RHK_ZPI_UpperBound": 5.99999999e-07,
+       "RHK_Zoffset": 0.0,
+       "RHK_Zscale": -2.7939678226714636e-16,
+       "RHK_Zunits": "m",
+       "bias": 0.3999999761581421,
+       "bias_units": "V",
+       "feedback_active": true,
+       "feedback_pgain": 1e-07,
+       "filename": "line_hopg_300k_2020_08_11_16_20_04_378.sm4",
+       "interpretation": "image",
+       "long_name": "Topography Forward",
+       "notes": "",
+       "offset": 0.0,
+       "scaling_factor": 1.0,
+       "scan_angle": 147.34811401367188,
+       "setpoint": 4.999999998e-10,
+       "setpoint_units": "A",
+       "start_time": "2020-08-11T16:13:02.000",
+       "time_per_point": 0.0003079792659264058,
+       "units": "m"
+      },
+      "dims": [
+       "Topography_Forward_x",
+       "Topography_Forward_y"
+      ],
+      "dtype": "float64",
+      "sha256": "c417e095a2286b20b9afa9444c2b03bc6cccc2e82d238743eff08e1e842e9193",
+      "shape": [
+       512,
+       8
+      ],
+      "stats": {
+       "nanmax": -3.7285768227728415e-07,
+       "nanmean": -3.731438060016088e-07,
+       "nanmin": -3.734523495504712e-07
+      }
+     }
+    },
+    "dims": {
+     "Current_Backward_x": 512,
+     "Current_Backward_y": 8,
+     "Current_Forward_x": 512,
+     "Current_Forward_y": 8,
+     "Current_x": 241,
+     "Current_y": 32,
+     "LIA_Current_Backward_x": 512,
+     "LIA_Current_Backward_y": 8,
+     "LIA_Current_Forward_x": 512,
+     "LIA_Current_Forward_y": 8,
+     "LIA_Current_x": 241,
+     "LIA_Current_y": 32,
+     "Topography_Backward_x": 512,
+     "Topography_Backward_y": 8,
+     "Topography_Forward_x": 512,
+     "Topography_Forward_y": 8
+    }
+   }
+  }
  },
- "load": "error"
+ "load": "ok"
 }

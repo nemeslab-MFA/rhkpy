@@ -13,7 +13,7 @@ import logging as _logging
 
 from .io import load_spym
 from .builders import _load_specmap, _load_line, _load_spec, _load_image
-from .builders.detect import _checkdatatype, _checkrepetitions
+from .builders.detect import _checkdatatype, _checkrepetitions, _is_single_sweep, _get_filename
 from .analysis import ops as _ops
 from .plotting import quickplot as _quickplot
 
@@ -28,7 +28,7 @@ class rhkdata:
 	:type filename: str
 	:param repetitions: The number of repeated aquisitions of spectra in tip position, defaults to 0
 	:type repetitions: int, optional
-	:param alternate: `True` if the bias is swept forward and backward, `False` if not, defaults to True
+	:param alternate: `True` if the bias is swept forward and backward, `False` if not, defaults to True. Files with one spectrum per tip position are always loaded with `False`: the scan direction dimension then has a single entry.
 	:type alternate: bool, optional
 	:param loadraw: Set to `True` if you want the raw topography data, defaults to False
 	:type loadraw: bool, optional
@@ -119,6 +119,11 @@ class rhkdata:
 
 		# check type of data and spectra contained in the file
 		self.datatype, self.spectype = _checkdatatype(self)
+
+		# one spectrum per tip position leaves no second sweep to separate
+		if self.datatype != 'image' and self.alternate and _is_single_sweep(self):
+			_logger.warning('%s has one spectrum per tip position, loading it with alternate = False.', _get_filename(self.filename))
+			self.alternate = False
 
 		# number of spectra at a tip position
 		# default value is 0, if this is changed, the code will use the given value, othewise it will try to infer the number of repetitions from the number of identical tip positions

@@ -14,7 +14,7 @@ function. To add support for a new measurement type:
 
 from ..analysis.ops import polyflatten
 
-from .detect import _checkrepetitions, _checkdatatype, _aspect_ratio, _get_filename
+from .detect import _checkrepetitions, _checkdatatype, _aspect_ratio, _get_filename, _is_single_sweep
 from .spectra import _xr_map_iv, _xr_line_iv, _xr_spec_iv, _xr_map_iz, _xr_line_iz, _xr_spec_iz
 from .image import _xr_image, _xr_image_line
 from .metadata import _add_map_metadata, _add_line_metadata, _add_spec_metadata, _add_image_metadata

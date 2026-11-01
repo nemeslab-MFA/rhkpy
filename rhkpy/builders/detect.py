@@ -14,9 +14,9 @@ _logger = logging.getLogger('rhkpy')
 _SPECTYPE_FROM_XUNITS = {'V': 'iv', 'm': 'iz'}
 
 
-def _checkrepetitions(stmdata_object):
-	"""Infer the number of repeated spectra per tip position from the number of
-	identical tip coordinates in the RHK_SpecDrift attributes."""
+def _spectra_per_position(stmdata_object):
+	"""Number of spectra per tip position, from the number of identical tip
+	coordinates in the RHK_SpecDrift attributes."""
 	# make an array of x and y coordinates
 	coordlist = np.column_stack((
 		np.array(stmdata_object.spymdata.Current.attrs['RHK_SpecDrift_Xcoord']),
@@ -24,7 +24,18 @@ def _checkrepetitions(stmdata_object):
 	))
 	# get the number of unique pairs
 	_, counts = np.unique(coordlist, axis=0, return_counts=True)
-	reps = counts.max()
+	return counts.max()
+
+
+def _is_single_sweep(stmdata_object):
+	"""`True` if the file has one spectrum per tip position, so there is neither
+	a second sweep direction nor a repetition to separate."""
+	return _spectra_per_position(stmdata_object) == 1
+
+
+def _checkrepetitions(stmdata_object):
+	"""Infer the number of repeated spectra per tip position."""
+	reps = _spectra_per_position(stmdata_object)
 	reps = int(reps / (stmdata_object.alternate + 1))
 	return reps
 

@@ -16,7 +16,7 @@ register it in ``rhkpy.builders._BUILDER_REGISTRY``.
 import numpy as np
 import xarray as xr
 
-from .detect import _get_filename
+from .detect import _get_filename, _is_single_sweep
 
 # attribute blocks reused across builders
 _PA_ATTRS = {'units': 'pA', 'long units': 'picoampere'}
@@ -63,14 +63,24 @@ def _page(stmdata_object, page_name: str) -> xr.DataArray:
 	return getattr(stmdata_object.spymdata, page_name)
 
 
-def _split_scandir(array: np.ndarray, numberofspectra: int) -> tuple[np.ndarray, np.ndarray]:
+def _split_scandir(array: np.ndarray, numberofspectra: int, single_sweep: bool = False) -> list[np.ndarray]:
 	"""Collect all spectra measured at the same tip position into the last axis
 	and separate the alternating forward/backward sweeps by slicing.
 
-	Returns (forward, backward), each of shape (npoints, npositions, nrepetitions).
+	Returns [forward, backward], or just [forward] if `single_sweep` is set, each
+	of shape (npoints, npositions, nrepetitions).
 	"""
 	temp = np.reshape(array, (array.shape[0], -1, numberofspectra), order='C')
-	return temp[:, :, 0::2], temp[:, :, 1::2]
+	if single_sweep:
+		return [temp]
+	return [temp[:, :, 0::2], temp[:, :, 1::2]]
+
+
+def _scandir_labels(cfg, single_sweep: bool) -> np.ndarray:
+	"""Values of the scan direction coordinate. A single sweep is labelled like
+	the first sweep of an alternating measurement."""
+	labels = cfg['scandir_labels'][:1] if single_sweep else cfg['scandir_labels']
+	return np.array(labels, dtype = 'U')
 
 
 def _spec_positions(stmdata_object, page_name: str) -> tuple[np.ndarray, np.ndarray]:
@@ -100,11 +110,9 @@ def _apply_channel_attrs(xrspec, cfg):
 def _build_map(stmdata_object, cfg):
 	"""Spectroscopy map: spectra on a mapsize x mapsize grid of tip positions."""
 	primary = cfg['channels'][0][1]
+	single_sweep = _is_single_sweep(stmdata_object)
 
-	# total number of spectra in one position of the tip.
-	# NOTE: deliberately no int() cast; for files where the inferred number of
-	# repetitions is 0, the int/int division below raises the same
-	# ZeroDivisionError as the historical code (pinned by the tests).
+	# total number of spectra in one position of the tip
 	numberofspectra = (stmdata_object.alternate + 1)*stmdata_object.repetitions
 	# size of the map in mapsize x mapsize
 	mapsize = int(np.sqrt(_page(stmdata_object, primary).data.shape[1] / numberofspectra))
@@ -114,14 +122,11 @@ def _build_map(stmdata_object, cfg):
 	# line up with the topography image (first topo pixel = first spec pixel)
 	data_vars = {}
 	for var_name, page_name in cfg['channels']:
-		fw, bw = _split_scandir(_page(stmdata_object, page_name).data, numberofspectra)
-		gridfw = np.reshape(fw, (fw.shape[0], mapsize, mapsize, fw.shape[2]), order='C')
-		gridbw = np.reshape(bw, (bw.shape[0], mapsize, mapsize, bw.shape[2]), order='C')
-		gridfw = np.flip(gridfw, axis=(1, 2))
-		gridbw = np.flip(gridbw, axis=(1, 2))
+		sweeps = _split_scandir(_page(stmdata_object, page_name).data, numberofspectra, single_sweep)
+		grids = [np.flip(np.reshape(s, (s.shape[0], mapsize, mapsize, s.shape[2]), order='C'), axis=(1, 2)) for s in sweeps]
 		dims = [cfg['sweep_dim'], *cfg['map_pos_dims'], 'repetitions', cfg['scandir_dim']]
 		# stack the forward and backward sweeps along the scandir dim; convert to pA
-		data_vars[var_name] = (dims, np.stack((gridfw, gridbw), axis=-1)*10**12)
+		data_vars[var_name] = (dims, np.stack(grids, axis=-1)*10**12)
 
 	# tip positions of the spectra, arranged on the same grid (in nm)
 	xcoo, ycoo = _spec_positions(stmdata_object, primary)
@@ -144,7 +149,7 @@ def _build_map(stmdata_object, cfg):
 			'specpos_x': tempx,
 			'specpos_y': tempy,
 			'repetitions': np.array(range(stmdata_object.repetitions)),
-			cfg['scandir_dim']: np.array(cfg['scandir_labels'], dtype = 'U'),
+			cfg['scandir_dim']: _scandir_labels(cfg, single_sweep),
 			},
 		attrs = dict(filename = _get_filename(stmdata_object.filename))
 	)
@@ -160,21 +165,17 @@ def _build_map(stmdata_object, cfg):
 def _build_line(stmdata_object, cfg):
 	"""Line spectroscopy: spectra along a line of tip positions."""
 	primary = cfg['channels'][0][1]
+	single_sweep = _is_single_sweep(stmdata_object)
 
 	# total number of spectra in one position of the tip
 	numberofspectra = int((stmdata_object.alternate + 1)*stmdata_object.repetitions)
-	# size of the line: the number of different physical tip positions.
-	# NOTE: linesize is unused, but the division is kept deliberately; for
-	# files where the inferred number of repetitions is 0 it raises the same
-	# ZeroDivisionError as the historical code (pinned by the tests).
-	linesize = int(_page(stmdata_object, primary).data.shape[1] / numberofspectra)  # noqa: F841
 
 	# separate the forward/backward sweeps of each channel; convert to pA
 	data_vars = {}
 	for var_name, page_name in cfg['channels']:
-		fw, bw = _split_scandir(_page(stmdata_object, page_name).data, numberofspectra)
+		sweeps = _split_scandir(_page(stmdata_object, page_name).data, numberofspectra, single_sweep)
 		dims = [cfg['sweep_dim'], 'dist', 'repetitions', cfg['scandir_dim']]
-		data_vars[var_name] = (dims, np.stack((fw, bw), axis=-1)*10**12)
+		data_vars[var_name] = (dims, np.stack(sweeps, axis=-1)*10**12)
 
 	# tip positions: need only every nth coordinate, where n is the number of
 	# spectra in a tip position
@@ -193,7 +194,7 @@ def _build_line(stmdata_object, cfg):
 			cfg['sweep_dim']: _sweep_coord_values(stmdata_object, cfg),
 			'dist': linecoord,
 			'repetitions': np.array(range(stmdata_object.repetitions)),
-			cfg['scandir_dim']: np.array(cfg['scandir_labels'], dtype = 'U'),
+			cfg['scandir_dim']: _scandir_labels(cfg, single_sweep),
 			},
 		attrs = dict(filename = _get_filename(stmdata_object.filename))
 	)
@@ -208,15 +209,15 @@ def _build_line(stmdata_object, cfg):
 def _build_spec(stmdata_object, cfg):
 	"""Single-point spectroscopy: repeated spectra at one tip position."""
 	primary = cfg['channels'][0][1]
+	single_sweep = _is_single_sweep(stmdata_object)
 
 	# separate the alternating forward/backward sweeps; convert to pA
 	data_vars = {}
 	for var_name, page_name in cfg['channels']:
 		arr = _page(stmdata_object, page_name).data
-		fw = arr[:, 0::2]
-		bw = arr[:, 1::2]
+		sweeps = [arr] if single_sweep else [arr[:, 0::2], arr[:, 1::2]]
 		dims = [cfg['sweep_dim'], 'repetitions', cfg['scandir_dim']]
-		data_vars[var_name] = (dims, np.stack((fw, bw), axis=-1)*10**12)
+		data_vars[var_name] = (dims, np.stack(sweeps, axis=-1)*10**12)
 
 	# tip position: only the first x and y components are needed
 	xcoo, ycoo = _spec_positions(stmdata_object, primary)
@@ -230,7 +231,7 @@ def _build_spec(stmdata_object, cfg):
 		coords = {
 			cfg['sweep_dim']: _sweep_coord_values(stmdata_object, cfg),
 			'repetitions': np.array(range(stmdata_object.repetitions)),
-			cfg['scandir_dim']: np.array(cfg['scandir_labels'], dtype = 'U'),
+			cfg['scandir_dim']: _scandir_labels(cfg, single_sweep),
 			},
 		attrs = dict(filename = _get_filename(stmdata_object.filename))
 	)
