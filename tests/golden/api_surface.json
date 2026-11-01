@@ -163,6 +163,7 @@
    "mrep": "(self)",
    "msw": "(self)",
    "polyflatten": "(self, **kwargs)",
+   "preview": "(self, path=None, dpi=150, at=None)",
    "print_info": "(self)",
    "qplot": "(self, width=None, **kwargs)",
    "summary": "(self)"

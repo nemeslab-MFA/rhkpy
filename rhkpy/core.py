@@ -20,6 +20,7 @@ from .builders import _load_specmap, _load_line, _load_spec, _load_image
 from .builders.detect import _checkdatatype, _checkrepetitions, _is_single_sweep, _may_alternate, _get_filename
 from . import summary as _summary
 from .analysis import ops as _ops
+from .plotting import preview as _preview
 from .plotting import quickplot as _quickplot
 
 _logger = _logging.getLogger('rhkpy')
@@ -189,6 +190,31 @@ class rhkdata:
 				print(info['datatype'], info['spectype'], info['setpoint_pA'])
 		"""
 		return _summary.summarize(self)
+
+	def preview(self, path = None, dpi = 150, at = None):
+		"""Draw a static picture of the measurement with :py:mod:`matplotlib`, optionally saving it to a file.
+		Unlike :meth:`qplot`, this needs no notebook, browser or display.
+		Maps, lines and images are averaged over the repetitions and scan directions; images show the backward scan direction, as :meth:`qplot` does.
+
+		:param path: file to save the picture to, for example 'out.png'. If `None`, nothing is saved, defaults to None
+		:type path: str, optional
+		:param dpi: resolution of the saved picture, defaults to 150
+		:type dpi: int, optional
+		:param at: for maps, the sweep value to show the map at: bias in V, or z in nm. If `None`, the middle of the sweep is used, defaults to None
+		:type at: float, optional
+
+		:return: the figure
+		:rtype: :py:class:`matplotlib.figure.Figure`
+
+		:Example:
+
+			.. code-block:: python
+
+				import rhkpy
+
+				rhkpy.rhkdata('map.sm4').preview('map.png', at = 0.1)
+		"""
+		return _preview.preview(self, path = path, dpi = dpi, at = at)
 
 	def mrep(self):
 		"""Returns a new instance of :class:`rhkdata`, with the data averaged (using :py:mod:`xarray.Variable.mean`) along the 'repetitions' coordinate.

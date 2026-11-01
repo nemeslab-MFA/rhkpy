@@ -23,6 +23,7 @@ dependencies = [
 	"holoviews>=1.17.0",
 	"hvplot>=0.8.4",
 	"bokeh>=3.2.2",
+	"colorcet",
 	"panel>=1.2.1",
 	"selenium>=4.6",
 ]
