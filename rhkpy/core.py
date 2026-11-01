@@ -41,7 +41,7 @@ class rhkdata:
 	:var filename: (type str) filename of the "sm4" file
 	:var image: (type :py:mod:`xarray` Dataset) Dataset containing the image data
 	:var spectra: (type :py:mod:`xarray` Dataset) Dataset containing the spectroscopy data
-	:var spymdata: (type :py:mod:`spym` instance) Dataset, as loaded by the :py:mod:`spym` module
+	:var spymdata: (type :py:mod:`xarray` Dataset) raw Dataset, as loaded by the built-in sm4 reader (:mod:`rhkpy.io.sm4`)
 
 	All the variables can be listed by calling: :class:`rhkdata.print_info`.
 

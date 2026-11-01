@@ -9,7 +9,7 @@ The implementation now lives in:
 
 This module re-exports the public (and historical) names so that existing
 imports like ``from rhkpy.rhkpy_loader import rhkdata`` keep working
-unchanged.
+unchanged. Some spym features are gone since version 1.4.0: see CHANGELOG.md.
 """
 
 # historical module-level imports, kept because they are part of the public
@@ -24,6 +24,8 @@ from .io import sm4 as rhksm4
 ## flatten and plane fitting
 from .analysis.level import align
 from .analysis.level import plane
+from .analysis.level import fixzero
+from .analysis.level import destripe
 
 # for fancy plotting
 import hvplot.xarray
