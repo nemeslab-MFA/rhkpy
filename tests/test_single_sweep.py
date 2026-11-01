@@ -1,6 +1,7 @@
-"""Files with one spectrum per tip position: a single sweep direction and no
-repetitions. They load with alternate = False and a one-entry scan direction
-dimension, labelled like the first sweep of an alternating measurement.
+"""Loading with a single scan direction: every sweep counts as a repetition, and
+the scan direction dimension has one entry, labelled like the first sweep of an
+alternating measurement. Files with one spectrum per tip position always load
+this way; other files do with alternate = False.
 """
 
 import numpy as np
@@ -85,6 +86,44 @@ def test_spec(monkeypatch):
 	assert data.alternate is False
 	assert dict(data.spectra.sizes) == {'bias': 481, 'repetitions': 1, 'biasscandir': 1}
 	assert list(data.spectra.biasscandir.values) == ['left']
+	assert data.qplot() is not None
+
+
+def test_alternate_false_map():
+	"""A file with several spectra per position: every sweep is a repetition."""
+	data = rhkpy.rhkdata(_fixture_path('dI-dV_ABC_Graphite-Sample5_9K_2021_08_24_11_54_33_632.sm4'), alternate = False)
+	assert data.alternate is False
+	assert (data.repetitions, data.numberofspectra) == (2, 2)
+	spectra = data.spectra
+	assert dict(spectra.sizes) == {'bias': 501, 'specpos_y': 32, 'specpos_x': 32, 'repetitions': 2, 'biasscandir': 1}
+	assert list(spectra.biasscandir.values) == ['left']
+	raw = data.spymdata.Current.data * 10**12
+	current = spectra.current.isel(biasscandir = 0).values
+	np.testing.assert_allclose(current[:, -1, -1, 0], raw[:, 0])
+	np.testing.assert_allclose(current[:, -1, -1, 1], raw[:, 1])
+	np.testing.assert_allclose(current[:, -1, -2, 0], raw[:, 2])
+	assert data.qplot() is not None
+
+
+def test_alternate_false_line():
+	data = rhkpy.rhkdata(_fixture_path('Iz_line_Stripes-9K-HOPG-SPI2-3_2021_09_02_15_15_35_930.sm4'), alternate = False)
+	assert (data.repetitions, data.numberofspectra) == (20, 20)
+	spectra = data.spectra
+	assert dict(spectra.sizes) == {'z': 51, 'dist': 32, 'repetitions': 20, 'zscandir': 1}
+	assert list(spectra.zscandir.values) == ['up']
+	raw = data.spymdata.Current.data * 10**12
+	current = spectra.current.isel(zscandir = 0).values
+	np.testing.assert_allclose(current[:, 0, 7], raw[:, 7])
+	np.testing.assert_allclose(current[:, 3, 7], raw[:, 3*20 + 7])
+	assert data.qplot() is not None
+
+
+def test_alternate_false_spec():
+	data = rhkpy.rhkdata(_fixture_path('Iz_Stripes-9K-HOPG-SPI2-3_2021_09_07_10_15_28_529.sm4'), alternate = False)
+	assert (data.repetitions, data.numberofspectra) == (20, 20)
+	spectra = data.spectra
+	assert dict(spectra.sizes) == {'z': 51, 'repetitions': 20, 'zscandir': 1}
+	np.testing.assert_allclose(spectra.current.isel(zscandir = 0).values, data.spymdata.Current.data * 10**12)
 	assert data.qplot() is not None
 
 

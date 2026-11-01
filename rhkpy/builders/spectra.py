@@ -16,7 +16,7 @@ register it in ``rhkpy.builders._BUILDER_REGISTRY``.
 import numpy as np
 import xarray as xr
 
-from .detect import _get_filename, _is_single_sweep
+from .detect import _get_filename
 
 # attribute blocks reused across builders
 _PA_ATTRS = {'units': 'pA', 'long units': 'picoampere'}
@@ -77,8 +77,8 @@ def _split_scandir(array: np.ndarray, numberofspectra: int, single_sweep: bool =
 
 
 def _scandir_labels(cfg, single_sweep: bool) -> np.ndarray:
-	"""Values of the scan direction coordinate. A single sweep is labelled like
-	the first sweep of an alternating measurement."""
+	"""Values of the scan direction coordinate. With a single scan direction, the
+	label is that of the first sweep of an alternating measurement."""
 	labels = cfg['scandir_labels'][:1] if single_sweep else cfg['scandir_labels']
 	return np.array(labels, dtype = 'U')
 
@@ -110,7 +110,7 @@ def _apply_channel_attrs(xrspec, cfg):
 def _build_map(stmdata_object, cfg):
 	"""Spectroscopy map: spectra on a mapsize x mapsize grid of tip positions."""
 	primary = cfg['channels'][0][1]
-	single_sweep = _is_single_sweep(stmdata_object)
+	single_sweep = not stmdata_object.alternate
 
 	# total number of spectra in one position of the tip
 	numberofspectra = (stmdata_object.alternate + 1)*stmdata_object.repetitions
@@ -165,7 +165,7 @@ def _build_map(stmdata_object, cfg):
 def _build_line(stmdata_object, cfg):
 	"""Line spectroscopy: spectra along a line of tip positions."""
 	primary = cfg['channels'][0][1]
-	single_sweep = _is_single_sweep(stmdata_object)
+	single_sweep = not stmdata_object.alternate
 
 	# total number of spectra in one position of the tip
 	numberofspectra = int((stmdata_object.alternate + 1)*stmdata_object.repetitions)
@@ -209,7 +209,7 @@ def _build_line(stmdata_object, cfg):
 def _build_spec(stmdata_object, cfg):
 	"""Single-point spectroscopy: repeated spectra at one tip position."""
 	primary = cfg['channels'][0][1]
-	single_sweep = _is_single_sweep(stmdata_object)
+	single_sweep = not stmdata_object.alternate
 
 	# separate the alternating forward/backward sweeps; convert to pA
 	data_vars = {}

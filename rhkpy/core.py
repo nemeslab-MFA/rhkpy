@@ -31,7 +31,7 @@ class rhkdata:
 	:type filename: str
 	:param repetitions: The number of repeated aquisitions of spectra in tip position. If 0, it is inferred from the file, defaults to 0
 	:type repetitions: int, optional
-	:param alternate: `True` if the bias is swept forward and backward, `False` if not, defaults to True. Files with one spectrum per tip position are always loaded with `False`: the scan direction dimension then has a single entry.
+	:param alternate: `True` if the bias is swept forward and backward, `False` if not, defaults to True. With `False`, every sweep counts as a repetition and the scan direction dimension has a single entry, labelled like the first sweep of an alternating measurement. If the file does alternate, forward and backward sweeps end up mixed in the repetitions and the label doesn't describe them. Files with one spectrum per tip position are always loaded with `False`.
 	:type alternate: bool, optional
 	:param loadraw: Set to `True` if you want the raw topography data, defaults to False
 	:type loadraw: bool, optional
