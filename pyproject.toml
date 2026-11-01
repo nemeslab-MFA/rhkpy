@@ -32,6 +32,9 @@ dependencies = [
 Homepage = "https://github.com/zrbyte/rhkpy"
 Documentation = "https://zrbyte.github.io/rhkpy/"
 
+[project.scripts]
+rhkpy = "rhkpy.cli:main"
+
 [project.optional-dependencies]
 test = ["pytest"]
 
