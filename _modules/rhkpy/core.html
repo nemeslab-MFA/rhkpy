@@ -86,13 +86,16 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">_logging</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numbers</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">_numbers</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">_os</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">_np</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_spym</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.builders</span><span class="w"> </span><span class="kn">import</span> <span class="n">_load_specmap</span><span class="p">,</span> <span class="n">_load_line</span><span class="p">,</span> <span class="n">_load_spec</span><span class="p">,</span> <span class="n">_load_image</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.builders.detect</span><span class="w"> </span><span class="kn">import</span> <span class="n">_checkdatatype</span><span class="p">,</span> <span class="n">_checkrepetitions</span><span class="p">,</span> <span class="n">_is_single_sweep</span><span class="p">,</span> <span class="n">_may_alternate</span><span class="p">,</span> <span class="n">_get_filename</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">summary</span> <span class="k">as</span> <span class="n">_summary</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.analysis</span><span class="w"> </span><span class="kn">import</span> <span class="n">ops</span> <span class="k">as</span> <span class="n">_ops</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.plotting</span><span class="w"> </span><span class="kn">import</span> <span class="n">preview</span> <span class="k">as</span> <span class="n">_preview</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.plotting</span><span class="w"> </span><span class="kn">import</span> <span class="n">quickplot</span> <span class="k">as</span> <span class="n">_quickplot</span>
 
 <span class="n">_logger</span> <span class="o">=</span> <span class="n">_logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">'rhkpy'</span><span class="p">)</span>
@@ -189,10 +192,13 @@
 		<span class="c1"># Boolean value, True if alternate scan directions is turned on</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">alternate</span> <span class="o">=</span> <span class="n">alternate</span>
 
-		<span class="c1"># Load the data using spym</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">):</span>
+			<span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'No such file: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+
+		<span class="c1"># Load the data using the built-in sm4 reader</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">spymdata</span> <span class="o">=</span> <span class="n">load_spym</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
 		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spymdata</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-			<span class="k">return</span>
+			<span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Could not read </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="si">}</span><span class="s1">: it does not appear to be a valid sm4 file'</span><span class="p">)</span>
 
 		<span class="c1"># check software version. Not tested for MinorVer &lt; 6</span>
 		<span class="n">l</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spymdata</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
@@ -235,6 +241,64 @@
 		<span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">datatype</span> <span class="o">==</span> <span class="s1">'image'</span><span class="p">:</span>
 			<span class="bp">self</span> <span class="o">=</span> <span class="n">_load_image</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
+	<span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="n">parts</span> <span class="o">=</span> <span class="p">[</span><span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">),</span> <span class="sa">f</span><span class="s1">'datatype=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">datatype</span><span class="si">!r}</span><span class="s1">'</span><span class="p">,</span> <span class="sa">f</span><span class="s1">'spectype=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">spectype</span><span class="si">!r}</span><span class="s1">'</span><span class="p">]</span>
+		<span class="k">if</span> <span class="s1">'image'</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
+			<span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">'image=</span><span class="si">{</span><span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">sizes</span><span class="p">)</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+		<span class="k">if</span> <span class="s1">'spectra'</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
+			<span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">'spectra=</span><span class="si">{</span><span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spectra</span><span class="o">.</span><span class="n">sizes</span><span class="p">)</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+		<span class="k">return</span> <span class="sa">f</span><span class="s1">'rhkdata(</span><span class="si">{</span><span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span><span class="si">}</span><span class="s1">)'</span>
+
+<div class="viewcode-block" id="rhkdata.summary">
+<a class="viewcode-back" href="../../rhkpy.html#rhkpy.core.rhkdata.summary">[docs]</a>
+	<span class="k">def</span><span class="w"> </span><span class="nf">summary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">		</span><span class="sd">"""What this measurement contains, as a dict of plain Python values, ready for :py:func:`json.dumps`.</span>
+<span class="sd">		Includes the measurement type, date, bias, setpoint and the shape, ranges and units of the `image` and `spectra` Datasets.</span>
+<span class="sd">		The 'notes' entry lists anything that changes how the data should be read, for example if the sweep direction label is an assumption.</span>
+
+<span class="sd">		:return: description of the measurement. The 'image' and 'spectra' entries are `None` if the file doesn't have them.</span>
+<span class="sd">		:rtype: dict</span>
+
+<span class="sd">		:Example:</span>
+
+<span class="sd">			.. code-block:: python</span>
+
+<span class="sd">				import rhkpy</span>
+
+<span class="sd">				info = rhkpy.rhkdata('filename.sm4').summary()</span>
+<span class="sd">				print(info['datatype'], info['spectype'], info['setpoint_pA'])</span>
+<span class="sd">		"""</span>
+		<span class="k">return</span> <span class="n">_summary</span><span class="o">.</span><span class="n">summarize</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="rhkdata.preview">
+<a class="viewcode-back" href="../../rhkpy.html#rhkpy.core.rhkdata.preview">[docs]</a>
+	<span class="k">def</span><span class="w"> </span><span class="nf">preview</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">dpi</span> <span class="o">=</span> <span class="mi">150</span><span class="p">,</span> <span class="n">at</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">		</span><span class="sd">"""Draw a static picture of the measurement with :py:mod:`matplotlib`, optionally saving it to a file.</span>
+<span class="sd">		Unlike :meth:`qplot`, this needs no notebook, browser or display.</span>
+<span class="sd">		Maps, lines and images are averaged over the repetitions and scan directions; images show the backward scan direction, as :meth:`qplot` does.</span>
+
+<span class="sd">		:param path: file to save the picture to, for example 'out.png'. If `None`, nothing is saved, defaults to None</span>
+<span class="sd">		:type path: str, optional</span>
+<span class="sd">		:param dpi: resolution of the saved picture, defaults to 150</span>
+<span class="sd">		:type dpi: int, optional</span>
+<span class="sd">		:param at: for maps, the sweep value to show the map at: bias in V, or z in nm. If `None`, the middle of the sweep is used, defaults to None</span>
+<span class="sd">		:type at: float, optional</span>
+
+<span class="sd">		:return: the figure</span>
+<span class="sd">		:rtype: :py:class:`matplotlib.figure.Figure`</span>
+
+<span class="sd">		:Example:</span>
+
+<span class="sd">			.. code-block:: python</span>
+
+<span class="sd">				import rhkpy</span>
+
+<span class="sd">				rhkpy.rhkdata('map.sm4').preview('map.png', at = 0.1)</span>
+<span class="sd">		"""</span>
+		<span class="k">return</span> <span class="n">_preview</span><span class="o">.</span><span class="n">preview</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="p">,</span> <span class="n">dpi</span> <span class="o">=</span> <span class="n">dpi</span><span class="p">,</span> <span class="n">at</span> <span class="o">=</span> <span class="n">at</span><span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="rhkdata.mrep">
 <a class="viewcode-back" href="../../rhkpy.html#rhkpy.core.rhkdata.mrep">[docs]</a>
 	<span class="k">def</span><span class="w"> </span><span class="nf">mrep</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -246,8 +310,7 @@
 <span class="sd">		"""</span>
 		<span class="c1"># function to take the mean along the repetitions coordinate</span>
 		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">datatype</span> <span class="o">==</span> <span class="s1">'image'</span><span class="p">:</span>
-			<span class="nb">print</span><span class="p">(</span><span class="s1">'An image instance doesn</span><span class="se">\'</span><span class="s1">t have repetitions.'</span><span class="p">)</span>
-			<span class="k">return</span>
+			<span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">'An image instance doesn</span><span class="se">\'</span><span class="s1">t have repetitions.'</span><span class="p">)</span>
 		<span class="n">newdata</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 		<span class="n">newdata</span><span class="o">.</span><span class="n">spectra</span> <span class="o">=</span> <span class="n">newdata</span><span class="o">.</span><span class="n">spectra</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span> <span class="o">=</span> <span class="s1">'repetitions'</span><span class="p">)</span>
 		<span class="k">return</span> <span class="n">newdata</span></div>
@@ -264,8 +327,7 @@
 <span class="sd">		"""</span>
 		<span class="c1"># function to take the mean along the biasscan coordinate</span>
 		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">datatype</span> <span class="o">==</span> <span class="s1">'image'</span><span class="p">:</span>
-			<span class="nb">print</span><span class="p">(</span><span class="s1">'An image instance doesn</span><span class="se">\'</span><span class="s1">t have biasscandir or zscandir.'</span><span class="p">)</span>
-			<span class="k">return</span>
+			<span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">'An image instance doesn</span><span class="se">\'</span><span class="s1">t have biasscandir or zscandir.'</span><span class="p">)</span>
 		<span class="n">newdata</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectype</span> <span class="o">==</span> <span class="s1">'iv'</span><span class="p">:</span>
 			<span class="n">newdata</span><span class="o">.</span><span class="n">spectra</span> <span class="o">=</span> <span class="n">newdata</span><span class="o">.</span><span class="n">spectra</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span> <span class="o">=</span> <span class="s1">'biasscandir'</span><span class="p">)</span>
@@ -331,8 +393,7 @@
 <span class="sd">		"""</span>
 		<span class="c1"># check if 'image' is present</span>
 		<span class="k">if</span> <span class="s1">'image'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
-			<span class="nb">print</span><span class="p">(</span><span class="s1">'This `rhkdata` instance does not contain an image'</span><span class="p">)</span>
-			<span class="k">return</span>
+			<span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">'This `rhkdata` instance does not contain an image'</span><span class="p">)</span>
 
 		<span class="c1"># copy the current instance</span>
 		<span class="n">rhkdataobj_new</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -355,8 +416,7 @@
 
 		<span class="c1"># check if 'image' is present</span>
 		<span class="k">if</span> <span class="s1">'image'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
-			<span class="nb">print</span><span class="p">(</span><span class="s1">'This `rhkdata` instance does not contain an image'</span><span class="p">)</span>
-			<span class="k">return</span>
+			<span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">'This `rhkdata` instance does not contain an image'</span><span class="p">)</span>
 		<span class="c1"># make a copy of the instance</span>
 		<span class="n">flattened_rhkdataobj</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 		<span class="c1"># apply flatten to the copy</span>

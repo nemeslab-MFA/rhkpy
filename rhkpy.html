@@ -54,10 +54,17 @@
 <li class="toctree-l4"><a class="reference internal" href="#rhkpy.core.rhkdata.mrep"><code class="docutils literal notranslate"><span class="pre">rhkdata.mrep()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#rhkpy.core.rhkdata.msw"><code class="docutils literal notranslate"><span class="pre">rhkdata.msw()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#rhkpy.core.rhkdata.polyflatten"><code class="docutils literal notranslate"><span class="pre">rhkdata.polyflatten()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rhkpy.core.rhkdata.preview"><code class="docutils literal notranslate"><span class="pre">rhkdata.preview()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#rhkpy.core.rhkdata.print_info"><code class="docutils literal notranslate"><span class="pre">rhkdata.print_info()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#rhkpy.core.rhkdata.qplot"><code class="docutils literal notranslate"><span class="pre">rhkdata.qplot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rhkpy.core.rhkdata.summary"><code class="docutils literal notranslate"><span class="pre">rhkdata.summary()</span></code></a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-rhkpy.summary">Summaries (rhkpy.summary)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#rhkpy.summary.scan"><code class="docutils literal notranslate"><span class="pre">scan()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rhkpy.guide.agent_guide"><code class="docutils literal notranslate"><span class="pre">agent_guide()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#module-rhkpy.io">File loading (rhkpy.io)</a><ul>
@@ -97,6 +104,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#rhkpy.plotting.quickplot.plot_spec_iz"><code class="docutils literal notranslate"><span class="pre">plot_spec_iz()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rhkpy.plotting.quickplot.plot_topo"><code class="docutils literal notranslate"><span class="pre">plot_topo()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rhkpy.plotting.quickplot.qplot"><code class="docutils literal notranslate"><span class="pre">qplot()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rhkpy.plotting.preview.preview"><code class="docutils literal notranslate"><span class="pre">preview()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rhkpy.plotting.navigation.navigation"><code class="docutils literal notranslate"><span class="pre">navigation()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#rhkpy.plotting.thumbnails.genthumbs"><code class="docutils literal notranslate"><span class="pre">genthumbs()</span></code></a></li>
 </ul>
@@ -108,6 +116,11 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">rhkpy package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#module-rhkpy.core">The rhkdata class</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#rhkpy.core.rhkdata"><code class="docutils literal notranslate"><span class="pre">rhkdata</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-rhkpy.summary">Summaries (rhkpy.summary)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#rhkpy.summary.scan"><code class="docutils literal notranslate"><span class="pre">scan()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rhkpy.guide.agent_guide"><code class="docutils literal notranslate"><span class="pre">agent_guide()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-rhkpy.io">File loading (rhkpy.io)</a><ul>
@@ -147,6 +160,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#rhkpy.plotting.quickplot.plot_spec_iz"><code class="docutils literal notranslate"><span class="pre">plot_spec_iz()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#rhkpy.plotting.quickplot.plot_topo"><code class="docutils literal notranslate"><span class="pre">plot_topo()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#rhkpy.plotting.quickplot.qplot"><code class="docutils literal notranslate"><span class="pre">qplot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rhkpy.plotting.preview.preview"><code class="docutils literal notranslate"><span class="pre">preview()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#rhkpy.plotting.navigation.navigation"><code class="docutils literal notranslate"><span class="pre">navigation()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#rhkpy.plotting.thumbnails.genthumbs"><code class="docutils literal notranslate"><span class="pre">genthumbs()</span></code></a></li>
 </ul>
@@ -360,6 +374,36 @@ All keywords accepted by <code class="xref py py-func docutils literal notransla
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="rhkpy.core.rhkdata.preview">
+<span class="sig-name descname"><span class="pre">preview</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">150</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">at</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rhkpy/core.html#rhkdata.preview"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rhkpy.core.rhkdata.preview" title="Link to this definition"></a></dt>
+<dd><p>Draw a static picture of the measurement with <code class="xref py py-mod docutils literal notranslate"><span class="pre">matplotlib</span></code>, optionally saving it to a file.
+Unlike <a class="reference internal" href="#rhkpy.core.rhkdata.qplot" title="rhkpy.core.rhkdata.qplot"><code class="xref py py-meth docutils literal notranslate"><span class="pre">qplot()</span></code></a>, this needs no notebook, browser or display.
+Maps, lines and images are averaged over the repetitions and scan directions; images show the backward scan direction, as <a class="reference internal" href="#rhkpy.core.rhkdata.qplot" title="rhkpy.core.rhkdata.qplot"><code class="xref py py-meth docutils literal notranslate"><span class="pre">qplot()</span></code></a> does.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<em>str</em><em>, </em><em>optional</em>) – file to save the picture to, for example ‘out.png’. If <cite>None</cite>, nothing is saved, defaults to None</p></li>
+<li><p><strong>dpi</strong> (<em>int</em><em>, </em><em>optional</em>) – resolution of the saved picture, defaults to 150</p></li>
+<li><p><strong>at</strong> (<em>float</em><em>, </em><em>optional</em>) – for maps, the sweep value to show the map at: bias in V, or z in nm. If <cite>None</cite>, the middle of the sweep is used, defaults to None</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the figure</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">matplotlib.figure.Figure</span></code></p>
+</dd>
+<dt class="field-even">Example<span class="colon">:</span></dt>
+<dd class="field-even"><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">rhkpy</span>
+
+<span class="n">rhkpy</span><span class="o">.</span><span class="n">rhkdata</span><span class="p">(</span><span class="s1">'map.sm4'</span><span class="p">)</span><span class="o">.</span><span class="n">preview</span><span class="p">(</span><span class="s1">'map.png'</span><span class="p">,</span> <span class="n">at</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="rhkpy.core.rhkdata.print_info">
 <span class="sig-name descname"><span class="pre">print_info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/rhkpy/core.html#rhkdata.print_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rhkpy.core.rhkdata.print_info" title="Link to this definition"></a></dt>
 <dd><p>List the variables of the <a class="reference internal" href="#rhkpy.core.rhkdata" title="rhkpy.core.rhkdata"><code class="xref py py-class docutils literal notranslate"><span class="pre">rhkdata</span></code></a> instance.</p>
@@ -392,6 +436,83 @@ For possible colorscale options see the <a class="reference external" href="http
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="rhkpy.core.rhkdata.summary">
+<span class="sig-name descname"><span class="pre">summary</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/rhkpy/core.html#rhkdata.summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rhkpy.core.rhkdata.summary" title="Link to this definition"></a></dt>
+<dd><p>What this measurement contains, as a dict of plain Python values, ready for <code class="xref py py-func docutils literal notranslate"><span class="pre">json.dumps()</span></code>.
+Includes the measurement type, date, bias, setpoint and the shape, ranges and units of the <cite>image</cite> and <cite>spectra</cite> Datasets.
+The ‘notes’ entry lists anything that changes how the data should be read, for example if the sweep direction label is an assumption.</p>
+<dl class="field-list">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>description of the measurement. The ‘image’ and ‘spectra’ entries are <cite>None</cite> if the file doesn’t have them.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+<dt class="field-odd">Example<span class="colon">:</span></dt>
+<dd class="field-odd"><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">rhkpy</span>
+
+<span class="n">info</span> <span class="o">=</span> <span class="n">rhkpy</span><span class="o">.</span><span class="n">rhkdata</span><span class="p">(</span><span class="s1">'filename.sm4'</span><span class="p">)</span><span class="o">.</span><span class="n">summary</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s1">'datatype'</span><span class="p">],</span> <span class="n">info</span><span class="p">[</span><span class="s1">'spectype'</span><span class="p">],</span> <span class="n">info</span><span class="p">[</span><span class="s1">'setpoint_pA'</span><span class="p">])</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-rhkpy.summary">
+<span id="summaries-rhkpy-summary"></span><h2>Summaries (rhkpy.summary)<a class="headerlink" href="#module-rhkpy.summary" title="Link to this heading"></a></h2>
+<p>A plain, JSON-ready description of what a measurement contains.</p>
+<p>Meant for scripts and AI agents, which can’t look at a <a class="reference internal" href="#rhkpy.core.rhkdata.qplot" title="rhkpy.core.rhkdata.qplot"><code class="xref py py-meth docutils literal notranslate"><span class="pre">qplot()</span></code></a>
+widget. Everything comes from the Datasets the builders already constructed.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="rhkpy.summary.scan">
+<span class="sig-prename descclassname"><span class="pre">rhkpy.summary.</span></span><span class="sig-name descname"><span class="pre">scan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'./'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recursive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rhkpy/summary.html#scan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rhkpy.summary.scan" title="Link to this definition"></a></dt>
+<dd><p>Describe every .sm4 file in a folder, using <a class="reference internal" href="#rhkpy.core.rhkdata.summary" title="rhkpy.core.rhkdata.summary"><code class="xref py py-meth docutils literal notranslate"><span class="pre">rhkpy.core.rhkdata.summary()</span></code></a>.
+A file that can’t be loaded gets an entry with its error, and the scan continues.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>folder</strong> (<em>str</em><em>, </em><em>optional</em>) – path of the folder, defaults to the current folder</p></li>
+<li><p><strong>recursive</strong> (<em>bool</em><em>, </em><em>optional</em>) – also look in subfolders, defaults to False</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>one dict per file, in sorted path order. Files that failed to load have only the keys ‘filename’, ‘path’ and ‘error’.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>FileNotFoundError</strong> – if the folder doesn’t exist</p>
+</dd>
+<dt class="field-odd">Example<span class="colon">:</span></dt>
+<dd class="field-odd"><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">rhkpy</span>
+
+<span class="n">maps</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="p">[</span><span class="s1">'filename'</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">rhkpy</span><span class="o">.</span><span class="n">scan</span><span class="p">(</span><span class="s1">'data/'</span><span class="p">)</span> <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'datatype'</span><span class="p">)</span> <span class="o">==</span> <span class="s1">'map'</span><span class="p">]</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<p id="module-rhkpy.guide">Access to the guide shipped inside the package.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="rhkpy.guide.agent_guide">
+<span class="sig-prename descclassname"><span class="pre">rhkpy.guide.</span></span><span class="sig-name descname"><span class="pre">agent_guide</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/rhkpy/guide.html#agent_guide"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rhkpy.guide.agent_guide" title="Link to this definition"></a></dt>
+<dd><p>The guide to using rhkpy from scripts and AI agents: the data model, how to inspect and
+picture measurements without a notebook, errors and pitfalls. Also printed by <code class="docutils literal notranslate"><span class="pre">rhkpy</span> <span class="pre">guide</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the guide, as markdown text</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
@@ -1162,6 +1283,16 @@ All repetitions are shown as dotted lines, with the repetition average in bold.<
 <span class="sig-prename descclassname"><span class="pre">rhkpy.plotting.quickplot.</span></span><span class="sig-name descname"><span class="pre">qplot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhkdata_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rhkpy/plotting/quickplot.html#qplot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rhkpy.plotting.quickplot.qplot" title="Link to this definition"></a></dt>
 <dd><p>Quick plot of an <code class="xref py py-class docutils literal notranslate"><span class="pre">rhkdata</span></code> instance.
 See <code class="xref py py-meth docutils literal notranslate"><span class="pre">rhkpy.rhkpy_loader.rhkdata.qplot()</span></code> for the documented interface.</p>
+</dd></dl>
+
+<p id="module-rhkpy.plotting.preview">A static picture of a measurement, for when nobody can look at a widget.</p>
+<p><a class="reference internal" href="#module-rhkpy.plotting.quickplot" title="rhkpy.plotting.quickplot"><code class="xref py py-mod docutils literal notranslate"><span class="pre">quickplot</span></code></a> makes interactive plots, and saving those as png
+needs a browser. This renders with matplotlib’s Agg canvas instead, without pyplot,
+so it works with no display and doesn’t change any global plotting state.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="rhkpy.plotting.preview.preview">
+<span class="sig-prename descclassname"><span class="pre">rhkpy.plotting.preview.</span></span><span class="sig-name descname"><span class="pre">preview</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rhkdata_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">150</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">at</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rhkpy/plotting/preview.html#preview"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rhkpy.plotting.preview.preview" title="Link to this definition"></a></dt>
+<dd><p>Draw a static picture of a measurement, see <a class="reference internal" href="#rhkpy.core.rhkdata.preview" title="rhkpy.core.rhkdata.preview"><code class="xref py py-meth docutils literal notranslate"><span class="pre">rhkpy.core.rhkdata.preview()</span></code></a>.</p>
 </dd></dl>
 
 <p id="module-rhkpy.plotting.navigation">Overview plot of multiple rhkdata instances at absolute tip positions.</p>

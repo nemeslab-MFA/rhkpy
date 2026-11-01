@@ -179,8 +179,7 @@
 		<span class="k">return</span> <span class="n">specplot</span>
 
 	<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-		<span class="nb">print</span><span class="p">(</span><span class="s1">'Please supply some rhkdata instances to plot.'</span><span class="p">)</span>
-		<span class="k">return</span>
+		<span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'Please supply some rhkdata instances to plot.'</span><span class="p">)</span>
 
 	<span class="n">datatypes</span> <span class="o">=</span> <span class="p">[]</span>
 	<span class="n">spectypes</span> <span class="o">=</span> <span class="p">[]</span>
@@ -199,8 +198,7 @@
 	<span class="c1"># indices_topo = [index for index, value in enumerate(datatypes) if value in ('map', 'image')]</span>
 
 	<span class="k">if</span> <span class="n">indices_topo</span> <span class="o">==</span> <span class="p">[]</span> <span class="ow">and</span> <span class="p">(</span><span class="n">plot_spec</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">True</span> <span class="ow">or</span> <span class="n">indices_spec</span> <span class="o">==</span> <span class="p">[]):</span>
-		<span class="nb">print</span><span class="p">(</span><span class="s1">'Nothing to plot: the rhkdata instances have no images, and spectrum positions are not requested.'</span><span class="p">)</span>
-		<span class="k">return</span>
+		<span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">'Nothing to plot: the rhkdata instances have no images, and spectrum positions are not requested.'</span><span class="p">)</span>
 
 	<span class="c1"># plot those images</span>
 	<span class="c1"># get a color map for the bounding boxes</span>

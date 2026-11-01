@@ -131,11 +131,9 @@
 <span class="sd">	"""</span>	
 	<span class="c1"># the xrobj passed to the function should always be and image</span>
 	<span class="k">if</span> <span class="s1">'topography'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">xrobj</span><span class="o">.</span><span class="n">data_vars</span><span class="p">:</span>
-		<span class="nb">print</span><span class="p">(</span><span class="s1">'Wrong xarray type. The data needs to be an `image`, not `spectra`'</span><span class="p">)</span>
-		<span class="k">return</span>
+		<span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">'Wrong xarray type. The data needs to be an `image`, not `spectra`'</span><span class="p">)</span>
 	<span class="k">if</span> <span class="n">xrobj</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'datatype'</span><span class="p">]</span> <span class="o">==</span> <span class="s1">'line'</span><span class="p">:</span>
-		<span class="nb">print</span><span class="p">(</span><span class="s1">'Sorry, linespectra are not supportet yet.'</span><span class="p">)</span>
-		<span class="k">return</span>
+		<span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">'Sorry, linespectra are not supported yet.'</span><span class="p">)</span>
 	
 	<span class="c1"># get scan angle</span>
 	<span class="n">scangle</span> <span class="o">=</span> <span class="n">xrobj</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'scan angle'</span><span class="p">]</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">180</span> <span class="c1"># in radians</span>
@@ -272,8 +270,7 @@
 	<span class="c1"># check if the right object was passed</span>
 	<span class="c1"># the xrobj passed to the function should always be and image</span>
 	<span class="k">if</span> <span class="n">field_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">xrobj</span><span class="o">.</span><span class="n">data_vars</span><span class="p">:</span>
-		<span class="nb">print</span><span class="p">(</span><span class="s1">'Wrong xarray type. The data needs to be an `image`'</span><span class="p">)</span>
-		<span class="k">return</span>
+		<span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">'Wrong xarray type. The data needs to be an `image`'</span><span class="p">)</span>
 	
 	<span class="c1"># make a copy of the xrobject</span>
 	<span class="n">flatxrobj</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">xrobj</span><span class="p">)</span>
