@@ -15,11 +15,11 @@ Peter Nemes-I., & Mirco Panighel. (2023). zrbyte/rhkpy: v1.3.3 (v1.3.3). Zenodo.
   - dI/dV maps
   - spectra along a line
   - individual spectra
-- Resample dI/dV maps along a line (see [`mapsection`](https://nemeslab-mfa.github.io/rhkpy/rhkpy.html#rhkpy.rhkpy_process.mapsection))
-- Quick, interactive visualization of spectroscopy data (see [`qplot`](https://nemeslab-mfa.github.io/rhkpy/rhkpy.html#rhkpy.rhkpy_loader.rhkdata.qplot))
-- Recreating the "navigation" window in Rev9, by plotting the relative positions of measurements (see the [`navigation`](https://nemeslab-mfa.github.io/rhkpy/rhkpy.html#rhkpy.rhkpy_process.navigation) function).
-- Generating thumbnails of your measurements (see [`genthumbs`](https://nemeslab-mfa.github.io/rhkpy/rhkpy.html#rhkpy.rhkpy_process.genthumbs))
-- Peak fitting (see [`peakfit`](https://nemeslab-mfa.github.io/rhkpy/rhkpy.html#rhkpy.rhkpy_process.peakfit))
+- Resample dI/dV maps along a line (see [`mapsection`](https://nemeslab-mfa.github.io/rhkpy/rhkpy.html#rhkpy.analysis.ops.mapsection))
+- Quick, interactive visualization of spectroscopy data (see [`qplot`](https://nemeslab-mfa.github.io/rhkpy/rhkpy.html#rhkpy.core.rhkdata.qplot))
+- Recreating the "navigation" window in Rev9, by plotting the relative positions of measurements (see the [`navigation`](https://nemeslab-mfa.github.io/rhkpy/rhkpy.html#rhkpy.plotting.navigation.navigation) function).
+- Generating thumbnails of your measurements (see [`genthumbs`](https://nemeslab-mfa.github.io/rhkpy/rhkpy.html#rhkpy.plotting.thumbnails.genthumbs))
+- Peak fitting (see [`peakfit`](https://nemeslab-mfa.github.io/rhkpy/rhkpy.html#rhkpy.analysis.fitting.peakfit))
 
 - Inspecting and picturing measurements without a notebook or browser (see [Scripts and AI agents](#scripts-and-ai-agents))
 
