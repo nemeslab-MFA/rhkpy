@@ -29,8 +29,8 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/zrbyte/rhkpy"
-Documentation = "https://zrbyte.github.io/rhkpy/"
+Homepage = "https://github.com/nemeslab-MFA/rhkpy"
+Documentation = "https://nemeslab-mfa.github.io/rhkpy/"
 
 [project.scripts]
 rhkpy = "rhkpy.cli:main"

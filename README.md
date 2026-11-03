@@ -2,9 +2,9 @@
 
 The sm4 reader is ported from the [spym project](https://github.com/rescipy-project/spym) (version 0.9.1).
 
-Documentation can be found here: https://zrbyte.github.io/rhkpy/
+Documentation can be found here: https://nemeslab-mfa.github.io/rhkpy/
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/zrbyte/rhkpy/HEAD)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/nemeslab-MFA/rhkpy/HEAD)
 
 If you use this package in your publication, consider citing it:
 Peter Nemes-I., & Mirco Panighel. (2023). zrbyte/rhkpy: v1.3.3 (v1.3.3). Zenodo. https://zenodo.org/doi/10.5281/zenodo.10143224
@@ -15,11 +15,11 @@ Peter Nemes-I., & Mirco Panighel. (2023). zrbyte/rhkpy: v1.3.3 (v1.3.3). Zenodo.
   - dI/dV maps
   - spectra along a line
   - individual spectra
-- Resample dI/dV maps along a line (see [`mapsection`](https://zrbyte.github.io/rhkpy/rhkpy.html#rhkpy.rhkpy_process.mapsection))
-- Quick, interactive visualization of spectroscopy data (see [`qplot`](https://zrbyte.github.io/rhkpy/rhkpy.html#rhkpy.rhkpy_loader.rhkdata.qplot))
-- Recreating the "navigation" window in Rev9, by plotting the relative positions of measurements (see the [`navigation`](https://zrbyte.github.io/rhkpy/rhkpy.html#rhkpy.rhkpy_process.navigation) function).
-- Generating thumbnails of your measurements (see [`genthumbs`](https://zrbyte.github.io/rhkpy/rhkpy.html#rhkpy.rhkpy_process.genthumbs))
-- Peak fitting (see [`peakfit`](https://zrbyte.github.io/rhkpy/rhkpy.html#rhkpy.rhkpy_process.peakfit))
+- Resample dI/dV maps along a line (see [`mapsection`](https://nemeslab-mfa.github.io/rhkpy/rhkpy.html#rhkpy.rhkpy_process.mapsection))
+- Quick, interactive visualization of spectroscopy data (see [`qplot`](https://nemeslab-mfa.github.io/rhkpy/rhkpy.html#rhkpy.rhkpy_loader.rhkdata.qplot))
+- Recreating the "navigation" window in Rev9, by plotting the relative positions of measurements (see the [`navigation`](https://nemeslab-mfa.github.io/rhkpy/rhkpy.html#rhkpy.rhkpy_process.navigation) function).
+- Generating thumbnails of your measurements (see [`genthumbs`](https://nemeslab-mfa.github.io/rhkpy/rhkpy.html#rhkpy.rhkpy_process.genthumbs))
+- Peak fitting (see [`peakfit`](https://nemeslab-mfa.github.io/rhkpy/rhkpy.html#rhkpy.rhkpy_process.peakfit))
 
 - Inspecting and picturing measurements without a notebook or browser (see [Scripts and AI agents](#scripts-and-ai-agents))
 

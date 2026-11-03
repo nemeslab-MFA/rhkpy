@@ -3,7 +3,7 @@
 ## Development setup
 
 ```bash
-git clone https://github.com/zrbyte/rhkpy.git
+git clone https://github.com/nemeslab-MFA/rhkpy.git
 cd rhkpy
 pip install -e . pytest
 ```

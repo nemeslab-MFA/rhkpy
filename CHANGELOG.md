@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- The repository moved to https://github.com/nemeslab-MFA/rhkpy and the documentation to https://nemeslab-mfa.github.io/rhkpy/. Links in the README, the docs, the demo notebook and the package metadata point there now. The docs deploy workflow uses the built-in `GITHUB_TOKEN` instead of a personal token.
+
 ## 1.5.0 (2026-11-01)
 
 Makes rhkpy usable without a notebook or browser, by scripts and AI agents. Data loading is unchanged.

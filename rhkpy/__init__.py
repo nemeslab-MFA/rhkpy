@@ -5,7 +5,7 @@ Load a measurement with :class:`~rhkpy.rhkpy_loader.rhkdata`, take a quick
 look with its ``qplot()`` method, and use the analysis functions (
 :func:`~rhkpy.rhkpy_process.peakfit`, :func:`~rhkpy.rhkpy_process.bgsubtract`,
 :func:`~rhkpy.rhkpy_process.polyflatten`, ...) on the underlying Datasets.
-See the tutorial notebook and https://zrbyte.github.io/rhkpy/ for examples.
+See the tutorial notebook and https://nemeslab-mfa.github.io/rhkpy/ for examples.
 
 For use from scripts and AI agents, without a notebook, read the guide:
 ``print(rhkpy.agent_guide())``, or run ``rhkpy guide`` in a shell.
