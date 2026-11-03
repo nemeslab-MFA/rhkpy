@@ -2,7 +2,7 @@ Introduction
 ============
 
 A python package for processing Scanning Tunneling Microscopy (STM) data from RHK, based on the `spym project <https://github.com/rescipy-project/spym>`_.
-Source is available from `GitHub <https://github.com/zrbyte/rhkpy/>`_.
+Source is available from `GitHub <https://github.com/nemeslab-MFA/rhkpy/>`_.
 
 To make the most of rhkpy, also consult the `xarray documentation <https://docs.xarray.dev/en/latest/index.html>`_ and check out `plotting examples <https://holoviews.org/reference/index.html>`_, with HoloViews. The HoloViews website has `examples <https://holoviews.org/user_guide/Plotting_with_Bokeh.html>`_ on how to customize plots, as well as tutorial notebooks.
 
@@ -51,7 +51,7 @@ You may wish to change the default directory holding the Jupyter notebook files.
 Examples
 =============
 
-Take a look at the ``demo.ipynb`` and ``tutorial.ipynb`` Jupyter notebooks in the `GitHub repository <https://github.com/zrbyte/rhkpy/>`_.
+Take a look at the ``demo.ipynb`` and ``tutorial.ipynb`` Jupyter notebooks in the `GitHub repository <https://github.com/nemeslab-MFA/rhkpy/>`_.
 
 Below is a simple example.
 
